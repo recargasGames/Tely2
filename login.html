@@ -2,13 +2,10 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mi Cine - Iniciar Sesión</title>
     <link rel="stylesheet" href="css/styles.css">
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="js/firebase-config.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body class="auth-page">
     <div class="auth-container">
@@ -36,7 +33,8 @@
                 </div>
                 
                 <button type="button" id="googleLogin" class="btn btn-google btn-block">
-                    🔑 Google
+                    <span class="material-icons">google</span>
+                    Google
                 </button>
             </form>
 
@@ -46,62 +44,10 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Verificar que auth existe
-            if (typeof auth === 'undefined') {
-                alert('Error de configuración. Por favor recarga la página.');
-                return;
-            }
-
-            // ===== LOGIN CON EMAIL =====
-            document.getElementById('loginForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-                
-                try {
-                    await auth.signInWithEmailAndPassword(email, password);
-                    window.location.href = 'index.html';
-                } catch (error) {
-                    console.error('Error de login:', error);
-                    let mensaje = '❌ Error: ';
-                    switch(error.code) {
-                        case 'auth/user-not-found':
-                            mensaje += 'Usuario no encontrado';
-                            break;
-                        case 'auth/wrong-password':
-                            mensaje += 'Contraseña incorrecta';
-                            break;
-                        case 'auth/invalid-email':
-                            mensaje += 'Correo electrónico inválido';
-                            break;
-                        default:
-                            mensaje += error.message;
-                    }
-                    alert(mensaje);
-                }
-            });
-
-            // ===== LOGIN CON GOOGLE =====
-            document.getElementById('googleLogin').addEventListener('click', async () => {
-                try {
-                    const provider = new firebase.auth.GoogleAuthProvider();
-                    await auth.signInWithPopup(provider);
-                    window.location.href = 'index.html';
-                } catch (error) {
-                    console.error('Error con Google:', error);
-                    alert('❌ Error al iniciar sesión con Google: ' + error.message);
-                }
-            });
-
-            // ===== REDIRECCIONAR SI YA ESTÁ LOGUEADO =====
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    window.location.href = 'index.html';
-                }
-            });
-        });
-    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
 </body>
 </html>
