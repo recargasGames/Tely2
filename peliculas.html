@@ -14,17 +14,7 @@
                 <span class="material-icons">menu</span>
             </button>
             <div class="logo-premium">🎬 Mi Cine</div>
-            <div class="header-actions">
-                <button class="search-btn" id="searchToggle">
-                    <span class="material-icons">search</span>
-                </button>
-            </div>
-        </div>
-        <div class="search-expand" id="searchExpand">
-            <div class="search-input-wrapper">
-                <span class="material-icons">search</span>
-                <input type="text" id="searchPeliculas" placeholder="Buscar películas...">
-            </div>
+            <div></div>
         </div>
     </header>
 
@@ -103,11 +93,17 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="js/firebase-config.js"></script>
-    <script src="js/auth.js"></script>
     
     <script>
-        // ==================== CARGAR PELÍCULAS DESDE FIREBASE ====================
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar autenticación
+            auth.onAuthStateChanged(function(user) {
+                if (user) {
+                    document.getElementById('sideUserAvatar').src = user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'Usuario') + '&background=E50914&color=fff&size=100';
+                    document.getElementById('sideUserName').textContent = user.displayName || 'Usuario';
+                }
+            });
+
             loadMovies();
             setupEventListeners();
         });
@@ -127,12 +123,12 @@
                 </div>
             `;
 
-            database.ref('content').orderByChild('createdAt').on('value', (snapshot) => {
+            database.ref('content').orderByChild('createdAt').on('value', function(snapshot) {
                 const data = snapshot.val();
                 let movies = [];
 
                 if (data) {
-                    Object.keys(data).forEach(key => {
+                    Object.keys(data).forEach(function(key) {
                         const item = data[key];
                         if (item.type === 'pelicula') {
                             movies.push({ id: key, ...item });
@@ -146,7 +142,7 @@
                         <div class="empty-state-premium" style="grid-column:1/-1;">
                             <div class="empty-icon">🎬</div>
                             <h3>No hay películas</h3>
-                            <p>Ve al panel de administración y presiona "AGREGAR TODAS LAS PELÍCULAS"</p>
+                            <p>Ve al panel de administración y agrega contenido</p>
                             <a href="admin.html" class="btn btn-primary" style="margin-top:12px;">Ir al Admin</a>
                         </div>
                     `;
@@ -159,7 +155,7 @@
                             <img src="${movie.poster}" alt="${movie.title}" loading="lazy">
                             <div class="card-badge top">${movie.vote_average ? '⭐ ' + movie.vote_average.toFixed(1) : 'Nuevo'}</div>
                             <div class="card-overlay">
-                                <button class="play-btn-small">
+                                <button class="play-btn-small" onclick="event.stopPropagation(); playContent('${movie.id}', 'pelicula')">
                                     <span class="material-icons">play_arrow</span>
                                 </button>
                             </div>
@@ -173,8 +169,18 @@
             });
         }
 
-        // ==================== ABRIR MODAL ====================
-        async function openContentModal(id) {
+        function playContent(id, type) {
+            const user = auth.currentUser;
+            if (!user) {
+                if (confirm('🔒 Para ver contenido necesitas iniciar sesión. ¿Deseas ir al login?')) {
+                    window.location.href = 'login.html';
+                }
+                return;
+            }
+            window.location.href = `reproductor.html?id=${id}&type=${type}`;
+        }
+
+        function openContentModal(id) {
             const user = auth.currentUser;
             if (!user) {
                 if (confirm('🔒 Para ver detalles necesitas iniciar sesión. ¿Deseas ir al login?')) {
@@ -186,32 +192,18 @@
             const modal = document.getElementById('contentModal');
             const modalContent = document.getElementById('modalContent');
 
-            modalContent.innerHTML = `
-                <div class="modal-loading">
-                    <div class="loader-dot"></div>
-                    <div class="loader-dot"></div>
-                    <div class="loader-dot"></div>
-                </div>
-            `;
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-
-            try {
-                const snapshot = await database.ref(`content/${id}`).once('value');
+            database.ref(`content/${id}`).once('value', function(snapshot) {
                 const data = snapshot.val();
-
                 if (!data) {
-                    throw new Error('No se encontró el contenido');
+                    alert('Contenido no encontrado');
+                    return;
                 }
 
-                const poster = data.poster;
-                const videoUrl = data.videoUrl || `https://unlimplay.co/play/movie/${data.tmdbId}`;
-
                 modalContent.innerHTML = `
-                    <div class="modal-hero" style="background-image: url(${poster})">
+                    <div class="modal-hero" style="background-image: url(${data.poster})">
                         <div class="modal-hero-gradient"></div>
                         <div class="modal-hero-content">
-                            <img src="${poster}" alt="${data.title}" class="modal-poster-img">
+                            <img src="${data.poster}" alt="${data.title}" class="modal-poster-img">
                             <div class="modal-hero-info">
                                 <h2>${data.title}</h2>
                                 <div class="modal-meta">
@@ -219,9 +211,9 @@
                                     <span class="modal-rating">⭐ ${data.vote_average || 'N/A'}</span>
                                 </div>
                                 <div class="modal-actions">
-                                    <a href="${videoUrl}" target="_blank" class="modal-play-btn">
+                                    <button class="modal-play-btn" onclick="playContent('${id}', 'pelicula')">
                                         <span class="material-icons">play_arrow</span> Reproducir
-                                    </a>
+                                    </button>
                                     <button class="modal-fav-btn" onclick="toggleFavorite('${id}')">
                                         <span class="material-icons">favorite_border</span>
                                     </button>
@@ -237,16 +229,9 @@
                     </div>
                 `;
 
-            } catch (error) {
-                console.error('Error:', error);
-                modalContent.innerHTML = `
-                    <div class="modal-error">
-                        <span class="error-icon">❌</span>
-                        <p>Error al cargar los detalles</p>
-                        <button class="btn btn-primary" onclick="openContentModal('${id}')">Reintentar</button>
-                    </div>
-                `;
-            }
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
         }
 
         function closeContentModal() {
@@ -254,28 +239,24 @@
             document.body.style.overflow = 'auto';
         }
 
-        // ==================== FAVORITOS ====================
-        async function toggleFavorite(id) {
+        function toggleFavorite(id) {
             const user = auth.currentUser;
             if (!user) return;
 
             const ref = database.ref(`favorites/${user.uid}/${id}`);
-            const snapshot = await ref.once('value');
-            const exists = snapshot.exists();
-
-            if (exists) {
-                await ref.remove();
-                alert('❌ Eliminado de favoritos');
-            } else {
-                await ref.set(true);
-                alert('✅ Agregado a favoritos');
-            }
+            ref.once('value', function(snapshot) {
+                if (snapshot.exists()) {
+                    ref.remove();
+                    alert('❌ Eliminado de favoritos');
+                } else {
+                    ref.set(true);
+                    alert('✅ Agregado a favoritos');
+                }
+            });
         }
 
-        // ==================== EVENTOS ====================
         function setupEventListeners() {
-            // Menú lateral
-            document.getElementById('menuToggle').addEventListener('click', () => {
+            document.getElementById('menuToggle').addEventListener('click', function() {
                 document.getElementById('sideMenu').classList.add('active');
                 document.getElementById('menuOverlay').classList.add('active');
             });
@@ -288,22 +269,17 @@
                 document.getElementById('menuOverlay').classList.remove('active');
             }
 
-            // Búsqueda
-            document.getElementById('searchToggle').addEventListener('click', () => {
-                document.getElementById('searchExpand').classList.toggle('active');
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeContentModal();
+                    closeMenu();
+                }
             });
 
-            // Cerrar modal
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') closeContentModal();
-            });
-
-            document.getElementById('contentModal').addEventListener('click', (e) => {
+            document.getElementById('contentModal').addEventListener('click', function(e) {
                 if (e.target === e.currentTarget) closeContentModal();
             });
         }
-
-        console.log('✅ Películas cargadas');
     </script>
 </body>
 </html>
