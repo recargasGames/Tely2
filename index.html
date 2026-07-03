@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+    <!-- HEADER -->
     <header class="header">
         <div class="header-content">
             <div class="logo">🎬 Mi Cine</div>
@@ -14,7 +15,6 @@
                 <a href="index.html" class="active">🏠 Inicio</a>
                 <a href="peliculas.html">🎬 Películas</a>
                 <a href="series.html">📺 Series</a>
-                <a href="admin.html" id="adminLink" class="hidden">⚙️ Admin</a>
             </nav>
             <div class="auth-section">
                 <div id="userInfo" class="user-info hidden">
@@ -25,37 +25,49 @@
                 <button id="logoutBtn" class="btn btn-logout hidden">Cerrar Sesión</button>
             </div>
         </div>
-        <div class="hero-banner">
-            <div class="hero-content">
-                <h1>🎥 Bienvenido a Mi Cine</h1>
-                <p>Descubre las mejores películas y series en un solo lugar</p>
-                <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="🔍 Buscar películas, series...">
-                    <span class="search-icon">🔍</span>
-                </div>
-            </div>
-        </div>
     </header>
 
+    <!-- HERO BANNER -->
+    <div class="hero-banner">
+        <div class="hero-content">
+            <h1>🎥 Bienvenido a Mi Cine</h1>
+            <p>Descubre las mejores películas y series</p>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Buscar películas o series...">
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
     <main class="main-content">
+        <!-- RECOMENDADO -->
         <section class="section">
             <div class="section-header">
-                <h2>🔥 Tendencias</h2>
-                <div class="filter-buttons">
-                    <button class="filter-btn active" data-filter="all">Todo</button>
-                    <button class="filter-btn" data-filter="pelicula">Películas</button>
-                    <button class="filter-btn" data-filter="serie">Series</button>
-                </div>
+                <h2>⭐ Recomendado</h2>
             </div>
-            <div id="contentGrid" class="content-grid"></div>
+            <div id="recomendadoGrid" class="content-grid"></div>
         </section>
 
+        <!-- PELÍCULAS POPULARES -->
         <section class="section">
-            <h2>📌 Destacados</h2>
-            <div id="featuredGrid" class="content-grid"></div>
+            <div class="section-header">
+                <h2>🎬 Películas Populares</h2>
+                <a href="peliculas.html" class="btn btn-secondary btn-sm">Ver todas →</a>
+            </div>
+            <div id="peliculasGrid" class="content-grid"></div>
+        </section>
+
+        <!-- SERIES POPULARES -->
+        <section class="section">
+            <div class="section-header">
+                <h2>📺 Series Populares</h2>
+                <a href="series.html" class="btn btn-secondary btn-sm">Ver todas →</a>
+            </div>
+            <div id="seriesGrid" class="content-grid"></div>
         </section>
     </main>
 
+    <!-- FOOTER -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
@@ -63,15 +75,13 @@
                 <p>Tu plataforma de entretenimiento favorita</p>
             </div>
             <div class="footer-section">
-                <h4>Enlaces Rápidos</h4>
+                <h4>Enlaces</h4>
                 <a href="peliculas.html">Películas</a>
                 <a href="series.html">Series</a>
-                <a href="admin.html">Admin</a>
             </div>
             <div class="footer-section">
                 <h4>Contacto</h4>
                 <p>📧 info@micine.com</p>
-                <p>📱 +58 123-456-7890</p>
             </div>
         </div>
         <div class="footer-bottom">
@@ -79,6 +89,7 @@
         </div>
     </footer>
 
+    <!-- MODAL -->
     <div id="modal" class="modal">
         <div class="modal-content">
             <div id="modalContent"></div>
@@ -90,22 +101,42 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/tmdb-api.js"></script>
     <script src="js/database.js"></script>
+    
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            loadContent('contentGrid');
-            loadFeaturedContent();
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Cargar recomendado (películas en cartelera)
+            await loadSection('recomendadoGrid', 'movie', 'now_playing');
             
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    loadContent('contentGrid', this.dataset.filter);
-                });
-            });
+            // Cargar películas populares
+            await loadSection('peliculasGrid', 'movie', 'popular');
+            
+            // Cargar series populares
+            await loadSection('seriesGrid', 'tv', 'popular');
 
-            document.getElementById('searchInput').addEventListener('input', function() {
-                loadContent('contentGrid', 'all', this.value);
+            // Búsqueda
+            const searchInput = document.getElementById('searchInput');
+            let searchTimeout;
+            
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const query = this.value.trim();
+                
+                if (query === '') {
+                    // Recargar contenido normal
+                    loadSection('recomendadoGrid', 'movie', 'now_playing');
+                    loadSection('peliculasGrid', 'movie', 'popular');
+                    loadSection('seriesGrid', 'tv', 'popular');
+                    return;
+                }
+
+                // Buscar en todas las secciones
+                searchTimeout = setTimeout(async () => {
+                    await searchContentAndRender('recomendadoGrid', query, 'all');
+                    await searchContentAndRender('peliculasGrid', query, 'pelicula');
+                    await searchContentAndRender('seriesGrid', query, 'serie');
+                }, 500);
             });
         });
     </script>
