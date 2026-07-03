@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
 </head>
 <body class="auth-page">
     <div class="auth-container">
@@ -44,38 +46,61 @@
         </div>
     </div>
 
-    <script src="js/firebase-config.js"></script>
     <script>
-        // Login con email/contraseña
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-                window.location.href = 'index.html';
-            } catch (error) {
-                alert('❌ Error: ' + error.message);
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar que auth existe
+            if (typeof auth === 'undefined') {
+                alert('Error de configuración. Por favor recarga la página.');
+                return;
             }
-        });
 
-        // Login con Google
-        document.getElementById('googleLogin').addEventListener('click', async () => {
-            try {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                await auth.signInWithPopup(provider);
-                window.location.href = 'index.html';
-            } catch (error) {
-                alert('❌ Error: ' + error.message);
-            }
-        });
+            // ===== LOGIN CON EMAIL =====
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                try {
+                    await auth.signInWithEmailAndPassword(email, password);
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    console.error('Error de login:', error);
+                    let mensaje = '❌ Error: ';
+                    switch(error.code) {
+                        case 'auth/user-not-found':
+                            mensaje += 'Usuario no encontrado';
+                            break;
+                        case 'auth/wrong-password':
+                            mensaje += 'Contraseña incorrecta';
+                            break;
+                        case 'auth/invalid-email':
+                            mensaje += 'Correo electrónico inválido';
+                            break;
+                        default:
+                            mensaje += error.message;
+                    }
+                    alert(mensaje);
+                }
+            });
 
-        // Verificar si ya está logueado
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                window.location.href = 'index.html';
-            }
+            // ===== LOGIN CON GOOGLE =====
+            document.getElementById('googleLogin').addEventListener('click', async () => {
+                try {
+                    const provider = new firebase.auth.GoogleAuthProvider();
+                    await auth.signInWithPopup(provider);
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    console.error('Error con Google:', error);
+                    alert('❌ Error al iniciar sesión con Google: ' + error.message);
+                }
+            });
+
+            // ===== REDIRECCIONAR SI YA ESTÁ LOGUEADO =====
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    window.location.href = 'index.html';
+                }
+            });
         });
     </script>
 </body>
