@@ -10,7 +10,7 @@
 <body>
     <header class="header-premium">
         <div class="header-premium-content">
-            <button class="menu-btn" onclick="history.back()">
+            <button class="menu-btn" onclick="window.location.href='index.html'">
                 <span class="material-icons">arrow_back</span>
             </button>
             <div class="logo-premium">🎬 Mi Cine</div>
@@ -19,15 +19,12 @@
     </header>
 
     <main class="main-premium">
-        <!-- ===== TABS ===== -->
         <div class="lista-tabs">
             <button class="lista-tab active" data-tab="favorites">❤️ Favoritos</button>
-            <button class="lista-tab" data-tab="continue">▶️ Continuar viendo</button>
+            <button class="lista-tab" data-tab="continue">▶️ Continuar</button>
             <button class="lista-tab" data-tab="history">📜 Historial</button>
-            <button class="lista-tab" data-tab="pending">⏳ Pendientes</button>
         </div>
 
-        <!-- ===== CONTENIDO ===== -->
         <div class="lista-content">
             <div class="lista-section active" id="section-favorites">
                 <div class="section-header-premium">
@@ -49,182 +46,132 @@
                 </div>
                 <div class="history-list" id="historyList"></div>
             </div>
-
-            <div class="lista-section" id="section-pending">
-                <div class="section-header-premium">
-                    <h2 class="section-title-premium">⏳ Pendientes</h2>
-                </div>
-                <div class="content-grid" id="pendingGrid"></div>
-            </div>
         </div>
     </main>
 
     <nav class="bottom-nav">
-        <a href="index.html" class="bottom-nav-item">
-            <span class="material-icons">home</span>
-            <span>Inicio</span>
-        </a>
-        <a href="peliculas.html" class="bottom-nav-item">
-            <span class="material-icons">movie</span>
-            <span>Películas</span>
-        </a>
-        <a href="series.html" class="bottom-nav-item">
-            <span class="material-icons">tv</span>
-            <span>Series</span>
-        </a>
-        <a href="mi-lista.html" class="bottom-nav-item active">
-            <span class="material-icons">bookmark</span>
-            <span>Mi Lista</span>
-        </a>
-        <a href="perfil.html" class="bottom-nav-item">
-            <span class="material-icons">person</span>
-            <span>Perfil</span>
-        </a>
+        <a href="index.html" class="bottom-nav-item">🏠 Inicio</a>
+        <a href="peliculas.html" class="bottom-nav-item">🎬 Películas</a>
+        <a href="series.html" class="bottom-nav-item">📺 Series</a>
+        <a href="mi-lista.html" class="bottom-nav-item active">🔖 Mi Lista</a>
+        <a href="perfil.html" class="bottom-nav-item">👤 Perfil</a>
     </nav>
-
-    <div class="modal-premium" id="contentModal">
-        <div class="modal-premium-content">
-            <button class="modal-close-premium" onclick="closeContentModal()">
-                <span class="material-icons">close</span>
-            </button>
-            <div id="modalContent"></div>
-        </div>
-    </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="js/firebase-config.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/tmdb-api.js"></script>
-    <script src="js/database.js"></script>
     
     <script>
+        let allContent = [];
         let userFavorites = [];
         let userProgress = {};
-        let watchHistory = [];
-        let allContent = [];
+        let userHistory = [];
 
-        document.addEventListener('DOMContentLoaded', async () => {
+        document.addEventListener('DOMContentLoaded', function() {
             const user = auth.currentUser;
             if (!user) {
                 window.location.href = 'login.html';
                 return;
             }
 
-            await loadAllData();
-            renderAllSections();
+            loadAllData();
             setupTabs();
         });
 
-        async function loadAllData() {
+        function loadAllData() {
             const user = auth.currentUser;
-            
-            // Cargar favoritos
-            const favSnapshot = await database.ref(`favorites/${user.uid}`).once('value');
-            const favData = favSnapshot.val() || {};
-            userFavorites = Object.keys(favData);
+            if (!user) return;
 
-            // Cargar progreso
-            const progSnapshot = await database.ref(`progress/${user.uid}`).once('value');
-            userProgress = progSnapshot.val() || {};
+            // Cargar contenido
+            database.ref('content').on('value', function(snapshot) {
+                const data = snapshot.val();
+                allContent = [];
+                if (data) {
+                    Object.keys(data).forEach(key => allContent.push({ id: key, ...data[key] }));
+                }
+                renderAll();
+            });
 
-            // Cargar historial
-            const histSnapshot = await database.ref(`history/${user.uid}`).once('value');
-            const histData = histSnapshot.val() || {};
-            watchHistory = Object.values(histData).sort((a, b) => b.timestamp - a.timestamp);
+            // Favoritos
+            database.ref(`favorites/${user.uid}`).on('value', function(snapshot) {
+                const data = snapshot.val() || {};
+                userFavorites = Object.keys(data);
+                renderFavorites();
+            });
 
-            // Cargar contenido (películas y series)
-            const movies = await getAllMovies();
-            const series = await getAllSeries();
-            allContent = [
-                ...movies.map(m => ({ ...m, type: 'movie' })),
-                ...series.map(s => ({ ...s, type: 'tv' }))
-            ];
+            // Progreso
+            database.ref(`progress/${user.uid}`).on('value', function(snapshot) {
+                userProgress = snapshot.val() || {};
+                renderContinue();
+            });
+
+            // Historial
+            database.ref(`history/${user.uid}`).on('value', function(snapshot) {
+                const data = snapshot.val() || {};
+                userHistory = Object.values(data).sort((a, b) => b.timestamp - a.timestamp);
+                renderHistory();
+            });
         }
 
-        function renderAllSections() {
+        function renderAll() {
             renderFavorites();
-            renderContinueWatching();
+            renderContinue();
             renderHistory();
-            renderPending();
         }
 
         function renderFavorites() {
             const container = document.getElementById('favoritesGrid');
-            const items = allContent.filter(item => userFavorites.includes(String(item.id)));
-            
+            const items = allContent.filter(item => userFavorites.includes(item.id));
+
             if (items.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state-premium">
-                        <span class="empty-icon">❤️</span>
-                        <h3>Sin favoritos</h3>
-                        <p>Agrega contenido a tu lista de favoritos</p>
-                    </div>
-                `;
+                container.innerHTML = `<div class="empty-state-premium"><div class="empty-icon">❤️</div><h3>Sin favoritos</h3></div>`;
                 return;
             }
 
-            container.innerHTML = items.map(item => {
-                const isMovie = item.type === 'movie';
-                const title = item.title || item.name;
-                const year = item.release_date || item.first_air_date || '';
-                return `
-                    <div class="content-card" onclick="openContentModal(${item.id}, '${isMovie ? 'movie' : 'tv'}')">
-                        <div class="card-image">
-                            <img src="${getPosterUrl(item.poster_path)}" alt="${title}" loading="lazy">
-                            <div class="card-overlay">
-                                <button class="play-btn-small">
-                                    <span class="material-icons">play_arrow</span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-info">
-                            <h4>${title}</h4>
-                            <span class="card-year">${year ? year.substring(0, 4) : 'N/A'}</span>
+            container.innerHTML = items.map(item => `
+                <div class="content-card" onclick="window.location.href='reproductor.html?id=${item.id}&type=${item.type}'">
+                    <div class="card-image">
+                        <img src="${item.poster}" alt="${item.title}" loading="lazy">
+                        <div class="card-overlay">
+                            <button class="play-btn-small"><span class="material-icons">play_arrow</span></button>
                         </div>
                     </div>
-                `;
-            }).join('');
+                    <div class="card-info">
+                        <h4>${item.title}</h4>
+                        <span class="card-year">${item.year || 'N/A'}</span>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        function renderContinueWatching() {
+        function renderContinue() {
             const container = document.getElementById('continueGrid');
             const items = allContent.filter(item => {
-                const progress = userProgress[item.id];
-                return progress && progress.episode > 0 && progress.episode < progress.total;
+                const p = userProgress[item.id];
+                return p && p.episode > 0 && p.episode < p.total;
             });
 
             if (items.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state-premium">
-                        <span class="empty-icon">▶️</span>
-                        <h3>Sin contenido en progreso</h3>
-                        <p>Empieza a ver algo y aparecerá aquí</p>
-                    </div>
-                `;
+                container.innerHTML = `<div class="empty-state-premium"><div class="empty-icon">▶️</div><h3>Sin contenido en progreso</h3></div>`;
                 return;
             }
 
             container.innerHTML = items.map(item => {
-                const progress = userProgress[item.id];
-                const percent = progress.total > 0 ? (progress.episode / progress.total) * 100 : 0;
-                const isMovie = item.type === 'movie';
-                const title = item.title || item.name;
+                const p = userProgress[item.id];
+                const percent = p.total > 0 ? (p.episode / p.total) * 100 : 0;
                 return `
-                    <div class="content-card" onclick="openContentModal(${item.id}, '${isMovie ? 'movie' : 'tv'}')">
+                    <div class="content-card" onclick="window.location.href='reproductor.html?id=${item.id}&type=${item.type}'">
                         <div class="card-image">
-                            <img src="${getPosterUrl(item.poster_path)}" alt="${title}" loading="lazy">
+                            <img src="${item.poster}" alt="${item.title}" loading="lazy">
                             <div class="card-progress-bar" style="width: ${percent}%"></div>
                             <div class="card-overlay">
-                                <button class="play-btn-small">
-                                    <span class="material-icons">play_arrow</span>
-                                </button>
+                                <button class="play-btn-small"><span class="material-icons">play_arrow</span></button>
                             </div>
                         </div>
                         <div class="card-info">
-                            <h4>${title}</h4>
-                            <span class="card-progress-text">${progress.episode}/${progress.total} capítulos</span>
+                            <h4>${item.title}</h4>
+                            <span class="card-progress-text">${p.episode || 0}/${p.total || 0} capítulos</span>
                         </div>
                     </div>
                 `;
@@ -233,33 +180,21 @@
 
         function renderHistory() {
             const container = document.getElementById('historyList');
-            
-            if (watchHistory.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state-premium">
-                        <span class="empty-icon">📜</span>
-                        <h3>Sin historial</h3>
-                        <p>Los contenido que veas aparecerán aquí</p>
-                    </div>
-                `;
+            if (userHistory.length === 0) {
+                container.innerHTML = `<div class="empty-state-premium"><div class="empty-icon">📜</div><h3>Sin historial</h3></div>`;
                 return;
             }
 
-            container.innerHTML = watchHistory.slice(0, 20).map(entry => {
-                const item = allContent.find(c => String(c.id) === String(entry.id));
+            container.innerHTML = userHistory.slice(0, 20).map(entry => {
+                const item = allContent.find(c => c.id === entry.id);
                 if (!item) return '';
-                const isMovie = item.type === 'movie';
-                const title = item.title || item.name;
-                const date = new Date(entry.timestamp);
-                const timeAgo = getTimeAgo(date);
-                
                 return `
-                    <div class="history-item" onclick="openContentModal(${item.id}, '${isMovie ? 'movie' : 'tv'}')">
-                        <img src="${getPosterUrl(item.poster_path)}" alt="${title}" loading="lazy">
+                    <div class="history-item" onclick="window.location.href='reproductor.html?id=${item.id}&type=${item.type}'">
+                        <img src="${item.poster}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/40x60/1A1A1A/ffffff?text=No'">
                         <div class="history-info">
-                            <h4>${title}</h4>
-                            <span class="history-type">${isMovie ? '🎬 Película' : '📺 Serie'}</span>
-                            <span class="history-time">${timeAgo}</span>
+                            <h4>${item.title}</h4>
+                            <span class="history-type">${item.type === 'pelicula' ? '🎬 Película' : '📺 Serie'}</span>
+                            <span class="history-time">${new Date(entry.timestamp).toLocaleDateString()}</span>
                         </div>
                         <span class="material-icons">chevron_right</span>
                     </div>
@@ -267,152 +202,16 @@
             }).join('');
         }
 
-        function renderPending() {
-            const container = document.getElementById('pendingGrid');
-            // Mostrar contenido recomendado como pendiente
-            const pending = allContent.slice(0, 8);
-            
-            container.innerHTML = pending.map(item => {
-                const isMovie = item.type === 'movie';
-                const title = item.title || item.name;
-                const year = item.release_date || item.first_air_date || '';
-                return `
-                    <div class="content-card" onclick="openContentModal(${item.id}, '${isMovie ? 'movie' : 'tv'}')">
-                        <div class="card-image">
-                            <img src="${getPosterUrl(item.poster_path)}" alt="${title}" loading="lazy">
-                            <div class="card-badge pending">⏳ Pendiente</div>
-                            <div class="card-overlay">
-                                <button class="play-btn-small">
-                                    <span class="material-icons">play_arrow</span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-info">
-                            <h4>${title}</h4>
-                            <span class="card-year">${year ? year.substring(0, 4) : 'N/A'}</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function getTimeAgo(date) {
-            const now = new Date();
-            const diff = Math.floor((now - date) / 1000);
-            
-            if (diff < 60) return 'Hace unos segundos';
-            if (diff < 3600) return `Hace ${Math.floor(diff / 60)} minutos`;
-            if (diff < 86400) return `Hace ${Math.floor(diff / 3600)} horas`;
-            if (diff < 604800) return `Hace ${Math.floor(diff / 86400)} días`;
-            return date.toLocaleDateString();
-        }
-
         function setupTabs() {
             document.querySelectorAll('.lista-tab').forEach(tab => {
                 tab.addEventListener('click', function() {
                     document.querySelectorAll('.lista-tab').forEach(t => t.classList.remove('active'));
                     document.querySelectorAll('.lista-section').forEach(s => s.classList.remove('active'));
-                    
                     this.classList.add('active');
                     document.getElementById('section-' + this.dataset.tab).classList.add('active');
                 });
             });
         }
-
-        // ==================== FUNCIONES DE UTILIDAD ====================
-        function getPosterUrl(path) {
-            return path ? `https://image.tmdb.org/t/p/w500${path}` : 'https://via.placeholder.com/300x450/1A1A1A/ffffff?text=No+Image';
-        }
-
-        async function getDetails(id, type) {
-            try {
-                const url = type === 'movie'
-                    ? `${TMDB_BASE_URL}/movie/${id}?api_key=${TMDB_API_KEY}&language=es-ES`
-                    : `${TMDB_BASE_URL}/tv/${id}?api_key=${TMDB_API_KEY}&language=es-ES`;
-                const response = await fetch(url);
-                return await response.json();
-            } catch (error) {
-                console.error('Error:', error);
-                return null;
-            }
-        }
-
-        async function openContentModal(id, type) {
-            const modal = document.getElementById('contentModal');
-            const modalContent = document.getElementById('modalContent');
-            
-            modalContent.innerHTML = `
-                <div class="modal-loading">
-                    <div class="loader-dot"></div>
-                    <div class="loader-dot"></div>
-                    <div class="loader-dot"></div>
-                </div>
-            `;
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-
-            try {
-                const data = await getDetails(id, type);
-                if (!data) throw new Error('No se encontraron detalles');
-
-                const isMovie = type === 'movie';
-                const title = data.title || data.name;
-                const poster = getPosterUrl(data.poster_path);
-                const backdrop = data.backdrop_path ? `https://image.tmdb.org/t/p/original${data.backdrop_path}` : poster;
-                const overview = data.overview || 'Sin descripción disponible';
-                const voteAverage = data.vote_average ? data.vote_average.toFixed(1) : 'N/A';
-
-                modalContent.innerHTML = `
-                    <div class="modal-hero" style="background-image: url(${backdrop})">
-                        <div class="modal-hero-gradient"></div>
-                        <div class="modal-hero-content">
-                            <img src="${poster}" alt="${title}" class="modal-poster-img">
-                            <div class="modal-hero-info">
-                                <h2>${title}</h2>
-                                <div class="modal-meta">
-                                    <span class="modal-rating">⭐ ${voteAverage}</span>
-                                </div>
-                                <div class="modal-actions">
-                                    <button class="modal-play-btn" onclick="window.location.href='reproductor.html?id=${id}&type=${type}'">
-                                        <span class="material-icons">play_arrow</span> Reproducir
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-body">
-                        <div class="modal-description">
-                            <h3>Sinopsis</h3>
-                            <p>${overview}</p>
-                        </div>
-                    </div>
-                `;
-
-            } catch (error) {
-                console.error('Error:', error);
-                modalContent.innerHTML = `
-                    <div class="modal-error">
-                        <span class="error-icon">❌</span>
-                        <p>Error al cargar los detalles</p>
-                    </div>
-                `;
-            }
-        }
-
-        function closeContentModal() {
-            document.getElementById('contentModal').classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeContentModal();
-        });
-
-        document.getElementById('contentModal').addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) closeContentModal();
-        });
-
-        console.log('✅ Mi Lista cargada correctamente');
     </script>
 </body>
 </html>
