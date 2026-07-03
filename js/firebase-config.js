@@ -1,4 +1,3 @@
-// ==================== CONFIGURACIÓN DE FIREBASE ====================
 const firebaseConfig = {
     apiKey: "AIzaSyBAdvlj4qzHSaPUIRIW5F51mHlnzoy1_es",
     authDomain: "tely2-245d5.firebaseapp.com",
@@ -10,11 +9,7 @@ const firebaseConfig = {
     measurementId: "G-L8W50JK7N3"
 };
 
-// Inicializar Firebase
 firebase.initializeApp(firebaseConfig);
-
-// Crear variables globales
 window.auth = firebase.auth();
 window.database = firebase.database();
-
-console.log('✅ Firebase configurado correctamente');
+console.log('✅ Firebase configurado');
