@@ -2,100 +2,252 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mi Cine - Inicio</title>
+    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-    <!-- HEADER -->
-    <header class="header">
-        <div class="header-content">
-            <div class="logo">🎬 Mi Cine</div>
-            <nav class="nav-menu">
-                <a href="index.html" class="active">🏠 Inicio</a>
-                <a href="peliculas.html">🎬 Películas</a>
-                <a href="series.html">📺 Series</a>
-            </nav>
-            <div class="auth-section">
-                <div id="userInfo" class="user-info hidden">
-                    <img id="userPhoto" src="" alt="User">
-                    <span id="userName"></span>
-                </div>
-                <button id="loginBtn" class="btn btn-google" onclick="window.location.href='login.html'">🔑 Iniciar Sesión</button>
-                <button id="logoutBtn" class="btn btn-logout hidden">Cerrar Sesión</button>
+    <!-- ==================== HEADER ==================== -->
+    <header class="header-premium" id="mainHeader">
+        <div class="header-premium-content">
+            <button class="menu-btn" id="menuToggle">
+                <span class="material-icons">menu</span>
+            </button>
+            <div class="logo-premium">🎬 Mi Cine</div>
+            <div class="header-actions">
+                <button class="search-btn" id="searchToggle">
+                    <span class="material-icons">search</span>
+                </button>
+                <button class="notifications-btn" id="notifBtn">
+                    <span class="material-icons">notifications</span>
+                    <span class="notification-dot" id="notifDot"></span>
+                </button>
             </div>
+        </div>
+        
+        <!-- Barra de búsqueda expandible -->
+        <div class="search-expand" id="searchExpand">
+            <div class="search-input-wrapper">
+                <span class="material-icons">search</span>
+                <input type="text" id="globalSearch" placeholder="Buscar películas, series, actores...">
+                <button class="clear-search" id="clearSearch">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="search-suggestions" id="searchSuggestions"></div>
         </div>
     </header>
 
-    <!-- HERO BANNER -->
-    <div class="hero-banner">
-        <div class="hero-content">
-            <h1>🎥 Bienvenido a Mi Cine</h1>
-            <p>Descubre las mejores películas y series</p>
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 Buscar películas o series...">
+    <!-- ==================== MENÚ LATERAL ==================== -->
+    <div class="side-menu" id="sideMenu">
+        <div class="side-menu-header">
+            <div class="logo-premium">🎬 Mi Cine</div>
+            <button class="close-menu" id="closeMenu">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <div class="side-user-info">
+            <img id="sideUserAvatar" src="" alt="Avatar">
+            <div>
+                <h4 id="sideUserName">Usuario</h4>
+                <span class="side-user-badge">Premium</span>
+            </div>
+        </div>
+        <nav class="side-nav">
+            <a href="index.html" class="side-nav-item active">
+                <span class="material-icons">home</span>
+                <span>Inicio</span>
+            </a>
+            <a href="peliculas.html" class="side-nav-item">
+                <span class="material-icons">movie</span>
+                <span>Películas</span>
+            </a>
+            <a href="series.html" class="side-nav-item">
+                <span class="material-icons">tv</span>
+                <span>Series</span>
+            </a>
+            <a href="mi-lista.html" class="side-nav-item">
+                <span class="material-icons">bookmark</span>
+                <span>Mi Lista</span>
+            </a>
+            <a href="perfil.html" class="side-nav-item">
+                <span class="material-icons">person</span>
+                <span>Perfil</span>
+            </a>
+        </nav>
+        <div class="side-menu-footer">
+            <button class="btn-logout-side" id="logoutSide">
+                <span class="material-icons">logout</span>
+                <span>Cerrar Sesión</span>
+            </button>
+        </div>
+    </div>
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- ==================== NOTIFICACIONES ==================== -->
+    <div class="notifications-panel" id="notifPanel">
+        <div class="notif-header">
+            <h3>Notificaciones</h3>
+            <button class="close-notif" id="closeNotif">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <div class="notif-list" id="notifList">
+            <div class="notif-item">
+                <span class="notif-icon">🎬</span>
+                <div>
+                    <p><strong>Nuevo estreno:</strong> "Dune: Parte 2"</p>
+                    <span class="notif-time">Hace 2 horas</span>
+                </div>
+            </div>
+            <div class="notif-item">
+                <span class="notif-icon">📺</span>
+                <div>
+                    <p><strong>Nuevo episodio:</strong> "The Last of Us - T2 E3"</p>
+                    <span class="notif-time">Hace 5 horas</span>
+                </div>
+            </div>
+            <div class="notif-item">
+                <span class="notif-icon">⭐</span>
+                <div>
+                    <p><strong>Recomendado:</strong> "Breaking Bad" te podría gustar</p>
+                    <span class="notif-time">Hace 1 día</span>
+                </div>
             </div>
         </div>
     </div>
+    <div class="notif-overlay" id="notifOverlay"></div>
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <main class="main-content">
-        <!-- RECOMENDADO -->
-        <section class="section">
-            <div class="section-header">
-                <h2>⭐ Recomendado</h2>
+    <!-- ==================== CONTENIDO PRINCIPAL ==================== -->
+    <main class="main-premium">
+        <!-- ===== BANNER DESTACADO ===== -->
+        <section class="hero-banner-premium" id="heroBanner">
+            <div class="hero-banner-content">
+                <div class="hero-info">
+                    <span class="hero-badge">NUEVO</span>
+                    <h1 id="heroTitle">Dune: Parte 2</h1>
+                    <div class="hero-meta">
+                        <span>⭐ 8.7</span>
+                        <span>2024</span>
+                        <span>2h 46min</span>
+                        <span class="quality-badge">4K</span>
+                    </div>
+                    <p id="heroDescription">Sigue el viaje épico de Paul Atreides mientras busca venganza contra los Harkonnen...</p>
+                    <div class="hero-actions">
+                        <button class="btn-hero-play" onclick="playFeatured()">
+                            <span class="material-icons">play_arrow</span> Reproducir
+                        </button>
+                        <button class="btn-hero-info" onclick="openFeaturedInfo()">
+                            <span class="material-icons">info</span> Más info
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div id="recomendadoGrid" class="content-grid"></div>
+            <div class="hero-gradient"></div>
         </section>
 
-        <!-- PELÍCULAS POPULARES -->
-        <section class="section">
-            <div class="section-header">
-                <h2>🎬 Películas Populares</h2>
-                <a href="peliculas.html" class="btn btn-secondary btn-sm">Ver todas →</a>
+        <!-- ===== CONTINUAR VIENDO ===== -->
+        <section class="content-section" id="continueSection">
+            <div class="section-header-premium">
+                <h2 class="section-title-premium">
+                    <span class="material-icons">play_circle</span> Continuar viendo
+                </h2>
+                <a href="mi-lista.html#continuar" class="section-link">Ver todo</a>
             </div>
-            <div id="peliculasGrid" class="content-grid"></div>
+            <div class="content-row" id="continueRow"></div>
         </section>
 
-        <!-- SERIES POPULARES -->
-        <section class="section">
-            <div class="section-header">
-                <h2>📺 Series Populares</h2>
-                <a href="series.html" class="btn btn-secondary btn-sm">Ver todas →</a>
+        <!-- ===== TENDENCIAS ===== -->
+        <section class="content-section">
+            <div class="section-header-premium">
+                <h2 class="section-title-premium">
+                    <span class="material-icons">trending_up</span> Tendencias
+                </h2>
+                <a href="peliculas.html" class="section-link">Ver todo</a>
             </div>
-            <div id="seriesGrid" class="content-grid"></div>
+            <div class="content-row" id="trendingRow"></div>
+        </section>
+
+        <!-- ===== RECIÉN AGREGADAS ===== -->
+        <section class="content-section">
+            <div class="section-header-premium">
+                <h2 class="section-title-premium">
+                    <span class="material-icons">fiber_new</span> Recién agregadas
+                </h2>
+                <a href="peliculas.html" class="section-link">Ver todo</a>
+            </div>
+            <div class="content-row" id="newRow"></div>
+        </section>
+
+        <!-- ===== MÁS VISTAS ===== -->
+        <section class="content-section">
+            <div class="section-header-premium">
+                <h2 class="section-title-premium">
+                    <span class="material-icons">visibility</span> Más vistas
+                </h2>
+                <a href="peliculas.html" class="section-link">Ver todo</a>
+            </div>
+            <div class="content-row" id="popularRow"></div>
+        </section>
+
+        <!-- ===== RECOMENDADAS ===== -->
+        <section class="content-section" id="recommendedSection">
+            <div class="section-header-premium">
+                <h2 class="section-title-premium">
+                    <span class="material-icons">recommend</span> Recomendadas para ti
+                </h2>
+            </div>
+            <div class="content-row" id="recommendedRow"></div>
+        </section>
+
+        <!-- ===== CATEGORÍAS RÁPIDAS ===== -->
+        <section class="content-section">
+            <div class="section-header-premium">
+                <h2 class="section-title-premium">
+                    <span class="material-icons">category</span> Explorar por categorías
+                </h2>
+            </div>
+            <div class="categories-grid" id="categoriesGrid"></div>
         </section>
     </main>
 
-    <!-- FOOTER -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>🎬 Mi Cine</h3>
-                <p>Tu plataforma de entretenimiento favorita</p>
-            </div>
-            <div class="footer-section">
-                <h4>Enlaces</h4>
-                <a href="peliculas.html">Películas</a>
-                <a href="series.html">Series</a>
-            </div>
-            <div class="footer-section">
-                <h4>Contacto</h4>
-                <p>📧 info@micine.com</p>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 Mi Cine - Todos los derechos reservados</p>
-        </div>
-    </footer>
+    <!-- ==================== BARRA INFERIOR ==================== -->
+    <nav class="bottom-nav" id="bottomNav">
+        <a href="index.html" class="bottom-nav-item active">
+            <span class="material-icons">home</span>
+            <span>Inicio</span>
+        </a>
+        <a href="peliculas.html" class="bottom-nav-item">
+            <span class="material-icons">movie</span>
+            <span>Películas</span>
+        </a>
+        <a href="series.html" class="bottom-nav-item">
+            <span class="material-icons">tv</span>
+            <span>Series</span>
+        </a>
+        <a href="mi-lista.html" class="bottom-nav-item">
+            <span class="material-icons">bookmark</span>
+            <span>Mi Lista</span>
+        </a>
+        <a href="perfil.html" class="bottom-nav-item">
+            <span class="material-icons">person</span>
+            <span>Perfil</span>
+        </a>
+    </nav>
 
-    <!-- MODAL -->
-    <div id="modal" class="modal">
-        <div class="modal-content">
+    <!-- ==================== MODAL ==================== -->
+    <div class="modal-premium" id="contentModal">
+        <div class="modal-premium-content">
+            <button class="modal-close-premium" onclick="closeContentModal()">
+                <span class="material-icons">close</span>
+            </button>
             <div id="modalContent"></div>
         </div>
     </div>
 
+    <!-- ==================== SCRIPTS ==================== -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -103,42 +255,741 @@
     <script src="js/auth.js"></script>
     <script src="js/tmdb-api.js"></script>
     <script src="js/database.js"></script>
+    <script src="js/recommendations.js"></script>
     
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Cargar recomendado (películas en cartelera)
-            await loadSection('recomendadoGrid', 'movie', 'now_playing');
-            
-            // Cargar películas populares
-            await loadSection('peliculasGrid', 'movie', 'popular');
-            
-            // Cargar series populares
-            await loadSection('seriesGrid', 'tv', 'popular');
+        // ==================== VARIABLES GLOBALES ====================
+        let allMovies = [];
+        let allSeries = [];
+        let userProgress = {};
+        let userFavorites = [];
+        let watchHistory = [];
+        let currentUser = null;
+        let featuredContent = null;
 
-            // Búsqueda
-            const searchInput = document.getElementById('searchInput');
-            let searchTimeout;
+        // ==================== INICIALIZACIÓN ====================
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Verificar autenticación
+            auth.onAuthStateChanged(async user => {
+                if (user) {
+                    currentUser = user;
+                    await loadUserData();
+                    await loadAllContent();
+                    await renderHome();
+                } else {
+                    // Mostrar contenido público
+                    await loadAllContent();
+                    await renderHome();
+                }
+            });
+
+            setupEventListeners();
+            setupSearch();
+        });
+
+        // ==================== CARGAR CONTENIDO ====================
+        async function loadAllContent() {
+            try {
+                // Cargar películas
+                const movies = await getAllMovies();
+                allMovies = movies.map(m => ({ ...m, type: 'movie' }));
+                
+                // Cargar series
+                const series = await getAllSeries();
+                allSeries = series.map(s => ({ ...s, type: 'tv' }));
+                
+                // Cargar datos del usuario si está logueado
+                if (currentUser) {
+                    await loadUserProgress();
+                    await loadUserFavorites();
+                    await loadWatchHistory();
+                }
+            } catch (error) {
+                console.error('Error loading content:', error);
+            }
+        }
+
+        // ==================== RENDERIZAR INICIO ====================
+        async function renderHome() {
+            // Banner destacado
+            renderHeroBanner();
             
+            // Continuar viendo
+            renderContinueWatching();
+            
+            // Tendencias
+            renderTrending();
+            
+            // Recién agregadas
+            renderNewContent();
+            
+            // Más vistas
+            renderPopular();
+            
+            // Recomendadas
+            renderRecommendations();
+            
+            // Categorías
+            renderCategories();
+        }
+
+        // ==================== BANNER DESTACADO ====================
+        function renderHeroBanner() {
+            // Usar una película popular como destacada
+            const featured = allMovies.length > 0 ? allMovies[0] : null;
+            if (!featured) return;
+            
+            featuredContent = featured;
+            
+            document.getElementById('heroTitle').textContent = featured.title;
+            document.getElementById('heroDescription').textContent = featured.overview || 'Sin descripción disponible';
+            
+            // Actualizar fondo
+            const banner = document.getElementById('heroBanner');
+            if (featured.backdrop_path) {
+                banner.style.backgroundImage = `url(https://image.tmdb.org/t/p/original${featured.backdrop_path})`;
+            }
+        }
+
+        function playFeatured() {
+            if (featuredContent) {
+                playContent(featuredContent.id, 'movie');
+            }
+        }
+
+        function openFeaturedInfo() {
+            if (featuredContent) {
+                openContentModal(featuredContent.id, 'movie');
+            }
+        }
+
+        // ==================== CONTINUAR VIENDO ====================
+        function renderContinueWatching() {
+            const container = document.getElementById('continueRow');
+            
+            if (!currentUser || Object.keys(userProgress).length === 0) {
+                container.innerHTML = `
+                    <div class="empty-row">
+                        <span class="material-icons">play_circle</span>
+                        <p>No tienes contenido en progreso</p>
+                        <span class="empty-sub">Explora y comienza a ver algo</span>
+                    </div>
+                `;
+                return;
+            }
+
+            const continueItems = [];
+            Object.keys(userProgress).forEach(id => {
+                const progress = userProgress[id];
+                // Buscar en películas y series
+                const item = allMovies.find(m => m.id == id) || allSeries.find(s => s.id == id);
+                if (item) {
+                    continueItems.push({
+                        ...item,
+                        progress: progress,
+                        type: allMovies.find(m => m.id == id) ? 'movie' : 'tv'
+                    });
+                }
+            });
+
+            if (continueItems.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-row">
+                        <span class="material-icons">play_circle</span>
+                        <p>No tienes contenido en progreso</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = continueItems.map(item => `
+                <div class="content-card continue-card" onclick="playContent(${item.id}, '${item.type}')">
+                    <div class="card-image">
+                        <img src="${getPosterUrl(item.poster_path)}" alt="${item.title || item.name}" loading="lazy">
+                        <div class="card-progress-bar" style="width: ${(item.progress.episode / item.progress.total) * 100}%"></div>
+                        <div class="card-overlay">
+                            <button class="play-btn-small">
+                                <span class="material-icons">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-info">
+                        <h4>${item.title || item.name}</h4>
+                        <span class="card-progress-text">${item.progress.episode}/${item.progress.total} capítulos</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ==================== TENDENCIAS ====================
+        function renderTrending() {
+            const container = document.getElementById('trendingRow');
+            const trending = [...allMovies].sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0)).slice(0, 10);
+            
+            container.innerHTML = trending.map(item => `
+                <div class="content-card" onclick="openContentModal(${item.id}, 'movie')">
+                    <div class="card-image">
+                        <img src="${getPosterUrl(item.poster_path)}" alt="${item.title}" loading="lazy">
+                        <div class="card-badge top">Top ${trending.indexOf(item) + 1}</div>
+                        <div class="card-overlay">
+                            <button class="play-btn-small">
+                                <span class="material-icons">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-info">
+                        <h4>${item.title}</h4>
+                        <span class="card-year">${item.release_date ? item.release_date.substring(0, 4) : 'N/A'}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ==================== RECIÉN AGREGADAS ====================
+        function renderNewContent() {
+            const container = document.getElementById('newRow');
+            const newItems = [...allMovies, ...allSeries]
+                .sort((a, b) => (a.release_date || a.first_air_date || '').localeCompare(b.release_date || b.first_air_date || ''))
+                .reverse()
+                .slice(0, 10);
+            
+            container.innerHTML = newItems.map(item => {
+                const isMovie = item.type === 'movie';
+                return `
+                    <div class="content-card" onclick="openContentModal(${item.id}, '${isMovie ? 'movie' : 'tv'}')">
+                        <div class="card-image">
+                            <img src="${getPosterUrl(item.poster_path)}" alt="${item.title || item.name}" loading="lazy">
+                            <div class="card-badge new">Nuevo</div>
+                            <div class="card-overlay">
+                                <button class="play-btn-small">
+                                    <span class="material-icons">play_arrow</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-info">
+                            <h4>${item.title || item.name}</h4>
+                            <span class="card-year">${(item.release_date || item.first_air_date || '').substring(0, 4) || 'N/A'}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ==================== MÁS VISTAS ====================
+        function renderPopular() {
+            const container = document.getElementById('popularRow');
+            const popular = [...allMovies].sort((a, b) => (b.popularity || 0) - (a.popularity || 0)).slice(0, 10);
+            
+            container.innerHTML = popular.map(item => `
+                <div class="content-card" onclick="openContentModal(${item.id}, 'movie')">
+                    <div class="card-image">
+                        <img src="${getPosterUrl(item.poster_path)}" alt="${item.title}" loading="lazy">
+                        <div class="card-badge popular">🔥 Popular</div>
+                        <div class="card-overlay">
+                            <button class="play-btn-small">
+                                <span class="material-icons">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-info">
+                        <h4>${item.title}</h4>
+                        <span class="card-year">${item.release_date ? item.release_date.substring(0, 4) : 'N/A'}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ==================== RECOMENDACIONES ====================
+        function renderRecommendations() {
+            const container = document.getElementById('recommendedRow');
+            
+            if (!currentUser || watchHistory.length === 0) {
+                // Mostrar recomendaciones por defecto (películas populares)
+                const defaultRecs = [...allMovies].slice(0, 10);
+                container.innerHTML = defaultRecs.map(item => `
+                    <div class="content-card" onclick="openContentModal(${item.id}, 'movie')">
+                        <div class="card-image">
+                            <img src="${getPosterUrl(item.poster_path)}" alt="${item.title}" loading="lazy">
+                            <div class="card-overlay">
+                                <button class="play-btn-small">
+                                    <span class="material-icons">play_arrow</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-info">
+                            <h4>${item.title}</h4>
+                            <span class="card-year">${item.release_date ? item.release_date.substring(0, 4) : 'N/A'}</span>
+                        </div>
+                    </div>
+                `).join('');
+                return;
+            }
+
+            // Generar recomendaciones basadas en el historial
+            const recommendations = generateRecommendations(watchHistory, allMovies, allSeries);
+            
+            container.innerHTML = recommendations.slice(0, 10).map(item => {
+                const isMovie = item.type === 'movie';
+                return `
+                    <div class="content-card" onclick="openContentModal(${item.id}, '${isMovie ? 'movie' : 'tv'}')">
+                        <div class="card-image">
+                            <img src="${getPosterUrl(item.poster_path)}" alt="${item.title || item.name}" loading="lazy">
+                            <div class="card-badge recommended">⭐ Recomendado</div>
+                            <div class="card-overlay">
+                                <button class="play-btn-small">
+                                    <span class="material-icons">play_arrow</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-info">
+                            <h4>${item.title || item.name}</h4>
+                            <span class="card-year">${(item.release_date || item.first_air_date || '').substring(0, 4) || 'N/A'}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ==================== CATEGORÍAS ====================
+        function renderCategories() {
+            const container = document.getElementById('categoriesGrid');
+            const categories = [
+                { name: 'Acción', icon: '⚡', color: '#E50914' },
+                { name: 'Drama', icon: '🎭', color: '#3498db' },
+                { name: 'Comedia', icon: '😂', color: '#f39c12' },
+                { name: 'Crimen', icon: '🔫', color: '#2c3e50' },
+                { name: 'Ciencia Ficción', icon: '🚀', color: '#00b894' },
+                { name: 'Terror', icon: '👻', color: '#6c5ce7' },
+                { name: 'Aventura', icon: '🗺️', color: '#00cec9' },
+                { name: 'Anime', icon: '🎌', color: '#fd79a8' },
+                { name: 'Documental', icon: '🎥', color: '#636e72' },
+                { name: 'Familiar', icon: '👨‍👩‍👦', color: '#fdcb6e' }
+            ];
+
+            container.innerHTML = categories.map(cat => `
+                <div class="category-card" onclick="searchByGenre('${cat.name}')" style="background: ${cat.color}22; border-color: ${cat.color}44;">
+                    <span class="category-icon">${cat.icon}</span>
+                    <span class="category-name">${cat.name}</span>
+                </div>
+            `).join('');
+        }
+
+        function searchByGenre(genre) {
+            window.location.href = `peliculas.html?genre=${encodeURIComponent(genre)}`;
+        }
+
+        // ==================== FUNCIONES DE REPRODUCCIÓN ====================
+        function playContent(id, type) {
+            const user = auth.currentUser;
+            if (!user) {
+                if (confirm('🔒 Para ver contenido necesitas iniciar sesión. ¿Deseas ir al login?')) {
+                    window.location.href = 'login.html';
+                }
+                return;
+            }
+
+            // Guardar en historial
+            saveToHistory(id, type);
+            
+            // Abrir reproductor
+            window.location.href = `reproductor.html?id=${id}&type=${type}`;
+        }
+
+        function saveToHistory(id, type) {
+            if (!currentUser) return;
+            
+            const historyRef = database.ref(`history/${currentUser.uid}/${id}`);
+            historyRef.set({
+                id: id,
+                type: type,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+        }
+
+        // ==================== MODAL DE CONTENIDO ====================
+        async function openContentModal(id, type) {
+            const user = auth.currentUser;
+            if (!user) {
+                if (confirm('🔒 Para ver detalles necesitas iniciar sesión. ¿Deseas ir al login?')) {
+                    window.location.href = 'login.html';
+                }
+                return;
+            }
+
+            const modal = document.getElementById('contentModal');
+            const modalContent = document.getElementById('modalContent');
+            
+            modalContent.innerHTML = `
+                <div class="modal-loading">
+                    <div class="loader-dot"></div>
+                    <div class="loader-dot"></div>
+                    <div class="loader-dot"></div>
+                </div>
+            `;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            try {
+                const data = await getDetails(id, type);
+                if (!data) throw new Error('No se encontraron detalles');
+
+                const isMovie = type === 'movie';
+                const title = data.title || data.name;
+                const year = data.release_date || data.first_air_date || '';
+                const poster = getPosterUrl(data.poster_path);
+                const backdrop = data.backdrop_path ? `https://image.tmdb.org/t/p/original${data.backdrop_path}` : poster;
+                const overview = data.overview || 'Sin descripción disponible';
+                const voteAverage = data.vote_average ? data.vote_average.toFixed(1) : 'N/A';
+                const genres = data.genres ? data.genres.map(g => g.name).join(', ') : 'No especificado';
+                const runtime = data.runtime ? `${data.runtime}min` : 'N/A';
+                const isFavorite = userFavorites.includes(id);
+
+                // Generar contenido del modal
+                modalContent.innerHTML = `
+                    <div class="modal-hero" style="background-image: url(${backdrop})">
+                        <div class="modal-hero-gradient"></div>
+                        <div class="modal-hero-content">
+                            <img src="${poster}" alt="${title}" class="modal-poster-img">
+                            <div class="modal-hero-info">
+                                <h2>${title}</h2>
+                                <div class="modal-meta">
+                                    <span class="modal-year">${year ? year.substring(0, 4) : 'N/A'}</span>
+                                    <span class="modal-rating">⭐ ${voteAverage}</span>
+                                    ${isMovie ? `<span class="modal-runtime">${runtime}</span>` : ''}
+                                    <span class="quality-badge">HD</span>
+                                </div>
+                                <div class="modal-genres">
+                                    ${data.genres?.map(g => `<span class="genre-tag">${g.name}</span>`).join('') || 'Sin géneros'}
+                                </div>
+                                <div class="modal-actions">
+                                    <button class="modal-play-btn" onclick="playContent(${id}, '${type}')">
+                                        <span class="material-icons">play_arrow</span> Reproducir
+                                    </button>
+                                    <button class="modal-fav-btn ${isFavorite ? 'active' : ''}" onclick="toggleFavorite(${id})">
+                                        <span class="material-icons">${isFavorite ? 'favorite' : 'favorite_border'}</span>
+                                    </button>
+                                    <button class="modal-share-btn" onclick="shareContent('${title}')">
+                                        <span class="material-icons">share</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <div class="modal-description">
+                            <h3>Sinopsis</h3>
+                            <p>${overview}</p>
+                        </div>
+                        ${!isMovie && data.seasons ? `
+                            <div class="modal-seasons">
+                                <h3>Temporadas</h3>
+                                ${data.seasons.filter(s => s.season_number > 0).map(season => `
+                                    <div class="modal-season">
+                                        <h4>Temporada ${season.season_number}</h4>
+                                        <div class="modal-episodes">
+                                            ${Array.from({length: Math.min(season.episode_count || 10, 10)}, (_, i) => `
+                                                <button class="modal-episode-btn" onclick="playContent(${id}, 'tv', ${season.season_number}, ${i + 1})">
+                                                    Episodio ${i + 1}
+                                                </button>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                        <div class="modal-similar">
+                            <h3>Contenido similar</h3>
+                            <div class="modal-similar-grid" id="similarGrid"></div>
+                        </div>
+                    </div>
+                `;
+
+                // Cargar contenido similar
+                loadSimilarContent(id, type);
+
+            } catch (error) {
+                console.error('Error:', error);
+                modalContent.innerHTML = `
+                    <div class="modal-error">
+                        <span class="error-icon">❌</span>
+                        <p>Error al cargar los detalles</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadSimilarContent(id, type) {
+            const grid = document.getElementById('similarGrid');
+            if (!grid) return;
+
+            try {
+                const similar = await getSimilarContent(id, type);
+                grid.innerHTML = similar.slice(0, 6).map(item => {
+                    const isMovie = item.media_type === 'movie';
+                    return `
+                        <div class="similar-card" onclick="openContentModal(${item.id}, '${isMovie ? 'movie' : 'tv'}')">
+                            <img src="${getPosterUrl(item.poster_path)}" alt="${item.title || item.name}" loading="lazy">
+                            <div class="similar-info">
+                                <h5>${item.title || item.name}</h5>
+                                <span>${(item.release_date || item.first_air_date || '').substring(0, 4) || 'N/A'}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading similar:', error);
+                grid.innerHTML = '<p>No hay contenido similar disponible</p>';
+            }
+        }
+
+        function closeContentModal() {
+            document.getElementById('contentModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // ==================== FAVORITOS ====================
+        function toggleFavorite(id) {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const isFavorite = userFavorites.includes(id);
+            const ref = database.ref(`favorites/${user.uid}/${id}`);
+
+            if (isFavorite) {
+                ref.remove();
+                userFavorites = userFavorites.filter(f => f !== id);
+            } else {
+                ref.set(true);
+                userFavorites.push(id);
+            }
+
+            // Actualizar UI
+            const favBtn = document.querySelector('.modal-fav-btn');
+            if (favBtn) {
+                favBtn.classList.toggle('active');
+                favBtn.innerHTML = `<span class="material-icons">${isFavorite ? 'favorite_border' : 'favorite'}</span>`;
+            }
+        }
+
+        // ==================== COMPARTIR ====================
+        function shareContent(title) {
+            if (navigator.share) {
+                navigator.share({
+                    title: `Mi Cine - ${title}`,
+                    text: `Mira "${title}" en Mi Cine`,
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert('Enlace copiado al portapapeles');
+            }
+        }
+
+        // ==================== BÚSQUEDA ====================
+        function setupSearch() {
+            const searchInput = document.getElementById('globalSearch');
+            const suggestions = document.getElementById('searchSuggestions');
+            let searchTimeout;
+
             searchInput.addEventListener('input', function() {
                 clearTimeout(searchTimeout);
                 const query = this.value.trim();
-                
-                if (query === '') {
-                    // Recargar contenido normal
-                    loadSection('recomendadoGrid', 'movie', 'now_playing');
-                    loadSection('peliculasGrid', 'movie', 'popular');
-                    loadSection('seriesGrid', 'tv', 'popular');
+
+                if (query.length < 2) {
+                    suggestions.classList.remove('active');
                     return;
                 }
 
-                // Buscar en todas las secciones
                 searchTimeout = setTimeout(async () => {
-                    await searchContentAndRender('recomendadoGrid', query, 'all');
-                    await searchContentAndRender('peliculasGrid', query, 'pelicula');
-                    await searchContentAndRender('seriesGrid', query, 'serie');
-                }, 500);
+                    const results = await searchContent(query);
+                    if (results.length === 0) {
+                        suggestions.innerHTML = `
+                            <div class="suggestion-empty">
+                                <span class="material-icons">search_off</span>
+                                <p>No se encontraron resultados</p>
+                            </div>
+                        `;
+                    } else {
+                        suggestions.innerHTML = results.slice(0, 8).map(item => {
+                            const isMovie = item.media_type === 'movie';
+                            return `
+                                <div class="suggestion-item" onclick="openContentModal(${item.id}, '${isMovie ? 'movie' : 'tv'}')">
+                                    <img src="${getPosterUrl(item.poster_path)}" alt="${item.title || item.name}" loading="lazy">
+                                    <div>
+                                        <h4>${item.title || item.name}</h4>
+                                        <span>${isMovie ? '🎬 Película' : '📺 Serie'} • ${(item.release_date || item.first_air_date || '').substring(0, 4) || 'N/A'}</span>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                    suggestions.classList.add('active');
+                }, 300);
             });
+
+            // Cerrar sugerencias al hacer clic fuera
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.search-expand')) {
+                    suggestions.classList.remove('active');
+                }
+            });
+
+            // Limpiar búsqueda
+            document.getElementById('clearSearch').addEventListener('click', () => {
+                searchInput.value = '';
+                suggestions.classList.remove('active');
+                searchInput.focus();
+            });
+        }
+
+        // ==================== EVENTOS ====================
+        function setupEventListeners() {
+            // Menú lateral
+            document.getElementById('menuToggle').addEventListener('click', () => {
+                document.getElementById('sideMenu').classList.add('active');
+                document.getElementById('menuOverlay').classList.add('active');
+            });
+
+            document.getElementById('closeMenu').addEventListener('click', closeMenu);
+            document.getElementById('menuOverlay').addEventListener('click', closeMenu);
+
+            function closeMenu() {
+                document.getElementById('sideMenu').classList.remove('active');
+                document.getElementById('menuOverlay').classList.remove('active');
+            }
+
+            // Búsqueda
+            document.getElementById('searchToggle').addEventListener('click', () => {
+                const expand = document.getElementById('searchExpand');
+                expand.classList.toggle('active');
+                if (expand.classList.contains('active')) {
+                    document.getElementById('globalSearch').focus();
+                }
+            });
+
+            // Notificaciones
+            document.getElementById('notifBtn').addEventListener('click', () => {
+                document.getElementById('notifPanel').classList.toggle('active');
+                document.getElementById('notifOverlay').classList.toggle('active');
+            });
+
+            document.getElementById('closeNotif').addEventListener('click', closeNotif);
+            document.getElementById('notifOverlay').addEventListener('click', closeNotif);
+
+            function closeNotif() {
+                document.getElementById('notifPanel').classList.remove('active');
+                document.getElementById('notifOverlay').classList.remove('active');
+            }
+
+            // Cerrar sesión
+            document.getElementById('logoutSide').addEventListener('click', () => {
+                auth.signOut().then(() => {
+                    window.location.href = 'login.html';
+                });
+            });
+
+            // Cerrar modal con ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeContentModal();
+                    closeNotif();
+                    closeMenu();
+                }
+            });
+
+            // Scroll header
+            let lastScroll = 0;
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.scrollY;
+                const header = document.getElementById('mainHeader');
+                if (currentScroll > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+                lastScroll = currentScroll;
+            });
+        }
+
+        // ==================== FUNCIONES DE UTILIDAD ====================
+        function getPosterUrl(path) {
+            return path ? `https://image.tmdb.org/t/p/w500${path}` : 'https://via.placeholder.com/300x450/1A1A1A/ffffff?text=No+Image';
+        }
+
+        function getDetails(id, type) {
+            return type === 'movie' ? getMovieDetails(id) : getSeriesDetails(id);
+        }
+
+        async function getSimilarContent(id, type) {
+            try {
+                const url = type === 'movie'
+                    ? `${TMDB_BASE_URL}/movie/${id}/similar?api_key=${TMDB_API_KEY}&language=es-ES`
+                    : `${TMDB_BASE_URL}/tv/${id}/similar?api_key=${TMDB_API_KEY}&language=es-ES`;
+                const response = await fetch(url);
+                const data = await response.json();
+                return data.results.map(item => ({
+                    ...item,
+                    media_type: type === 'movie' ? 'movie' : 'tv'
+                }));
+            } catch (error) {
+                console.error('Error getting similar:', error);
+                return [];
+            }
+        }
+
+        // ==================== CARGAR DATOS DEL USUARIO ====================
+        async function loadUserData() {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            document.getElementById('sideUserAvatar').src = user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'Usuario') + '&background=E50914&color=fff&size=100';
+            document.getElementById('sideUserName').textContent = user.displayName || 'Usuario';
+        }
+
+        async function loadUserProgress() {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const snapshot = await database.ref(`progress/${user.uid}`).once('value');
+            userProgress = snapshot.val() || {};
+        }
+
+        async function loadUserFavorites() {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const snapshot = await database.ref(`favorites/${user.uid}`).once('value');
+            const data = snapshot.val() || {};
+            userFavorites = Object.keys(data);
+        }
+
+        async function loadWatchHistory() {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const snapshot = await database.ref(`history/${user.uid}`).once('value');
+            const data = snapshot.val() || {};
+            watchHistory = Object.values(data).sort((a, b) => b.timestamp - a.timestamp);
+        }
+
+        // ==================== CARGA INFINITA ====================
+        let isLoadingMore = false;
+        window.addEventListener('scroll', () => {
+            if (isLoadingMore) return;
+            
+            const scrollBottom = window.innerHeight + window.scrollY;
+            const documentHeight = document.documentElement.scrollHeight;
+            
+            if (scrollBottom >= documentHeight - 400) {
+                isLoadingMore = true;
+                // Aquí se podría implementar carga de más contenido
+                setTimeout(() => {
+                    isLoadingMore = false;
+                }, 1000);
+            }
         });
+
+        console.log('✅ Mi Cine App cargada correctamente');
     </script>
 </body>
 </html>
