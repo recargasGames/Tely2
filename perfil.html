@@ -115,6 +115,7 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Verificar autenticación
             const user = auth.currentUser;
             if (!user) {
                 window.location.href = 'login.html';
@@ -167,6 +168,8 @@
                 if (confirm('¿Seguro que quieres cerrar sesión?')) {
                     auth.signOut().then(function() {
                         window.location.href = 'login.html';
+                    }).catch(function(error) {
+                        alert('Error: ' + error.message);
                     });
                 }
             });
@@ -193,7 +196,7 @@
             const user = auth.currentUser;
             if (!user) return;
 
-            if (confirm('Se enviará un enlace de restablecimiento a tu correo')) {
+            if (confirm('Se enviará un enlace de restablecimiento a ' + user.email)) {
                 auth.sendPasswordResetEmail(user.email)
                     .then(function() {
                         alert('✅ Enlace enviado a tu correo');
@@ -205,4 +208,4 @@
         }
     </script>
 </body>
-</html>
+</html>2
