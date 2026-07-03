@@ -2,45 +2,39 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Admin - Mi Cine</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mi Cine - Admin</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-    <header class="header">
-        <div class="header-content">
-            <div class="logo">⚙️ Panel Admin</div>
-            <nav class="nav-menu">
-                <a href="index.html">🏠 Volver al sitio</a>
-            </nav>
-            <div class="auth-section">
-                <div id="userInfo" class="user-info hidden">
-                    <img id="userPhoto" src="" alt="User">
-                    <span id="userName"></span>
-                </div>
-                <button id="logoutBtn" class="btn btn-logout hidden">Cerrar Sesión</button>
-            </div>
+    <header class="header-premium">
+        <div class="header-premium-content">
+            <button class="menu-btn" onclick="window.location.href='index.html'">
+                <span class="material-icons">arrow_back</span>
+            </button>
+            <div class="logo-premium">⚙️ Admin</div>
+            <div></div>
         </div>
     </header>
 
-    <main class="main-content">
+    <main class="main-premium">
         <div class="admin-container">
             <div class="admin-header">
-                <h2>⚙️ Panel de Administración</h2>
-                <p>Gestiona el contenido que aparece en la plataforma</p>
-                <p style="color:#888;font-size:14px;">🔒 Solo para administradores</p>
+                <h2>Panel de Administración</h2>
+                <p>Gestiona el contenido personalizado</p>
             </div>
 
             <div class="admin-tabs">
-                <button class="admin-tab active" data-tab="manage">📋 Gestionar Contenido</button>
-                <button class="admin-tab" data-tab="add">➕ Agregar Manual</button>
+                <button class="admin-tab active" data-tab="manage">📋 Gestionar</button>
+                <button class="admin-tab" data-tab="add">➕ Agregar</button>
                 <button class="admin-tab" data-tab="stats">📊 Estadísticas</button>
             </div>
 
-            <!-- TAB 1: GESTIONAR -->
+            <!-- GESTIONAR -->
             <div class="admin-tab-content active" id="tab-manage">
-                <div class="manage-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;margin-bottom:20px;">
-                    <h3>📋 Contenido Guardado</h3>
+                <div class="manage-header">
+                    <h3>Contenido Personalizado</h3>
                     <div class="search-box small">
                         <input type="text" id="searchManage" placeholder="🔍 Buscar...">
                     </div>
@@ -48,7 +42,7 @@
                 <div id="manageGrid" class="manage-grid"></div>
             </div>
 
-            <!-- TAB 2: AGREGAR MANUAL -->
+            <!-- AGREGAR -->
             <div class="admin-tab-content" id="tab-add">
                 <form id="adminForm" class="admin-form">
                     <div class="form-row">
@@ -107,13 +101,13 @@
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">💾 Guardar Contenido</button>
+                        <button type="submit" class="btn btn-primary">💾 Guardar</button>
                         <button type="reset" class="btn btn-secondary">🗑️ Limpiar</button>
                     </div>
                 </form>
             </div>
 
-            <!-- TAB 3: ESTADÍSTICAS -->
+            <!-- ESTADÍSTICAS -->
             <div class="admin-tab-content" id="tab-stats">
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -134,7 +128,7 @@
                         <div class="stat-icon">📦</div>
                         <div class="stat-info">
                             <h3 id="totalContenido">0</h3>
-                            <p>Total Contenido</p>
+                            <p>Total</p>
                         </div>
                     </div>
                 </div>
@@ -142,222 +136,11 @@
         </div>
     </main>
 
-    <footer class="footer">
-        <div class="footer-bottom">
-            <p>&copy; 2024 Mi Cine - Panel de Administración</p>
-        </div>
-    </footer>
-
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/tmdb-api.js"></script>
-    <script>
-        let allContent = [];
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // Verificar autenticación
-            auth.onAuthStateChanged(user => {
-                if (!user) {
-                    window.location.href = 'login.html';
-                }
-            });
-
-            document.querySelectorAll('.admin-tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
-                    this.classList.add('active');
-                    document.getElementById('tab-' + this.dataset.tab).classList.add('active');
-                    if (this.dataset.tab === 'manage') loadManageContent();
-                    if (this.dataset.tab === 'stats') loadStats();
-                });
-            });
-
-            document.getElementById('adminForm').addEventListener('submit', saveContent);
-            document.getElementById('searchManage').addEventListener('input', function() {
-                loadManageContent(this.value);
-            });
-
-            loadManageContent();
-            loadStats();
-        });
-
-        function addEpisode() {
-            const container = document.getElementById('episodeList');
-            const div = document.createElement('div');
-            div.className = 'episode-item';
-            const count = container.children.length + 1;
-            div.innerHTML = `
-                <input type="text" placeholder="Temporada X - Episodio X" value="Temporada 1 - Episodio ${count}">
-                <input type="text" placeholder="URL del video (opcional)">
-                <button type="button" class="btn btn-danger btn-sm" onclick="removeEpisode(this)">✖</button>
-            `;
-            container.appendChild(div);
-        }
-
-        function removeEpisode(btn) {
-            const items = document.querySelectorAll('.episode-item');
-            if (items.length > 1) {
-                btn.parentElement.remove();
-            } else {
-                alert('Debe haber al menos un episodio');
-            }
-        }
-
-        async function saveContent(e) {
-            e.preventDefault();
-            
-            const title = document.getElementById('title').value;
-            const year = document.getElementById('year').value;
-            const poster = document.getElementById('poster').value || 'https://via.placeholder.com/300x450/1a1a2e/ffffff?text=No+Image';
-            const type = document.getElementById('type').value;
-            const description = document.getElementById('description').value;
-            const tmdbId = document.getElementById('tmdbId').value;
-            const customUrl = document.getElementById('customUrl').value;
-
-            // Generar URL
-            let videoUrl = customUrl;
-            if (!videoUrl && tmdbId && type === 'pelicula') {
-                videoUrl = getMovieUrl(tmdbId);
-            }
-
-            // Obtener episodios
-            const episodeItems = document.querySelectorAll('.episode-item');
-            const episodes = [];
-            if (type === 'serie') {
-                episodeItems.forEach((item, index) => {
-                    const inputs = item.querySelectorAll('input');
-                    const epTitle = inputs[0].value || `Episodio ${index + 1}`;
-                    let epUrl = inputs[1].value;
-                    
-                    if (!epUrl && tmdbId) {
-                        const match = epTitle.match(/Temporada\s*(\d+)\s*[-–]\s*Episodio\s*(\d+)/i);
-                        if (match) {
-                            epUrl = getSeriesUrl(tmdbId, match[1], match[2]);
-                        } else {
-                            epUrl = getSeriesUrl(tmdbId, 1, index + 1);
-                        }
-                    }
-                    
-                    episodes.push({
-                        title: epTitle,
-                        url: epUrl || ''
-                    });
-                });
-            }
-
-            const content = {
-                title,
-                year: year || new Date().getFullYear().toString(),
-                poster,
-                type,
-                description,
-                tmdbId,
-                videoUrl: videoUrl || '',
-                customUrl: customUrl || '',
-                episodes: type === 'serie' ? episodes : [],
-                createdAt: firebase.database.ServerValue.TIMESTAMP
-            };
-
-            try {
-                const newRef = database.ref('content').push();
-                await newRef.set(content);
-                alert('✅ Contenido guardado exitosamente!');
-                document.getElementById('adminForm').reset();
-                document.querySelectorAll('.episode-item').forEach((item, index) => {
-                    if (index > 0) item.remove();
-                });
-                loadManageContent();
-                loadStats();
-            } catch (error) {
-                alert('❌ Error al guardar: ' + error.message);
-            }
-        }
-
-        function loadManageContent(searchTerm = '') {
-            const grid = document.getElementById('manageGrid');
-            
-            database.ref('content').orderByChild('createdAt').on('value', (snapshot) => {
-                const data = snapshot.val();
-                allContent = [];
-                
-                if (data) {
-                    Object.keys(data).forEach(key => {
-                        allContent.push({
-                            id: key,
-                            ...data[key]
-                        });
-                    });
-                    allContent.reverse();
-                }
-
-                let filtered = allContent;
-                if (searchTerm) {
-                    filtered = filtered.filter(item => 
-                        item.title.toLowerCase().includes(searchTerm.toLowerCase())
-                    );
-                }
-
-                if (filtered.length === 0) {
-                    grid.innerHTML = `
-                        <div class="empty-state">
-                            <div class="icon">📭</div>
-                            <p>No hay contenido guardado</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                grid.innerHTML = filtered.map(item => `
-                    <div class="manage-item">
-                        <div class="manage-item-info">
-                            <img src="${item.poster}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/50x75/1a1a2e/ffffff?text=No+Image'">
-                            <div>
-                                <h4>${item.title}</h4>
-                                <p>${item.year || 'Año desconocido'} • ${item.type === 'pelicula' ? '🎬 Película' : '📺 Serie'} ${item.tmdbId ? `• ID: ${item.tmdbId}` : ''}</p>
-                            </div>
-                        </div>
-                        <div class="manage-item-actions">
-                            <button class="btn btn-danger btn-sm" onclick="deleteContent('${item.id}')">🗑️</button>
-                        </div>
-                    </div>
-                `).join('');
-            });
-        }
-
-        function deleteContent(id) {
-            if (confirm('¿Estás seguro de eliminar este contenido?')) {
-                database.ref(`content/${id}`).remove().then(() => {
-                    alert('✅ Contenido eliminado');
-                    loadManageContent();
-                    loadStats();
-                }).catch(error => {
-                    alert('❌ Error al eliminar: ' + error.message);
-                });
-            }
-        }
-
-        function loadStats() {
-            database.ref('content').on('value', (snapshot) => {
-                const data = snapshot.val();
-                let peliculas = 0;
-                let series = 0;
-                
-                if (data) {
-                    Object.keys(data).forEach(key => {
-                        if (data[key].type === 'pelicula') peliculas++;
-                        else if (data[key].type === 'serie') series++;
-                    });
-                }
-
-                document.getElementById('totalPeliculas').textContent = peliculas;
-                document.getElementById('totalSeries').textContent = series;
-                document.getElementById('totalContenido').textContent = peliculas + series;
-            });
-        }
-    </script>
+    <script src="js/admin.js"></script>
 </body>
 </html>
