@@ -18,10 +18,6 @@
                 <button class="search-btn" id="searchToggle">
                     <span class="material-icons">search</span>
                 </button>
-                <button class="notifications-btn" id="notifBtn">
-                    <span class="material-icons">notifications</span>
-                    <span class="notification-dot"></span>
-                </button>
             </div>
         </div>
         <div class="search-expand" id="searchExpand">
@@ -32,7 +28,7 @@
         </div>
     </header>
 
-    <!-- MENÚ LATERAL -->
+    <!-- MENÚ LATERAL SIN ADMIN -->
     <div class="side-menu" id="sideMenu">
         <div class="side-menu-header">
             <div class="logo-premium">🎬 Mi Cine</div>
@@ -59,26 +55,6 @@
         </div>
     </div>
     <div class="menu-overlay" id="menuOverlay"></div>
-
-    <!-- NOTIFICACIONES -->
-    <div class="notifications-panel" id="notifPanel">
-        <div class="notif-header">
-            <h3>Notificaciones</h3>
-            <button class="close-notif" id="closeNotif">
-                <span class="material-icons">close</span>
-            </button>
-        </div>
-        <div class="notif-list" id="notifList">
-            <div class="notif-item">
-                <span class="notif-icon">🎬</span>
-                <div>
-                    <p><strong>Nuevo estreno:</strong> "Dune: Parte 2"</p>
-                    <span class="notif-time">Hace 2 horas</span>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="notif-overlay" id="notifOverlay"></div>
 
     <!-- CONTENIDO -->
     <main class="main-premium">
@@ -173,17 +149,31 @@
     <script src="js/firebase-config.js"></script>
     
     <script>
-        // ==================== FUNCIÓN REDIRECCIÓN CORREGIDA ====================
+        // ==================== VARIABLES ====================
+        let featuredMovie = null;
+        let allContent = [];
+        let isLoggedIn = false;
+
+        // ==================== VERIFICAR AUTENTICACIÓN ====================
+        auth.onAuthStateChanged(function(user) {
+            isLoggedIn = !!user;
+            if (user) {
+                document.getElementById('sideUserAvatar').src = user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'Usuario') + '&background=E50914&color=fff&size=100';
+                document.getElementById('sideUserName').textContent = user.displayName || 'Usuario';
+            } else {
+                document.getElementById('sideUserAvatar').src = 'https://ui-avatars.com/api/?name=Usuario&background=333&color=fff&size=100';
+                document.getElementById('sideUserName').textContent = 'Invitado';
+            }
+        });
+
+        // ==================== REDIRECCIÓN A LOGIN ====================
         function goToLogin() {
-            // Guardar la página actual para volver después del login
             localStorage.setItem('returnUrl', window.location.href);
             window.location.href = 'login.html';
         }
 
-        // ==================== VERIFICAR AUTENTICACIÓN ====================
         function checkAuth() {
-            const user = auth.currentUser;
-            if (!user) {
+            if (!isLoggedIn) {
                 if (confirm('🔒 Para ver contenido necesitas iniciar sesión. ¿Deseas ir al login?')) {
                     goToLogin();
                 }
@@ -199,18 +189,7 @@
         }
 
         // ==================== CARGAR CONTENIDO ====================
-        let featuredMovie = null;
-        let allContent = [];
-
         document.addEventListener('DOMContentLoaded', function() {
-            // Verificar autenticación para mostrar usuario
-            auth.onAuthStateChanged(function(user) {
-                if (user) {
-                    document.getElementById('sideUserAvatar').src = user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'Usuario') + '&background=E50914&color=fff&size=100';
-                    document.getElementById('sideUserName').textContent = user.displayName || 'Usuario';
-                }
-            });
-
             loadContent();
             setupEventListeners();
         });
@@ -252,7 +231,7 @@
                     <div class="empty-row">
                         <span class="material-icons">movie</span>
                         <p>No hay películas disponibles</p>
-                        <a href="admin.html" class="btn btn-primary" style="margin-top:12px;">Agregar películas</a>
+                        <button class="btn btn-primary" style="margin-top:12px;" onclick="goToAdmin()">📥 Sincronizar con TMDB</button>
                     </div>
                 `;
                 return;
@@ -284,7 +263,7 @@
                     <div class="empty-row">
                         <span class="material-icons">tv</span>
                         <p>No hay series disponibles</p>
-                        <a href="admin.html" class="btn btn-primary" style="margin-top:12px;">Agregar series</a>
+                        <button class="btn btn-primary" style="margin-top:12px;" onclick="goToAdmin()">📥 Sincronizar con TMDB</button>
                     </div>
                 `;
                 return;
@@ -309,20 +288,25 @@
             `).join('');
         }
 
+        function goToAdmin() {
+            window.location.href = 'admin.html';
+        }
+
         function renderContinueWatching() {
             const container = document.getElementById('continueRow');
-            const user = auth.currentUser;
-
-            if (!user) {
+            if (!isLoggedIn) {
                 container.innerHTML = `
-                    <div class="empty-row">
-                        <span class="material-icons">play_circle</span>
-                        <p>Inicia sesión para ver tu progreso</p>
+                    <div class="empty-row" style="background:rgba(229,9,20,0.05);border-radius:12px;padding:24px;">
+                        <span class="material-icons" style="color:#E50914;">lock</span>
+                        <p style="color:#E50914;font-weight:600;">🔒 Inicia sesión para ver tu progreso</p>
                         <button class="btn btn-primary" style="margin-top:12px;" onclick="goToLogin()">Iniciar sesión</button>
                     </div>
                 `;
                 return;
             }
+
+            const user = auth.currentUser;
+            if (!user) return;
 
             database.ref(`progress/${user.uid}`).once('value', function(snapshot) {
                 const progressData = snapshot.val() || {};
@@ -446,7 +430,7 @@
                         <div class="modal-seasons">
                             <h3>Episodios</h3>
                             <div class="modal-episodes">
-                                ${content.episodes.slice(0, 10).map(ep => `
+                                ${content.episodes.slice(0, 15).map(ep => `
                                     <button class="modal-episode-btn" onclick="playContent('${id}', '${content.type}')">
                                         ${ep.title}
                                     </button>
@@ -502,19 +486,6 @@
                 document.getElementById('searchExpand').classList.toggle('active');
             });
 
-            document.getElementById('notifBtn').addEventListener('click', function() {
-                document.getElementById('notifPanel').classList.toggle('active');
-                document.getElementById('notifOverlay').classList.toggle('active');
-            });
-
-            document.getElementById('closeNotif').addEventListener('click', closeNotif);
-            document.getElementById('notifOverlay').addEventListener('click', closeNotif);
-
-            function closeNotif() {
-                document.getElementById('notifPanel').classList.remove('active');
-                document.getElementById('notifOverlay').classList.remove('active');
-            }
-
             document.getElementById('logoutSide').addEventListener('click', function() {
                 if (confirm('¿Seguro que quieres cerrar sesión?')) {
                     auth.signOut().then(function() {
@@ -527,24 +498,11 @@
                 if (e.key === 'Escape') {
                     closeContentModal();
                     closeMenu();
-                    closeNotif();
                 }
             });
 
             document.getElementById('contentModal').addEventListener('click', function(e) {
                 if (e.target === e.currentTarget) closeContentModal();
-            });
-
-            // ===== CORRECCIÓN: Verificar autenticación al cargar =====
-            // Si el usuario está logueado y vuelve de login, mantener sesión
-            auth.onAuthStateChanged(function(user) {
-                if (user) {
-                    // Usuario logueado, todo normal
-                    console.log('Usuario logueado:', user.displayName);
-                } else {
-                    // Usuario no logueado, mostrar opción de login
-                    console.log('Usuario no logueado');
-                }
             });
         }
 
