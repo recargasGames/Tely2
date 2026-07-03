@@ -40,7 +40,7 @@
         .stat-box .number { font-size: 32px; font-weight: 800; color: #E50914; }
         .stat-box .label { font-size: 15px; color: #888; margin-top: 4px; }
 
-        .log-container { background: #0D0D0D; border-radius: 10px; padding: 14px; max-height: 180px; overflow-y: auto; font-family: monospace; font-size: 13px; color: #888; margin-top: 14px; border: 1px solid #1A1A1A; }
+        .log-container { background: #0D0D0D; border-radius: 10px; padding: 14px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 13px; color: #888; margin-top: 14px; border: 1px solid #1A1A1A; }
         .log-container .log-item { padding: 4px 0; border-bottom: 1px solid #1A1A1A; }
         .log-container .log-item.success { color: #00b894; }
         .log-container .log-item.error { color: #E50914; }
@@ -64,9 +64,6 @@
         .manage-item-info h4 { font-size: 17px; color: #fff; margin: 0; }
         .manage-item-info p { color: #888; font-size: 14px; margin: 0; }
         .manage-item-actions { display: flex; gap: 10px; }
-
-        .admin-hidden { display: none; }
-        .admin-hidden.visible { display: flex; }
     </style>
 </head>
 <body>
@@ -84,24 +81,21 @@
         <div class="admin-container">
             <div class="admin-header">
                 <h2>Panel de Administración</h2>
-                <p style="color:#E50914;font-weight:600;">⚠️ Solo para el dueño de la plataforma</p>
+                <p style="color:#E50914;font-weight:600;">⚠️ Solo para el administrador</p>
             </div>
 
-            <!-- BOTÓN MÁGICO -->
             <button class="btn-magic" id="btnMagic">
                 <span class="spinner"></span>
                 <span class="btn-text">🚀 Sincronizar con TMDB (TODAS)</span>
             </button>
             <p style="color:#666;font-size:15px;text-align:center;margin:10px 0 0;">
-                Trae TODAS las películas y series populares de TMDB (hasta 500+ de cada una)
+                Trae TODAS las películas y series populares de TMDB
             </p>
 
-            <!-- PROGRESS -->
             <div class="progress-bar-container" id="progressContainer">
                 <div class="progress-bar-fill" id="progressFill">0%</div>
             </div>
 
-            <!-- ESTADÍSTICAS -->
             <div class="stats-container">
                 <div class="stat-box">
                     <div class="number" id="statMovies">0</div>
@@ -117,12 +111,10 @@
                 </div>
             </div>
 
-            <!-- LOG -->
             <div class="log-container" id="logContainer">
                 <div class="log-item info">📋 Esperando acción...</div>
             </div>
 
-            <!-- CONTENIDO GUARDADO -->
             <div style="margin-top:28px;">
                 <h3 style="color:#888;font-size:17px;margin-bottom:14px;">📋 Contenido en Firebase</h3>
                 <div id="manageGrid" class="manage-grid"></div>
@@ -143,17 +135,15 @@
         let isRunning = false;
 
         document.addEventListener('DOMContentLoaded', function() {
+            // VERIFICAR QUE EL USUARIO ESTÁ LOGUEADO
             auth.onAuthStateChanged(function(user) {
                 if (!user) {
+                    alert('🔒 Debes iniciar sesión primero');
                     window.location.href = 'login.html';
                     return;
                 }
-                // SOLO EL DUEÑO (cambia este correo)
-                if (user.email !== 'aa3964063@gmail.com') {
-                    alert('⛔ Acceso denegado. Solo el administrador puede entrar.');
-                    window.location.href = 'index.html';
-                    return;
-                }
+                // SI ESTÁ LOGUEADO, CARGAR TODO
+                console.log('✅ Usuario logueado:', user.email);
                 loadStats();
                 loadManageContent();
             });
@@ -161,7 +151,7 @@
             document.getElementById('btnMagic').addEventListener('click', startImport);
         });
 
-        // ==================== FUNCIÓN PRINCIPAL - TRAE TODAS LAS PELÍCULAS Y SERIES ====================
+        // ==================== FUNCIÓN PRINCIPAL ====================
         async function startImport() {
             if (isRunning) return;
             if (!confirm('⚠️ ¿Sincronizar con TMDB? Se traerán TODAS las películas y series populares.\n\nEsto puede tomar varios minutos.')) return;
@@ -190,7 +180,7 @@
                 let processed = 0;
 
                 // ===== 3. GUARDAR PELÍCULAS =====
-                addLog('💾 Guardando películas...', 'info');
+                addLog('💾 Guardando películas en Firebase...', 'info');
                 for (const movie of movies) {
                     const content = {
                         id: movie.id,
@@ -200,42 +190,34 @@
                         type: 'pelicula',
                         description: movie.overview || 'Sin descripción',
                         vote_average: movie.vote_average || 0,
-                        // FORMATO DE ENLACE PARA PELÍCULAS
                         videoUrl: `https://multiembed.mov/?video_id=${movie.id}&tmdb=1&lang=es&sub=es`,
                         episodes: []
                     };
                     await saveContent(content);
                     processed++;
-                    updateProgress(processed, total, `Película ${processed}/${total}: ${movie.title}`);
-                    
-                    if (processed % 10 === 0) {
-                        addLog(`🎬 ${processed}/${total} películas guardadas`, 'info');
-                    }
+                    updateProgress(processed, total, `Película ${processed}/${total}`);
                 }
 
                 // ===== 4. GUARDAR SERIES =====
-                addLog('💾 Guardando series...', 'info');
+                addLog('💾 Guardando series en Firebase...', 'info');
                 for (const serie of series) {
                     const episodes = [];
                     try {
-                        // Obtener detalles de la serie para las temporadas
                         const details = await getSeriesDetails(serie.id);
                         if (details && details.seasons) {
                             const validSeasons = details.seasons.filter(s => s.season_number > 0);
                             for (const season of validSeasons) {
                                 const epCount = Math.min(season.episode_count || 10, 20);
                                 for (let i = 1; i <= epCount; i++) {
-                                    // FORMATO DE ENLACE PARA SERIES
-                                    const episodeUrl = `https://multiembed.mov/?video_id=${serie.id}&tmdb=1&s=${season.season_number}&e=${i}&lang=es&sub=es`;
                                     episodes.push({
                                         title: `Temporada ${season.season_number} - Episodio ${i}`,
-                                        url: episodeUrl
+                                        url: `https://multiembed.mov/?video_id=${serie.id}&tmdb=1&s=${season.season_number}&e=${i}&lang=es&sub=es`
                                     });
                                 }
                             }
                         }
                     } catch (e) {
-                        addLog(`⚠️ Error al obtener episodios de ${serie.name}`, 'warning');
+                        addLog(`⚠️ Error en episodios de ${serie.name}`, 'warning');
                     }
 
                     const content = {
@@ -246,22 +228,15 @@
                         type: 'serie',
                         description: serie.overview || 'Sin descripción',
                         vote_average: serie.vote_average || 0,
-                        // ENLACE BASE PARA LA SERIE (primer episodio)
                         videoUrl: episodes.length > 0 ? episodes[0].url : `https://multiembed.mov/?video_id=${serie.id}&tmdb=1&s=1&e=1&lang=es&sub=es`,
                         episodes: episodes
                     };
                     await saveContent(content);
                     processed++;
-                    updateProgress(processed, total, `Serie ${processed - movies.length}/${total}: ${serie.name}`);
-                    
-                    if (processed % 10 === 0) {
-                        addLog(`📺 ${processed}/${total} series guardadas`, 'info');
-                    }
+                    updateProgress(processed, total, `Serie ${processed - movies.length}/${total}`);
                 }
 
                 addLog(`✅ ¡COMPLETADO! ${total} contenidos guardados en Firebase`, 'success');
-                addLog(`🎬 ${movies.length} películas guardadas`, 'success');
-                addLog(`📺 ${series.length} series guardadas`, 'success');
                 loadStats();
                 loadManageContent();
 
@@ -278,13 +253,12 @@
 
         // ==================== FUNCIONES DE TMDB ====================
         
-        // Obtener TODAS las películas (todas las páginas disponibles)
         async function getAllMovies() {
             let allMovies = [];
             let page = 1;
             let hasMore = true;
             
-            while (hasMore && page <= 25) { // Hasta 25 páginas (500+ películas)
+            while (hasMore && page <= 25) {
                 try {
                     const response = await fetch(
                         `${TMDB_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&language=es-ES&page=${page}`
@@ -305,13 +279,12 @@
             return allMovies;
         }
 
-        // Obtener TODAS las series (todas las páginas disponibles)
         async function getAllSeries() {
             let allSeries = [];
             let page = 1;
             let hasMore = true;
             
-            while (hasMore && page <= 25) { // Hasta 25 páginas (500+ series)
+            while (hasMore && page <= 25) {
                 try {
                     const response = await fetch(
                         `${TMDB_BASE_URL}/tv/popular?api_key=${TMDB_API_KEY}&language=es-ES&page=${page}`
