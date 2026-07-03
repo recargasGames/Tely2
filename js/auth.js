@@ -11,7 +11,7 @@ auth.onAuthStateChanged(user => {
         
         // Mostrar información del usuario
         document.querySelectorAll('#userPhoto').forEach(img => {
-            img.src = user.photoURL || 'https://via.placeholder.com/35/1a1a2e/ffffff?text=U';
+            img.src = user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'Usuario') + '&background=e50914&color=fff&size=35';
         });
         document.querySelectorAll('#userName').forEach(span => {
             span.textContent = user.displayName || 'Usuario';
