@@ -5,115 +5,350 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mi Cine - Reproductor</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/player.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        .player-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .player-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: rgba(0,0,0,0.8);
+            z-index: 10;
+        }
+
+        .player-header .back-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .player-header .title {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-video-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            position: relative;
+        }
+
+        .player-video-wrapper video {
+            width: 100%;
+            height: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+        }
+
+        .player-controls {
+            background: rgba(0,0,0,0.9);
+            padding: 12px 20px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .player-controls .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .player-controls .progress-bar {
+            flex: 1;
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .player-controls .progress-bar .fill {
+            height: 100%;
+            background: #E50914;
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .player-controls .progress-bar .dot {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            background: #E50914;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .player-controls .progress-bar:hover .dot {
+            opacity: 1;
+        }
+
+        .player-controls .time {
+            color: #aaa;
+            font-size: 12px;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .player-controls .buttons {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .player-controls .buttons button {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .player-controls .buttons button:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .player-controls .buttons .play-btn {
+            width: 48px;
+            height: 48px;
+            background: #E50914;
+            border-radius: 50%;
+        }
+
+        .player-controls .buttons .play-btn:hover {
+            background: #b2070f;
+        }
+
+        .player-controls .buttons .play-btn .material-icons {
+            font-size: 28px;
+        }
+
+        .player-controls .buttons button .material-icons {
+            font-size: 24px;
+        }
+
+        .player-controls .bottom-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .player-controls .bottom-row .left,
+        .player-controls .bottom-row .right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .player-controls .bottom-row .quality-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .player-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.7);
+            z-index: 5;
+        }
+
+        .player-loading.active {
+            display: flex;
+        }
+
+        .player-loading .loader-dot {
+            width: 12px;
+            height: 12px;
+            background: #E50914;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 4px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .player-loading .loader-dot:nth-child(1) { animation-delay: -0.32s; }
+        .player-loading .loader-dot:nth-child(2) { animation-delay: -0.16s; }
+        .player-loading .loader-dot:nth-child(3) { animation-delay: 0s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        .player-error {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.8);
+            z-index: 5;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .player-error.active {
+            display: flex;
+        }
+
+        .player-error .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .player-error h3 {
+            margin: 0 0 8px;
+        }
+
+        .player-error p {
+            color: #888;
+            margin: 0 0 16px;
+        }
+
+        .player-error .btn-retry {
+            background: #E50914;
+            border: none;
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .player-controls .buttons .play-btn {
+                width: 40px;
+                height: 40px;
+            }
+            .player-controls .buttons .play-btn .material-icons {
+                font-size: 22px;
+            }
+            .player-controls .buttons button .material-icons {
+                font-size: 20px;
+            }
+            .player-header .title {
+                font-size: 14px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="player-container" id="playerContainer">
-        <!-- ===== CONTROLES ===== -->
-        <div class="player-controls" id="playerControls">
-            <div class="player-top-controls">
-                <button class="player-back" onclick="goBack()">
-                    <span class="material-icons">arrow_back</span>
-                </button>
-                <div class="player-title" id="playerTitle">Título del contenido</div>
-                <div class="player-top-right">
-                    <button class="player-quality-btn" onclick="toggleQuality()">
-                        <span class="material-icons">hd</span>
-                    </button>
-                    <button class="player-subtitles-btn" onclick="toggleSubtitles()">
-                        <span class="material-icons">subtitles</span>
-                    </button>
-                </div>
+        <!-- HEADER -->
+        <div class="player-header">
+            <button class="back-btn" onclick="closePlayer()">
+                <span class="material-icons">arrow_back</span>
+            </button>
+            <span class="title" id="playerTitle">Cargando...</span>
+        </div>
+
+        <!-- VIDEO -->
+        <div class="player-video-wrapper">
+            <video id="playerVideo" controls></video>
+            
+            <!-- LOADING -->
+            <div class="player-loading" id="playerLoading">
+                <div class="loader-dot"></div>
+                <div class="loader-dot"></div>
+                <div class="loader-dot"></div>
+                <p style="color:#888;margin-top:12px;">Cargando video...</p>
             </div>
 
-            <!-- ===== REPRODUCTOR ===== -->
-            <div class="player-video-wrapper">
-                <video id="playerVideo" class="player-video" controls>
-                    <source id="videoSource" src="" type="video/mp4">
-                    Tu navegador no soporta el reproductor de video.
-                </video>
-                <div class="player-overlay" id="playerOverlay">
-                    <button class="player-big-play" id="bigPlayBtn">
-                        <span class="material-icons">play_arrow</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- ===== CONTROLES INFERIORES ===== -->
-            <div class="player-bottom-controls">
-                <div class="player-progress-container">
-                    <div class="player-progress-bar" id="progressBar">
-                        <div class="player-progress-fill" id="progressFill"></div>
-                        <div class="player-progress-buffer" id="progressBuffer"></div>
-                        <div class="player-progress-dot" id="progressDot"></div>
-                    </div>
-                    <div class="player-time">
-                        <span id="currentTime">0:00</span>
-                        <span id="totalTime">0:00</span>
-                    </div>
-                </div>
-
-                <div class="player-bottom-row">
-                    <div class="player-left-controls">
-                        <button class="player-control-btn" id="playPauseBtn">
-                            <span class="material-icons">pause</span>
-                        </button>
-                        <button class="player-control-btn" id="rewindBtn">
-                            <span class="material-icons">replay_10</span>
-                        </button>
-                        <button class="player-control-btn" id="forwardBtn">
-                            <span class="material-icons">forward_10</span>
-                        </button>
-                        <button class="player-control-btn" id="volumeBtn">
-                            <span class="material-icons">volume_up</span>
-                        </button>
-                        <div class="player-volume-slider">
-                            <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
-                        </div>
-                    </div>
-
-                    <div class="player-right-controls">
-                        <button class="player-control-btn" id="nextEpisodeBtn" style="display:none;">
-                            <span class="material-icons">skip_next</span>
-                            <span>Siguiente</span>
-                        </button>
-                        <button class="player-control-btn" id="fullscreenBtn">
-                            <span class="material-icons">fullscreen</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- ===== EPISODIOS ===== -->
-                <div class="player-episodes" id="playerEpisodes" style="display:none;">
-                    <h4>Episodios</h4>
-                    <div id="episodesList"></div>
-                </div>
-
-                <!-- ===== CALIDAD ===== -->
-                <div class="player-quality-menu" id="qualityMenu" style="display:none;">
-                    <button class="quality-option" data-quality="4k">4K</button>
-                    <button class="quality-option" data-quality="1080p">1080p</button>
-                    <button class="quality-option active" data-quality="720p">720p</button>
-                    <button class="quality-option" data-quality="480p">480p</button>
-                </div>
-
-                <!-- ===== SUBTÍTULOS ===== -->
-                <div class="player-subtitles-menu" id="subtitlesMenu" style="display:none;">
-                    <button class="sub-option active" data-sub="off">Desactivados</button>
-                    <button class="sub-option" data-sub="es">Español</button>
-                    <button class="sub-option" data-sub="en">Inglés</button>
-                    <button class="sub-option" data-sub="fr">Francés</button>
-                </div>
+            <!-- ERROR -->
+            <div class="player-error" id="playerError">
+                <div class="icon">❌</div>
+                <h3>No se pudo cargar el video</h3>
+                <p>El enlace podría estar caído o no estar disponible</p>
+                <button class="btn-retry" onclick="retryPlay()">Reintentar</button>
             </div>
         </div>
 
-        <!-- ===== LOADING ===== -->
-        <div class="player-loading" id="playerLoading">
-            <div class="loader-dot"></div>
-            <div class="loader-dot"></div>
-            <div class="loader-dot"></div>
-            <p>Cargando...</p>
+        <!-- CONTROLES -->
+        <div class="player-controls">
+            <div class="progress-container">
+                <span class="time" id="currentTime">0:00</span>
+                <div class="progress-bar" id="progressBar">
+                    <div class="fill" id="progressFill"></div>
+                    <div class="dot" id="progressDot"></div>
+                </div>
+                <span class="time" id="totalTime">0:00</span>
+            </div>
+
+            <div class="buttons">
+                <button id="rewindBtn">
+                    <span class="material-icons">replay_10</span>
+                </button>
+                <button class="play-btn" id="playBtn">
+                    <span class="material-icons">play_arrow</span>
+                </button>
+                <button id="forwardBtn">
+                    <span class="material-icons">forward_10</span>
+                </button>
+            </div>
+
+            <div class="bottom-row">
+                <div class="left">
+                    <button id="volumeBtn">
+                        <span class="material-icons">volume_up</span>
+                    </button>
+                    <button id="fullscreenBtn">
+                        <span class="material-icons">fullscreen</span>
+                    </button>
+                </div>
+                <div class="right">
+                    <button class="quality-btn" id="qualityBtn">HD</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -121,7 +356,275 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="js/firebase-config.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/player.js"></script>
+    
+    <script>
+        // ==================== VARIABLES ====================
+        const video = document.getElementById('playerVideo');
+        const playBtn = document.getElementById('playBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const currentTimeEl = document.getElementById('currentTime');
+        const totalTimeEl = document.getElementById('totalTime');
+        const loading = document.getElementById('playerLoading');
+        const error = document.getElementById('playerError');
+        const titleEl = document.getElementById('playerTitle');
+
+        let isPlaying = false;
+        let isFullscreen = false;
+        let volume = 1;
+        let isMuted = false;
+
+        // ==================== OBTENER PARÁMETROS ====================
+        const urlParams = new URLSearchParams(window.location.search);
+        const contentId = urlParams.get('id');
+        const contentType = urlParams.get('type');
+
+        // ==================== INICIALIZAR ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = auth.currentUser;
+            if (!user) {
+                alert('Inicia sesión para ver contenido');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            if (!contentId) {
+                alert('Contenido no válido');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            loadContent();
+            setupControls();
+        });
+
+        // ==================== CARGAR CONTENIDO ====================
+        async function loadContent() {
+            loading.classList.add('active');
+            error.classList.remove('active');
+
+            try {
+                // Obtener datos de Firebase
+                const snapshot = await database.ref(`content/${contentId}`).once('value');
+                const data = snapshot.val();
+
+                if (!data) {
+                    throw new Error('Contenido no encontrado');
+                }
+
+                // Título
+                titleEl.textContent = data.title || 'Sin título';
+
+                // URL del video
+                let videoUrl = data.videoUrl;
+
+                // Si no tiene URL, generarla con el ID de TMDB
+                if (!videoUrl && data.tmdbId) {
+                    if (data.type === 'pelicula') {
+                        videoUrl = `https://unlimplay.co/play/movie/${data.tmdbId}`;
+                    } else {
+                        videoUrl = `https://unlimplay.co/play/tv/${data.tmdbId}/1/1`;
+                    }
+                }
+
+                if (!videoUrl) {
+                    throw new Error('No se encontró enlace de video');
+                }
+
+                // Cargar video
+                video.src = videoUrl;
+                video.load();
+
+                // Intentar reproducir
+                video.play().then(() => {
+                    isPlaying = true;
+                    updatePlayIcon();
+                    loading.classList.remove('active');
+                }).catch(function() {
+                    // Auto-play bloqueado
+                    isPlaying = false;
+                    updatePlayIcon();
+                    loading.classList.remove('active');
+                });
+
+                // Guardar en historial
+                const user = auth.currentUser;
+                if (user) {
+                    database.ref(`history/${user.uid}/${contentId}`).set({
+                        id: contentId,
+                        type: data.type,
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+                }
+
+            } catch (err) {
+                console.error('Error:', err);
+                loading.classList.remove('active');
+                error.classList.add('active');
+                document.querySelector('.player-error p').textContent = err.message || 'Error al cargar el video';
+            }
+        }
+
+        // ==================== CONTROLES ====================
+        function setupControls() {
+            // Play/Pause
+            playBtn.addEventListener('click', togglePlay);
+            video.addEventListener('click', togglePlay);
+
+            // Progreso
+            video.addEventListener('timeupdate', updateProgress);
+            progressBar.addEventListener('click', seek);
+
+            // Tiempo
+            video.addEventListener('loadedmetadata', function() {
+                totalTimeEl.textContent = formatTime(video.duration);
+            });
+
+            // Adelantar/Retroceder
+            document.getElementById('rewindBtn').addEventListener('click', function() {
+                video.currentTime = Math.max(0, video.currentTime - 10);
+            });
+
+            document.getElementById('forwardBtn').addEventListener('click', function() {
+                video.currentTime = Math.min(video.duration, video.currentTime + 10);
+            });
+
+            // Volumen
+            document.getElementById('volumeBtn').addEventListener('click', function() {
+                isMuted = !isMuted;
+                video.muted = isMuted;
+                updateVolumeIcon();
+            });
+
+            // Pantalla completa
+            document.getElementById('fullscreenBtn').addEventListener('click', toggleFullscreen);
+
+            // Teclado
+            document.addEventListener('keydown', function(e) {
+                if (e.target.tagName === 'INPUT') return;
+                switch(e.key) {
+                    case ' ':
+                    case 'Space':
+                        e.preventDefault();
+                        togglePlay();
+                        break;
+                    case 'f':
+                        toggleFullscreen();
+                        break;
+                    case 'ArrowRight':
+                        video.currentTime = Math.min(video.duration, video.currentTime + 5);
+                        break;
+                    case 'ArrowLeft':
+                        video.currentTime = Math.max(0, video.currentTime - 5);
+                        break;
+                    case 'm':
+                        isMuted = !isMuted;
+                        video.muted = isMuted;
+                        updateVolumeIcon();
+                        break;
+                }
+            });
+
+            // Fin del video
+            video.addEventListener('ended', function() {
+                isPlaying = false;
+                updatePlayIcon();
+            });
+
+            // Errores
+            video.addEventListener('error', function() {
+                loading.classList.remove('active');
+                error.classList.add('active');
+            });
+        }
+
+        // ==================== FUNCIONES ====================
+        function togglePlay() {
+            if (video.paused) {
+                video.play();
+                isPlaying = true;
+            } else {
+                video.pause();
+                isPlaying = false;
+            }
+            updatePlayIcon();
+        }
+
+        function updatePlayIcon() {
+            const icon = playBtn.querySelector('.material-icons');
+            icon.textContent = isPlaying ? 'pause' : 'play_arrow';
+        }
+
+        function updateProgress() {
+            const percent = (video.currentTime / video.duration) * 100;
+            progressFill.style.width = percent + '%';
+            document.getElementById('progressDot').style.left = percent + '%';
+            currentTimeEl.textContent = formatTime(video.currentTime);
+
+            // Guardar progreso en Firebase
+            if (video.currentTime > 0 && video.currentTime % 5 < 0.5) {
+                saveProgress(video.currentTime);
+            }
+        }
+
+        function seek(e) {
+            const rect = progressBar.getBoundingClientRect();
+            const percent = (e.clientX - rect.left) / rect.width;
+            video.currentTime = percent * video.duration;
+        }
+
+        function formatTime(seconds) {
+            if (!seconds || isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateVolumeIcon() {
+            const icon = document.getElementById('volumeBtn').querySelector('.material-icons');
+            if (isMuted || video.volume === 0) {
+                icon.textContent = 'volume_off';
+            } else if (video.volume < 0.5) {
+                icon.textContent = 'volume_down';
+            } else {
+                icon.textContent = 'volume_up';
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+                isFullscreen = true;
+                document.getElementById('fullscreenBtn').querySelector('.material-icons').textContent = 'fullscreen_exit';
+            } else {
+                document.exitFullscreen();
+                isFullscreen = false;
+                document.getElementById('fullscreenBtn').querySelector('.material-icons').textContent = 'fullscreen';
+            }
+        }
+
+        function saveProgress(currentTime) {
+            const user = auth.currentUser;
+            if (!user || !contentId) return;
+
+            database.ref(`progress/${user.uid}/${contentId}`).update({
+                time: currentTime,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+        }
+
+        function retryPlay() {
+            loadContent();
+        }
+
+        function closePlayer() {
+            if (isFullscreen) {
+                document.exitFullscreen();
+            }
+            window.history.back();
+        }
+
+        console.log('✅ Reproductor cargado');
+    </script>
 </body>
-</html>
+</html>w
