@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cine - Inicio</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">🎬 Mi Cine</div>
+            
+            <nav class="nav-menu">
+                <a href="index.html" class="active">🏠 Inicio</a>
+                <a href="peliculas.html">🎬 Películas</a>
+                <a href="series.html">📺 Series</a>
+                <a href="admin.html" id="adminLink" class="hidden">⚙️ Admin</a>
+            </nav>
+
+            <div class="auth-section">
+                <div id="userInfo" class="user-info hidden">
+                    <img id="userPhoto" src="" alt="User">
+                    <span id="userName"></span>
+                </div>
+                <button id="loginBtn" class="btn btn-google" onclick="window.location.href='login.html'">
+                    🔑 Iniciar Sesión
+                </button>
+                <button id="logoutBtn" class="btn btn-logout hidden">Cerrar Sesión</button>
+            </div>
+        </div>
+
+        <!-- BANNER PRINCIPAL -->
+        <div class="hero-banner">
+            <div class="hero-content">
+                <h1>🎥 Bienvenido a Mi Cine</h1>
+                <p>Descubre las mejores películas y series en un solo lugar</p>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="🔍 Buscar películas, series, actores...">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+        <section class="section">
+            <div class="section-header">
+                <h2>🔥 Tendencias</h2>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">Todo</button>
+                    <button class="filter-btn" data-filter="pelicula">Películas</button>
+                    <button class="filter-btn" data-filter="serie">Series</button>
+                </div>
+            </div>
+            <div id="contentGrid" class="content-grid"></div>
+        </section>
+
+        <section class="section">
+            <h2>📌 Destacados</h2>
+            <div id="featuredGrid" class="content-grid"></div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>🎬 Mi Cine</h3>
+                <p>Tu plataforma de entretenimiento favorita</p>
+            </div>
+            <div class="footer-section">
+                <h4>Enlaces Rápidos</h4>
+                <a href="peliculas.html">Películas</a>
+                <a href="series.html">Series</a>
+                <a href="admin.html">Admin</a>
+            </div>
+            <div class="footer-section">
+                <h4>Contacto</h4>
+                <p>📧 info@micine.com</p>
+                <p>📱 +58 123-456-7890</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Mi Cine - Todos los derechos reservados</p>
+        </div>
+    </footer>
+
+    <!-- MODAL -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">✕</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/database.js"></script>
+    <script>
+        // Cargar contenido al inicio
+        document.addEventListener('DOMContentLoaded', () => {
+            loadContent('contentGrid');
+            loadFeaturedContent();
+            
+            // Filtros
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const filter = this.dataset.filter;
+                    loadContent('contentGrid', filter);
+                });
+            });
+
+            // Búsqueda
+            document.getElementById('searchInput').addEventListener('input', function() {
+                const searchTerm = this.value;
+                loadContent('contentGrid', 'all', searchTerm);
+            });
+        });
+    </script>
+</body>
+  </html>
