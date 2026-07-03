@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cine - Películas</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">🎬 Mi Cine</div>
+            <nav class="nav-menu">
+                <a href="index.html">🏠 Inicio</a>
+                <a href="peliculas.html" class="active">🎬 Películas</a>
+                <a href="series.html">📺 Series</a>
+                <a href="admin.html" id="adminLink" class="hidden">⚙️ Admin</a>
+            </nav>
+            <div class="auth-section">
+                <div id="userInfo" class="user-info hidden">
+                    <img id="userPhoto" src="" alt="User">
+                    <span id="userName"></span>
+                </div>
+                <button id="loginBtn" class="btn btn-google" onclick="window.location.href='login.html'">🔑 Iniciar Sesión</button>
+                <button id="logoutBtn" class="btn btn-logout hidden">Cerrar Sesión</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="section">
+            <div class="section-header">
+                <h2>🎬 Películas</h2>
+                <div class="search-box small">
+                    <input type="text" id="searchPeliculas" placeholder="🔍 Buscar películas...">
+                </div>
+            </div>
+            <div id="peliculasGrid" class="content-grid"></div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>🎬 Mi Cine</h3>
+                <p>Tu plataforma de entretenimiento favorita</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Mi Cine - Todos los derechos reservados</p>
+        </div>
+    </footer>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">✕</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/database.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadContent('peliculasGrid', 'pelicula');
+            
+            document.getElementById('searchPeliculas').addEventListener('input', function() {
+                loadContent('peliculasGrid', 'pelicula', this.value);
+            });
+        });
+    </script>
+</body>
+</html>
