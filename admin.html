@@ -3,18 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Cine - Administración</title>
+    <title>Panel Admin - Mi Cine</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <header class="header">
         <div class="header-content">
-            <div class="logo">🎬 Mi Cine</div>
+            <div class="logo">⚙️ Panel Admin</div>
             <nav class="nav-menu">
-                <a href="index.html">🏠 Inicio</a>
-                <a href="peliculas.html">🎬 Películas</a>
-                <a href="series.html">📺 Series</a>
-                <a href="admin.html" class="active">⚙️ Admin</a>
+                <a href="index.html">🏠 Volver al sitio</a>
             </nav>
             <div class="auth-section">
                 <div id="userInfo" class="user-info hidden">
@@ -30,17 +27,29 @@
         <div class="admin-container">
             <div class="admin-header">
                 <h2>⚙️ Panel de Administración</h2>
-                <p>Gestiona todo el contenido de tu plataforma</p>
+                <p>Gestiona el contenido que aparece en la plataforma</p>
+                <p style="color:#888;font-size:14px;">🔒 Solo para administradores</p>
             </div>
 
             <div class="admin-tabs">
-                <button class="admin-tab active" data-tab="add">➕ Agregar Contenido</button>
-                <button class="admin-tab" data-tab="manage">📋 Gestionar</button>
+                <button class="admin-tab active" data-tab="manage">📋 Gestionar Contenido</button>
+                <button class="admin-tab" data-tab="add">➕ Agregar Manual</button>
                 <button class="admin-tab" data-tab="stats">📊 Estadísticas</button>
             </div>
 
-            <!-- TAB 1: AGREGAR -->
-            <div class="admin-tab-content active" id="tab-add">
+            <!-- TAB 1: GESTIONAR -->
+            <div class="admin-tab-content active" id="tab-manage">
+                <div class="manage-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;margin-bottom:20px;">
+                    <h3>📋 Contenido Guardado</h3>
+                    <div class="search-box small">
+                        <input type="text" id="searchManage" placeholder="🔍 Buscar...">
+                    </div>
+                </div>
+                <div id="manageGrid" class="manage-grid"></div>
+            </div>
+
+            <!-- TAB 2: AGREGAR MANUAL -->
+            <div class="admin-tab-content" id="tab-add">
                 <form id="adminForm" class="admin-form">
                     <div class="form-row">
                         <div class="form-group">
@@ -56,7 +65,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>🖼️ URL del Poster</label>
-                            <input type="url" id="poster" placeholder="https://ejemplo.com/poster.jpg">
+                            <input type="url" id="poster" placeholder="https://image.tmdb.org/t/p/w500/...">
                         </div>
                         <div class="form-group">
                             <label>🎭 Tipo *</label>
@@ -104,17 +113,6 @@
                 </form>
             </div>
 
-            <!-- TAB 2: GESTIONAR -->
-            <div class="admin-tab-content" id="tab-manage">
-                <div class="manage-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;margin-bottom:20px;">
-                    <h3>📋 Contenido Existente</h3>
-                    <div class="search-box small">
-                        <input type="text" id="searchManage" placeholder="🔍 Buscar...">
-                    </div>
-                </div>
-                <div id="manageGrid" class="manage-grid"></div>
-            </div>
-
             <!-- TAB 3: ESTADÍSTICAS -->
             <div class="admin-tab-content" id="tab-stats">
                 <div class="stats-grid">
@@ -155,10 +153,12 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/tmdb-api.js"></script>
     <script>
         let allContent = [];
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Verificar autenticación
             auth.onAuthStateChanged(user => {
                 if (!user) {
                     window.location.href = 'login.html';
@@ -207,16 +207,6 @@
             }
         }
 
-        function generateTMDBUrl(tmdbId, type, season = null, episode = null) {
-            if (!tmdbId) return null;
-            if (type === 'pelicula') {
-                return `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&lang=es&sub=es`;
-            } else if (type === 'serie' && season && episode) {
-                return `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${season}&e=${episode}&lang=es&sub=es`;
-            }
-            return null;
-        }
-
         async function saveContent(e) {
             e.preventDefault();
             
@@ -228,10 +218,10 @@
             const tmdbId = document.getElementById('tmdbId').value;
             const customUrl = document.getElementById('customUrl').value;
 
-            // Generar URL según el tipo
+            // Generar URL
             let videoUrl = customUrl;
             if (!videoUrl && tmdbId && type === 'pelicula') {
-                videoUrl = generateTMDBUrl(tmdbId, 'pelicula');
+                videoUrl = getMovieUrl(tmdbId);
             }
 
             // Obtener episodios
@@ -243,13 +233,12 @@
                     const epTitle = inputs[0].value || `Episodio ${index + 1}`;
                     let epUrl = inputs[1].value;
                     
-                    // Si no tiene URL personalizada, generar automática
                     if (!epUrl && tmdbId) {
                         const match = epTitle.match(/Temporada\s*(\d+)\s*[-–]\s*Episodio\s*(\d+)/i);
                         if (match) {
-                            epUrl = generateTMDBUrl(tmdbId, 'serie', match[1], match[2]);
+                            epUrl = getSeriesUrl(tmdbId, match[1], match[2]);
                         } else {
-                            epUrl = generateTMDBUrl(tmdbId, 'serie', 1, index + 1);
+                            epUrl = getSeriesUrl(tmdbId, 1, index + 1);
                         }
                     }
                     
@@ -316,7 +305,7 @@
                     grid.innerHTML = `
                         <div class="empty-state">
                             <div class="icon">📭</div>
-                            <p>No hay contenido para mostrar</p>
+                            <p>No hay contenido guardado</p>
                         </div>
                     `;
                     return;
