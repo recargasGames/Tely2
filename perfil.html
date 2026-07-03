@@ -10,7 +10,7 @@
 <body>
     <header class="header-premium">
         <div class="header-premium-content">
-            <button class="menu-btn" onclick="history.back()">
+            <button class="menu-btn" onclick="window.location.href='index.html'">
                 <span class="material-icons">arrow_back</span>
             </button>
             <div class="logo-premium">🎬 Mi Cine</div>
@@ -20,13 +20,10 @@
 
     <main class="main-premium">
         <div class="profile-page">
-            <!-- ===== HEADER PERFIL ===== -->
+            <!-- HEADER -->
             <div class="profile-header-page">
-                <div class="profile-avatar-large" onclick="changeProfilePhoto()">
+                <div class="profile-avatar-large">
                     <img id="profileAvatar" src="" alt="Avatar">
-                    <div class="avatar-edit">
-                        <span class="material-icons">camera_alt</span>
-                    </div>
                 </div>
                 <h2 id="profileName">Usuario</h2>
                 <p class="profile-email" id="profileEmail">email@ejemplo.com</p>
@@ -36,90 +33,48 @@
                 </div>
             </div>
 
-            <!-- ===== ESTADÍSTICAS ===== -->
+            <!-- ESTADÍSTICAS -->
             <div class="profile-stats">
-                <div class="stat-item" onclick="goToSection('favorites')">
+                <div class="stat-item">
                     <span class="stat-number" id="statFavorites">0</span>
                     <span class="stat-label">❤️ Favoritos</span>
                 </div>
-                <div class="stat-item" onclick="goToSection('continue')">
+                <div class="stat-item">
                     <span class="stat-number" id="statWatching">0</span>
                     <span class="stat-label">▶️ Viendo</span>
                 </div>
-                <div class="stat-item" onclick="goToSection('history')">
+                <div class="stat-item">
                     <span class="stat-number" id="statCompleted">0</span>
                     <span class="stat-label">✅ Completadas</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-number" id="statTime">0h</span>
-                    <span class="stat-label">⏱️ Tiempo</span>
+                    <span class="stat-number" id="statTotal">0</span>
+                    <span class="stat-label">📦 Total</span>
                 </div>
             </div>
 
-            <!-- ===== MENÚ ===== -->
+            <!-- MENÚ -->
             <div class="profile-menu-list">
-                <div class="profile-menu-group">
-                    <h4>Mi cuenta</h4>
-                    <button class="profile-menu-item" onclick="editProfile()">
-                        <span class="material-icons">edit</span>
-                        <span>Editar perfil</span>
-                        <span class="material-icons">chevron_right</span>
-                    </button>
-                    <button class="profile-menu-item" onclick="changePassword()">
-                        <span class="material-icons">lock</span>
-                        <span>Cambiar contraseña</span>
-                        <span class="material-icons">chevron_right</span>
-                    </button>
-                    <button class="profile-menu-item" onclick="changePhoto()">
-                        <span class="material-icons">photo_camera</span>
-                        <span>Cambiar foto</span>
-                        <span class="material-icons">chevron_right</span>
-                    </button>
-                </div>
-
-                <div class="profile-menu-group">
-                    <h4>Contenido</h4>
-                    <button class="profile-menu-item" onclick="goToSection('favorites')">
-                        <span class="material-icons">favorite</span>
-                        <span>Favoritos</span>
-                        <span class="material-icons">chevron_right</span>
-                    </button>
-                    <button class="profile-menu-item" onclick="goToSection('continue')">
-                        <span class="material-icons">play_circle</span>
-                        <span>Continuar viendo</span>
-                        <span class="material-icons">chevron_right</span>
-                    </button>
-                    <button class="profile-menu-item" onclick="goToSection('history')">
-                        <span class="material-icons">history</span>
-                        <span>Historial</span>
-                        <span class="material-icons">chevron_right</span>
-                    </button>
-                    <button class="profile-menu-item" onclick="goToSection('pending')">
-                        <span class="material-icons">schedule</span>
-                        <span>Pendientes</span>
-                        <span class="material-icons">chevron_right</span>
-                    </button>
-                </div>
-
-                <div class="profile-menu-group">
-                    <h4>Configuración</h4>
-                    <button class="profile-menu-item" onclick="openSettings()">
-                        <span class="material-icons">settings</span>
-                        <span>Configuración</span>
-                        <span class="material-icons">chevron_right</span>
-                    </button>
-                    <button class="profile-menu-item" onclick="openHelp()">
-                        <span class="material-icons">help</span>
-                        <span>Ayuda</span>
-                        <span class="material-icons">chevron_right</span>
-                    </button>
-                    <button class="profile-menu-item" onclick="openAbout()">
-                        <span class="material-icons">info</span>
-                        <span>Acerca de</span>
-                        <span class="material-icons">chevron_right</span>
-                    </button>
-                </div>
-
+                <button class="profile-menu-item" onclick="window.location.href='mi-lista.html'">
+                    <span class="material-icons">bookmark</span>
+                    <span>Mi Lista</span>
+                    <span class="material-icons">chevron_right</span>
+                </button>
+                <button class="profile-menu-item" onclick="editProfile()">
+                    <span class="material-icons">edit</span>
+                    <span>Editar perfil</span>
+                    <span class="material-icons">chevron_right</span>
+                </button>
+                <button class="profile-menu-item" onclick="changePassword()">
+                    <span class="material-icons">lock</span>
+                    <span>Cambiar contraseña</span>
+                    <span class="material-icons">chevron_right</span>
+                </button>
+                <button class="profile-menu-item" onclick="window.location.href='admin.html'">
+                    <span class="material-icons">settings</span>
+                    <span>Admin</span>
+                    <span class="material-icons">chevron_right</span>
+                </button>
                 <button class="profile-menu-item danger" id="profileLogout">
                     <span class="material-icons">logout</span>
                     <span>Cerrar Sesión</span>
@@ -129,6 +84,7 @@
         </div>
     </main>
 
+    <!-- BARRA INFERIOR -->
     <nav class="bottom-nav">
         <a href="index.html" class="bottom-nav-item">
             <span class="material-icons">home</span>
@@ -156,148 +112,97 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="js/firebase-config.js"></script>
-    <script src="js/auth.js"></script>
     
     <script>
-        let userStats = {
-            favorites: 0,
-            watching: 0,
-            completed: 0,
-            totalTime: 0
-        };
-
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', function() {
             const user = auth.currentUser;
             if (!user) {
                 window.location.href = 'login.html';
                 return;
             }
 
-            loadUserProfile(user);
-            loadUserStats(user);
-            
-            document.getElementById('profileLogout').addEventListener('click', () => {
+            // Mostrar datos del usuario
+            document.getElementById('profileAvatar').src = user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'Usuario') + '&background=E50914&color=fff&size=200';
+            document.getElementById('profileName').textContent = user.displayName || 'Usuario';
+            document.getElementById('profileEmail').textContent = user.email || 'email@ejemplo.com';
+
+            // Fecha de registro
+            if (user.metadata && user.metadata.creationTime) {
+                const date = new Date(user.metadata.creationTime);
+                document.getElementById('profileSince').textContent = 'Desde ' + date.getFullYear();
+            }
+
+            // Cargar estadísticas
+            const uid = user.uid;
+
+            // Favoritos
+            database.ref(`favorites/${uid}`).on('value', function(snapshot) {
+                const data = snapshot.val() || {};
+                document.getElementById('statFavorites').textContent = Object.keys(data).length;
+            });
+
+            // Progreso
+            database.ref(`progress/${uid}`).on('value', function(snapshot) {
+                const data = snapshot.val() || {};
+                let watching = 0;
+                let completed = 0;
+                let total = 0;
+
+                Object.values(data).forEach(function(progress) {
+                    total++;
+                    if (progress.episode > 0 && progress.episode < progress.total) {
+                        watching++;
+                    } else if (progress.episode === progress.total && progress.total > 0) {
+                        completed++;
+                    }
+                });
+
+                document.getElementById('statWatching').textContent = watching;
+                document.getElementById('statCompleted').textContent = completed;
+                document.getElementById('statTotal').textContent = total;
+            });
+
+            // Cerrar sesión
+            document.getElementById('profileLogout').addEventListener('click', function() {
                 if (confirm('¿Seguro que quieres cerrar sesión?')) {
-                    auth.signOut().then(() => {
+                    auth.signOut().then(function() {
                         window.location.href = 'login.html';
                     });
                 }
             });
         });
 
-        function loadUserProfile(user) {
-            document.getElementById('profileAvatar').src = user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'Usuario') + '&background=E50914&color=fff&size=200';
-            document.getElementById('profileName').textContent = user.displayName || 'Usuario';
-            document.getElementById('profileEmail').textContent = user.email || 'email@ejemplo.com';
-            
-            // Fecha de registro (simulada)
-            const creationDate = user.metadata?.creationTime ? new Date(user.metadata.creationTime) : new Date();
-            document.getElementById('profileSince').textContent = `Desde ${creationDate.getFullYear()}`;
-        }
-
-        function loadUserStats(user) {
-            // Cargar favoritos
-            database.ref(`favorites/${user.uid}`).on('value', (snapshot) => {
-                const data = snapshot.val() || {};
-                userStats.favorites = Object.keys(data).length;
-                document.getElementById('statFavorites').textContent = userStats.favorites;
-            });
-
-            // Cargar progreso
-            database.ref(`progress/${user.uid}`).on('value', (snapshot) => {
-                const data = snapshot.val() || {};
-                let watching = 0;
-                let completed = 0;
-                let totalTime = 0;
-                
-                Object.values(data).forEach(progress => {
-                    if (progress.episode > 0 && progress.episode < progress.total) {
-                        watching++;
-                    } else if (progress.episode === progress.total && progress.total > 0) {
-                        completed++;
-                    }
-                    // Estimar tiempo (30min por episodio)
-                    totalTime += progress.episode * 30;
-                });
-                
-                userStats.watching = watching;
-                userStats.completed = completed;
-                userStats.totalTime = totalTime;
-                
-                document.getElementById('statWatching').textContent = watching;
-                document.getElementById('statCompleted').textContent = completed;
-                document.getElementById('statTime').textContent = formatTime(totalTime);
-            });
-        }
-
-        function formatTime(minutes) {
-            if (minutes < 60) return `${minutes}m`;
-            const hours = Math.floor(minutes / 60);
-            const mins = minutes % 60;
-            return `${hours}h ${mins}m`;
-        }
-
-        function goToSection(section) {
-            window.location.href = `mi-lista.html?tab=${section}`;
-        }
-
         function editProfile() {
-            const name = prompt('Nuevo nombre:', document.getElementById('profileName').textContent);
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const name = prompt('Nuevo nombre:', user.displayName || '');
             if (name && name.trim()) {
-                const user = auth.currentUser;
                 user.updateProfile({ displayName: name.trim() })
-                    .then(() => {
+                    .then(function() {
                         document.getElementById('profileName').textContent = name.trim();
                         alert('✅ Perfil actualizado');
                     })
-                    .catch(error => alert('❌ Error: ' + error.message));
+                    .catch(function(error) {
+                        alert('❌ Error: ' + error.message);
+                    });
             }
         }
 
         function changePassword() {
             const user = auth.currentUser;
-            const email = user.email;
-            
-            if (confirm(`Se enviará un enlace de restablecimiento a ${email}`)) {
-                auth.sendPasswordResetEmail(email)
-                    .then(() => alert('✅ Enlace enviado a tu correo'))
-                    .catch(error => alert('❌ Error: ' + error.message));
+            if (!user) return;
+
+            if (confirm('Se enviará un enlace de restablecimiento a tu correo')) {
+                auth.sendPasswordResetEmail(user.email)
+                    .then(function() {
+                        alert('✅ Enlace enviado a tu correo');
+                    })
+                    .catch(function(error) {
+                        alert('❌ Error: ' + error.message);
+                    });
             }
         }
-
-        function changePhoto() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        const imgData = event.target.result;
-                        document.getElementById('profileAvatar').src = imgData;
-                        // Aquí se podría subir a Firebase Storage
-                        alert('✅ Foto actualizada (guardada localmente)');
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-            input.click();
-        }
-
-        function openSettings() {
-            alert('⚙️ Configuración en desarrollo');
-        }
-
-        function openHelp() {
-            alert('❓ Ayuda en desarrollo');
-        }
-
-        function openAbout() {
-            alert('🎬 Mi Cine v1.0\n\nTu plataforma de entretenimiento favorita');
-        }
-
-        console.log('✅ Perfil cargado correctamente');
     </script>
 </body>
 </html>
