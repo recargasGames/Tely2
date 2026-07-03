@@ -14,7 +14,6 @@
                 <a href="index.html">🏠 Inicio</a>
                 <a href="peliculas.html">🎬 Películas</a>
                 <a href="series.html" class="active">📺 Series</a>
-                <a href="admin.html" id="adminLink" class="hidden">⚙️ Admin</a>
             </nav>
             <div class="auth-section">
                 <div id="userInfo" class="user-info hidden">
@@ -30,7 +29,7 @@
     <main class="main-content">
         <section class="section">
             <div class="section-header">
-                <h2>📺 Series</h2>
+                <h2>📺 Todas las Series</h2>
                 <div class="search-box small">
                     <input type="text" id="searchSeries" placeholder="🔍 Buscar series...">
                 </div>
@@ -62,13 +61,110 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/tmdb-api.js"></script>
     <script src="js/database.js"></script>
+    
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            loadContent('seriesGrid', 'serie');
+        let currentPage = 1;
+
+        async function loadSeries(page = 1) {
+            const container = document.getElementById('seriesGrid');
             
+            if (page === 1) {
+                container.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Cargando series...</p>
+                    </div>
+                `;
+            }
+
+            try {
+                const series = await getPopularSeries(page);
+                const items = series.map(m => ({ ...m, media_type: 'tv' }));
+                
+                if (page === 1) {
+                    renderCards('seriesGrid', items);
+                    if (series.length > 0) {
+                        const parent = container.parentElement;
+                        const existingBtn = parent.querySelector('.load-more-btn');
+                        if (existingBtn) existingBtn.remove();
+                        const btn = document.createElement('button');
+                        btn.className = 'btn btn-secondary load-more-btn';
+                        btn.textContent = '📥 Cargar más series';
+                        btn.style.margin = '30px auto';
+                        btn.style.display = 'block';
+                        btn.onclick = () => {
+                            currentPage++;
+                            loadSeries(currentPage);
+                        };
+                        parent.appendChild(btn);
+                    }
+                } else {
+                    const existingItems = container.querySelectorAll('.movie-card');
+                    const newItems = items.map(item => {
+                        const title = item.title || item.name;
+                        const year = item.release_date || item.first_air_date || '';
+                        const poster = getPosterUrl(item.poster_path);
+                        const id = item.id;
+
+                        return `
+                            <div class="movie-card" onclick="openModalTMDB(${id}, 'tv')">
+                                <div class="card-image">
+                                    <img src="${poster}" alt="${title}" loading="lazy">
+                                    <div class="badge-type">📺</div>
+                                    <div class="badge-top">${year ? year.substring(0, 4) : 'N/A'}</div>
+                                    <div class="card-overlay">
+                                        <div class="play-btn">▶</div>
+                                    </div>
+                                </div>
+                                <div class="movie-info">
+                                    <h3>${title}</h3>
+                                    <div class="meta">
+                                        <span class="year">${year ? year.substring(0, 4) : 'Año desconocido'}</span>
+                                        <span class="type-badge badge-serie">Serie</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    container.innerHTML += newItems;
+                    
+                    if (series.length === 0) {
+                        const btn = container.parentElement.querySelector('.load-more-btn');
+                        if (btn) btn.remove();
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                if (page === 1) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">❌</div>
+                            <p>Error al cargar las series</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSeries(1);
+
             document.getElementById('searchSeries').addEventListener('input', function() {
-                loadContent('seriesGrid', 'serie', this.value);
+                const query = this.value.trim();
+                const container = document.getElementById('seriesGrid');
+                const loadBtn = container.parentElement.querySelector('.load-more-btn');
+                if (loadBtn) loadBtn.style.display = 'none';
+                
+                if (query === '') {
+                    currentPage = 1;
+                    loadSeries(1);
+                    return;
+                }
+                
+                searchContentAndRender('seriesGrid', query, 'serie');
             });
         });
     </script>
