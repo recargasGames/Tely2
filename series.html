@@ -24,9 +24,6 @@
             <div class="search-input-wrapper">
                 <span class="material-icons">search</span>
                 <input type="text" id="searchSeries" placeholder="Buscar series...">
-                <button class="clear-search" id="clearSearch">
-                    <span class="material-icons">close</span>
-                </button>
             </div>
         </div>
     </header>
@@ -107,147 +104,77 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/tmdb-api.js"></script>
-    <script src="js/database.js"></script>
     
     <script>
-        // ==================== VARIABLES ====================
-        let allSeries = [];
-        let currentPage = 1;
-        let isLoading = false;
-        let hasMore = true;
+        // ==================== CARGAR SERIES DESDE FIREBASE ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSeries();
+            setupEventListeners();
+        });
 
-        // ==================== CARGAR SERIES ====================
-        async function loadSeries(page = 1, append = false) {
-            if (isLoading) return;
-            if (!append) {
-                currentPage = 1;
-                hasMore = true;
-                document.getElementById('seriesGrid').innerHTML = `
-                    <div class="skeleton-grid">
-                        ${Array(6).fill(0).map(() => `
-                            <div class="skeleton-card">
-                                <div class="skeleton-image"></div>
-                                <div class="skeleton-title"></div>
-                                <div class="skeleton-meta"></div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }
+        function loadSeries() {
+            const grid = document.getElementById('seriesGrid');
+            
+            grid.innerHTML = `
+                <div class="skeleton-grid">
+                    ${Array(6).fill(0).map(() => `
+                        <div class="skeleton-card">
+                            <div class="skeleton-image"></div>
+                            <div class="skeleton-title"></div>
+                            <div class="skeleton-meta"></div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
 
-            isLoading = true;
+            database.ref('content').orderByChild('createdAt').on('value', (snapshot) => {
+                const data = snapshot.val();
+                let series = [];
 
-            try {
-                const response = await fetch(
-                    `${TMDB_BASE_URL}/tv/popular?api_key=${TMDB_API_KEY}&language=es-ES&page=${page}`
-                );
-                const data = await response.json();
-                const series = data.results || [];
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        const item = data[key];
+                        if (item.type === 'serie') {
+                            series.push({ id: key, ...item });
+                        }
+                    });
+                    series.reverse();
+                }
 
                 if (series.length === 0) {
-                    hasMore = false;
-                    isLoading = false;
+                    grid.innerHTML = `
+                        <div class="empty-state-premium" style="grid-column:1/-1;">
+                            <div class="empty-icon">📺</div>
+                            <h3>No hay series</h3>
+                            <p>Ve al panel de administración y presiona "AGREGAR TODAS LAS SERIES"</p>
+                            <a href="admin.html" class="btn btn-primary" style="margin-top:12px;">Ir al Admin</a>
+                        </div>
+                    `;
                     return;
                 }
 
-                if (!append) {
-                    allSeries = series;
-                } else {
-                    allSeries = [...allSeries, ...series];
-                }
-
-                renderSeries(allSeries, append);
-                isLoading = false;
-                hasMore = series.length === 20;
-
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('seriesGrid').innerHTML = `
-                    <div class="empty-state-premium" style="grid-column:1/-1;">
-                        <div class="empty-icon">❌</div>
-                        <h3>Error al cargar series</h3>
-                        <p>${error.message}</p>
-                        <button class="btn btn-primary" onclick="loadSeries(1)">Reintentar</button>
-                    </div>
-                `;
-                isLoading = false;
-            }
-        }
-
-        // ==================== RENDERIZAR SERIES ====================
-        function renderSeries(series, append = false) {
-            const grid = document.getElementById('seriesGrid');
-
-            if (series.length === 0) {
-                grid.innerHTML = `
-                    <div class="empty-state-premium" style="grid-column:1/-1;">
-                        <div class="empty-icon">📺</div>
-                        <h3>No hay series disponibles</h3>
-                        <p>Pronto agregaremos más contenido</p>
-                    </div>
-                `;
-                return;
-            }
-
-            const cards = series.map(serie => `
-                <div class="content-card" onclick="openContentModal(${serie.id}, 'tv')">
-                    <div class="card-image">
-                        <img src="${getPosterUrl(serie.poster_path)}" alt="${serie.name}" loading="lazy">
-                        <div class="card-badge top">${serie.vote_average ? '⭐ ' + serie.vote_average.toFixed(1) : 'Nuevo'}</div>
-                        <div class="card-overlay">
-                            <button class="play-btn-small">
-                                <span class="material-icons">play_arrow</span>
-                            </button>
+                grid.innerHTML = series.map(serie => `
+                    <div class="content-card" onclick="openContentModal('${serie.id}')">
+                        <div class="card-image">
+                            <img src="${serie.poster}" alt="${serie.title}" loading="lazy">
+                            <div class="card-badge top">${serie.vote_average ? '⭐ ' + serie.vote_average.toFixed(1) : 'Nuevo'}</div>
+                            <div class="card-overlay">
+                                <button class="play-btn-small">
+                                    <span class="material-icons">play_arrow</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-info">
+                            <h4>${serie.title}</h4>
+                            <span class="card-year">${serie.year || 'N/A'}</span>
                         </div>
                     </div>
-                    <div class="card-info">
-                        <h4>${serie.name}</h4>
-                        <span class="card-year">${serie.first_air_date ? serie.first_air_date.substring(0, 4) : 'N/A'}</span>
-                    </div>
-                </div>
-            `).join('');
-
-            if (append) {
-                grid.innerHTML += cards;
-            } else {
-                grid.innerHTML = cards;
-            }
-
-            const existingBtn = document.querySelector('.load-more-btn');
-            if (existingBtn) existingBtn.remove();
-
-            if (hasMore && series.length > 0) {
-                const btn = document.createElement('button');
-                btn.className = 'btn btn-secondary load-more-btn';
-                btn.textContent = '📥 Cargar más series';
-                btn.style.cssText = 'margin: 20px auto; display: block; padding: 12px 32px;';
-                btn.onclick = () => {
-                    currentPage++;
-                    loadSeries(currentPage, true);
-                };
-                grid.parentElement.appendChild(btn);
-            }
+                `).join('');
+            });
         }
 
-        // ==================== FUNCIONES GLOBALES ====================
-        function getPosterUrl(path) {
-            return path ? `https://image.tmdb.org/t/p/w500${path}` : 'https://via.placeholder.com/300x450/1A1A1A/ffffff?text=No+Image';
-        }
-
-        async function getSeriesDetails(id) {
-            try {
-                const response = await fetch(
-                    `${TMDB_BASE_URL}/tv/${id}?api_key=${TMDB_API_KEY}&language=es-ES`
-                );
-                return await response.json();
-            } catch (error) {
-                console.error('Error:', error);
-                return null;
-            }
-        }
-
-        async function openContentModal(id, type) {
+        // ==================== ABRIR MODAL ====================
+        async function openContentModal(id) {
             const user = auth.currentUser;
             if (!user) {
                 if (confirm('🔒 Para ver detalles necesitas iniciar sesión. ¿Deseas ir al login?')) {
@@ -270,28 +197,26 @@
             document.body.style.overflow = 'hidden';
 
             try {
-                const data = await getSeriesDetails(id);
-                if (!data) throw new Error('No se encontraron detalles');
+                const snapshot = await database.ref(`content/${id}`).once('value');
+                const data = snapshot.val();
 
-                const poster = getPosterUrl(data.poster_path);
-                const backdrop = data.backdrop_path ? `https://image.tmdb.org/t/p/original${data.backdrop_path}` : poster;
+                if (!data) {
+                    throw new Error('No se encontró el contenido');
+                }
 
-                // Generar enlace para primer episodio
-                const firstSeason = data.seasons?.find(s => s.season_number > 0);
-                const seasonNum = firstSeason?.season_number || 1;
-                const videoUrl = `https://unlimplay.co/play/tv/${id}/${seasonNum}/1`;
+                const poster = data.poster;
+                const videoUrl = data.videoUrl || `https://unlimplay.co/play/tv/${data.tmdbId}/1/1`;
 
-                // Episodios
+                // Generar episodios
                 let episodesHTML = '';
-                if (firstSeason) {
-                    const epCount = Math.min(firstSeason.episode_count || 10, 10);
+                if (data.episodes && data.episodes.length > 0) {
                     episodesHTML = `
                         <div class="modal-seasons">
-                            <h3>Temporada ${seasonNum}</h3>
+                            <h3>Episodios</h3>
                             <div class="modal-episodes">
-                                ${Array.from({length: epCount}, (_, i) => `
-                                    <a href="https://unlimplay.co/play/tv/${id}/${seasonNum}/${i+1}" target="_blank" class="modal-episode-btn">
-                                        Episodio ${i+1}
+                                ${data.episodes.slice(0, 20).map(ep => `
+                                    <a href="${ep.url}" target="_blank" class="modal-episode-btn">
+                                        ${ep.title}
                                     </a>
                                 `).join('')}
                             </div>
@@ -300,29 +225,23 @@
                 }
 
                 modalContent.innerHTML = `
-                    <div class="modal-hero" style="background-image: url(${backdrop})">
+                    <div class="modal-hero" style="background-image: url(${poster})">
                         <div class="modal-hero-gradient"></div>
                         <div class="modal-hero-content">
-                            <img src="${poster}" alt="${data.name}" class="modal-poster-img">
+                            <img src="${poster}" alt="${data.title}" class="modal-poster-img">
                             <div class="modal-hero-info">
-                                <h2>${data.name}</h2>
+                                <h2>${data.title}</h2>
                                 <div class="modal-meta">
-                                    <span class="modal-year">${data.first_air_date ? data.first_air_date.substring(0, 4) : 'N/A'}</span>
-                                    <span class="modal-rating">⭐ ${data.vote_average ? data.vote_average.toFixed(1) : 'N/A'}</span>
-                                    <span class="modal-seasons-count">${data.seasons?.filter(s => s.season_number > 0).length || 0} temporadas</span>
-                                </div>
-                                <div class="modal-genres">
-                                    ${data.genres?.map(g => `<span class="genre-tag">${g.name}</span>`).join('') || 'Sin géneros'}
+                                    <span class="modal-year">${data.year || 'N/A'}</span>
+                                    <span class="modal-rating">⭐ ${data.vote_average || 'N/A'}</span>
+                                    <span class="modal-seasons-count">${data.episodes?.length || 0} episodios</span>
                                 </div>
                                 <div class="modal-actions">
                                     <a href="${videoUrl}" target="_blank" class="modal-play-btn">
                                         <span class="material-icons">play_arrow</span> Reproducir
                                     </a>
-                                    <button class="modal-fav-btn" onclick="toggleFavorite(${id})">
+                                    <button class="modal-fav-btn" onclick="toggleFavorite('${id}')">
                                         <span class="material-icons">favorite_border</span>
-                                    </button>
-                                    <button class="modal-share-btn" onclick="shareContent('${data.name}')">
-                                        <span class="material-icons">share</span>
                                     </button>
                                 </div>
                             </div>
@@ -331,7 +250,7 @@
                     <div class="modal-body">
                         <div class="modal-description">
                             <h3>Sinopsis</h3>
-                            <p>${data.overview || 'Sin descripción disponible'}</p>
+                            <p>${data.description || 'Sin descripción disponible'}</p>
                         </div>
                         ${episodesHTML}
                     </div>
@@ -343,7 +262,7 @@
                     <div class="modal-error">
                         <span class="error-icon">❌</span>
                         <p>Error al cargar los detalles</p>
-                        <button class="btn btn-primary" onclick="openContentModal(${id}, '${type}')">Reintentar</button>
+                        <button class="btn btn-primary" onclick="openContentModal('${id}')">Reintentar</button>
                     </div>
                 `;
             }
@@ -354,58 +273,26 @@
             document.body.style.overflow = 'auto';
         }
 
-        function shareContent(title) {
-            if (navigator.share) {
-                navigator.share({
-                    title: `Mi Cine - ${title}`,
-                    text: `Mira "${title}" en Mi Cine`,
-                    url: window.location.href
-                });
+        // ==================== FAVORITOS ====================
+        async function toggleFavorite(id) {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const ref = database.ref(`favorites/${user.uid}/${id}`);
+            const snapshot = await ref.once('value');
+            const exists = snapshot.exists();
+
+            if (exists) {
+                await ref.remove();
+                alert('❌ Eliminado de favoritos');
             } else {
-                navigator.clipboard.writeText(window.location.href);
-                alert('Enlace copiado al portapapeles');
+                await ref.set(true);
+                alert('✅ Agregado a favoritos');
             }
         }
 
         // ==================== EVENTOS ====================
-        document.addEventListener('DOMContentLoaded', () => {
-            loadSeries(1);
-
-            // Búsqueda
-            const searchInput = document.getElementById('searchSeries');
-            let searchTimeout;
-
-            searchInput.addEventListener('input', function() {
-                clearTimeout(searchTimeout);
-                const query = this.value.trim();
-
-                if (query === '') {
-                    loadSeries(1);
-                    return;
-                }
-
-                searchTimeout = setTimeout(async () => {
-                    try {
-                        const response = await fetch(
-                            `${TMDB_BASE_URL}/search/tv?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&language=es-ES`
-                        );
-                        const data = await response.json();
-                        const results = data.results || [];
-                        renderSeries(results);
-                        const btn = document.querySelector('.load-more-btn');
-                        if (btn) btn.remove();
-                    } catch (error) {
-                        console.error('Error:', error);
-                    }
-                }, 500);
-            });
-
-            document.getElementById('clearSearch').addEventListener('click', () => {
-                searchInput.value = '';
-                loadSeries(1);
-            });
-
-            // Menú lateral
+        function setupEventListeners() {
             document.getElementById('menuToggle').addEventListener('click', () => {
                 document.getElementById('sideMenu').classList.add('active');
                 document.getElementById('menuOverlay').classList.add('active');
@@ -419,28 +306,20 @@
                 document.getElementById('menuOverlay').classList.remove('active');
             }
 
-            // Búsqueda toggle
             document.getElementById('searchToggle').addEventListener('click', () => {
                 document.getElementById('searchExpand').classList.toggle('active');
-                if (document.getElementById('searchExpand').classList.contains('active')) {
-                    searchInput.focus();
-                }
             });
 
-            // Cerrar modal
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    closeContentModal();
-                    closeMenu();
-                }
+                if (e.key === 'Escape') closeContentModal();
             });
 
             document.getElementById('contentModal').addEventListener('click', (e) => {
                 if (e.target === e.currentTarget) closeContentModal();
             });
-        });
+        }
 
-        console.log('✅ Series cargadas correctamente');
+        console.log('✅ Series cargadas');
     </script>
 </body>
 </html>
