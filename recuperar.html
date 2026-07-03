@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cine - Recuperar Contraseña</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-box">
+            <div class="auth-header">
+                <h1>🔐 Recuperar Contraseña</h1>
+                <p>Te enviaremos un enlace para restablecerla</p>
+            </div>
+
+            <form id="resetForm" class="auth-form">
+                <div class="form-group">
+                    <label>📧 Correo Electrónico</label>
+                    <input type="email" id="resetEmail" placeholder="tu@email.com" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block">Enviar Enlace</button>
+            </form>
+
+            <div class="auth-footer">
+                <p><a href="login.html">← Volver al inicio de sesión</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/firebase-config.js"></script>
+    <script>
+        document.getElementById('resetForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('resetEmail').value;
+            
+            try {
+                await auth.sendPasswordResetEmail(email);
+                alert('✅ Enlace enviado a tu correo');
+                window.location.href = 'login.html';
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
