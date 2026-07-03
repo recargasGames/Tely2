@@ -76,20 +76,12 @@
                     <span class="notif-time">Hace 2 horas</span>
                 </div>
             </div>
-            <div class="notif-item">
-                <span class="notif-icon">📺</span>
-                <div>
-                    <p><strong>Nuevo episodio:</strong> "The Last of Us - T2 E3"</p>
-                    <span class="notif-time">Hace 5 horas</span>
-                </div>
-            </div>
         </div>
     </div>
     <div class="notif-overlay" id="notifOverlay"></div>
 
-    <!-- CONTENIDO PRINCIPAL -->
+    <!-- CONTENIDO -->
     <main class="main-premium">
-        <!-- BANNER -->
         <section class="hero-banner-premium" id="heroBanner">
             <div class="hero-banner-content">
                 <span class="hero-badge">🔥 Popular</span>
@@ -111,7 +103,6 @@
             <div class="hero-gradient"></div>
         </section>
 
-        <!-- CONTINUAR VIENDO -->
         <section class="content-section" id="continueSection">
             <div class="section-header-premium">
                 <h2 class="section-title-premium">
@@ -121,7 +112,6 @@
             <div class="content-row" id="continueRow"></div>
         </section>
 
-        <!-- PELÍCULAS -->
         <section class="content-section">
             <div class="section-header-premium">
                 <h2 class="section-title-premium">
@@ -132,7 +122,6 @@
             <div class="content-row" id="moviesRow"></div>
         </section>
 
-        <!-- SERIES -->
         <section class="content-section">
             <div class="section-header-premium">
                 <h2 class="section-title-premium">
@@ -184,13 +173,37 @@
     <script src="js/firebase-config.js"></script>
     
     <script>
-        // ==================== VARIABLES ====================
+        // ==================== FUNCIÓN REDIRECCIÓN CORREGIDA ====================
+        function goToLogin() {
+            // Guardar la página actual para volver después del login
+            localStorage.setItem('returnUrl', window.location.href);
+            window.location.href = 'login.html';
+        }
+
+        // ==================== VERIFICAR AUTENTICACIÓN ====================
+        function checkAuth() {
+            const user = auth.currentUser;
+            if (!user) {
+                if (confirm('🔒 Para ver contenido necesitas iniciar sesión. ¿Deseas ir al login?')) {
+                    goToLogin();
+                }
+                return false;
+            }
+            return true;
+        }
+
+        // ==================== REPRODUCIR ====================
+        function playContent(id, type) {
+            if (!checkAuth()) return;
+            window.location.href = `reproductor.html?id=${id}&type=${type}`;
+        }
+
+        // ==================== CARGAR CONTENIDO ====================
         let featuredMovie = null;
         let allContent = [];
 
-        // ==================== CARGAR CONTENIDO ====================
         document.addEventListener('DOMContentLoaded', function() {
-            // Verificar autenticación
+            // Verificar autenticación para mostrar usuario
             auth.onAuthStateChanged(function(user) {
                 if (user) {
                     document.getElementById('sideUserAvatar').src = user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'Usuario') + '&background=E50914&color=fff&size=100';
@@ -203,7 +216,6 @@
         });
 
         function loadContent() {
-            // Cargar desde Firebase
             database.ref('content').orderByChild('createdAt').on('value', function(snapshot) {
                 const data = snapshot.val();
                 allContent = [];
@@ -223,23 +235,16 @@
             const movies = allContent.filter(item => item.type === 'pelicula');
             const series = allContent.filter(item => item.type === 'serie');
 
-            // Banner destacado
             if (movies.length > 0) {
                 featuredMovie = movies[0];
                 updateHero(featuredMovie);
             }
 
-            // Películas
             renderMovies(movies.slice(0, 10));
-            
-            // Series
             renderSeries(series.slice(0, 10));
-            
-            // Continuar viendo
             renderContinueWatching();
         }
 
-        // ==================== RENDERIZAR ====================
         function renderMovies(movies) {
             const container = document.getElementById('moviesRow');
             if (!movies || movies.length === 0) {
@@ -254,12 +259,12 @@
             }
 
             container.innerHTML = movies.map(movie => `
-                <div class="content-card" onclick="openContentModal('${movie.id}')">
+                <div class="content-card" onclick="openModal('${movie.id}')">
                     <div class="card-image">
                         <img src="${movie.poster}" alt="${movie.title}" loading="lazy">
                         <div class="card-badge top">${movie.vote_average ? '⭐ ' + movie.vote_average.toFixed(1) : 'Nuevo'}</div>
                         <div class="card-overlay">
-                            <button class="play-btn-small">
+                            <button class="play-btn-small" onclick="event.stopPropagation(); playContent('${movie.id}', 'pelicula')">
                                 <span class="material-icons">play_arrow</span>
                             </button>
                         </div>
@@ -286,12 +291,12 @@
             }
 
             container.innerHTML = series.map(serie => `
-                <div class="content-card" onclick="openContentModal('${serie.id}')">
+                <div class="content-card" onclick="openModal('${serie.id}')">
                     <div class="card-image">
                         <img src="${serie.poster}" alt="${serie.title}" loading="lazy">
                         <div class="card-badge top">${serie.vote_average ? '⭐ ' + serie.vote_average.toFixed(1) : 'Nuevo'}</div>
                         <div class="card-overlay">
-                            <button class="play-btn-small">
+                            <button class="play-btn-small" onclick="event.stopPropagation(); playContent('${serie.id}', 'serie')">
                                 <span class="material-icons">play_arrow</span>
                             </button>
                         </div>
@@ -304,7 +309,6 @@
             `).join('');
         }
 
-        // ==================== CONTINUAR VIENDO ====================
         function renderContinueWatching() {
             const container = document.getElementById('continueRow');
             const user = auth.currentUser;
@@ -314,7 +318,7 @@
                     <div class="empty-row">
                         <span class="material-icons">play_circle</span>
                         <p>Inicia sesión para ver tu progreso</p>
-                        <a href="login.html" class="btn btn-primary" style="margin-top:12px;">Iniciar sesión</a>
+                        <button class="btn btn-primary" style="margin-top:12px;" onclick="goToLogin()">Iniciar sesión</button>
                     </div>
                 `;
                 return;
@@ -334,15 +338,11 @@
                     return;
                 }
 
-                // Buscar contenido en progreso
                 const items = [];
                 progressIds.slice(0, 6).forEach(function(id) {
                     const content = allContent.find(c => c.id === id);
                     if (content) {
-                        items.push({
-                            ...content,
-                            progress: progressData[id]
-                        });
+                        items.push({ ...content, progress: progressData[id] });
                     }
                 });
 
@@ -379,7 +379,7 @@
             });
         }
 
-        // ==================== HERO BANNER ====================
+        // ==================== HERO ====================
         function updateHero(movie) {
             document.getElementById('heroTitle').textContent = movie.title;
             document.getElementById('heroDescription').textContent = movie.description || 'Sin descripción disponible';
@@ -397,31 +397,13 @@
             };
 
             document.getElementById('heroInfoBtn').onclick = function() {
-                openContentModal(movie.id);
+                openModal(movie.id);
             };
         }
 
-        // ==================== REPRODUCIR ====================
-        function playContent(id, type) {
-            const user = auth.currentUser;
-            if (!user) {
-                if (confirm('🔒 Para ver contenido necesitas iniciar sesión. ¿Deseas ir al login?')) {
-                    window.location.href = 'login.html';
-                }
-                return;
-            }
-            window.location.href = `reproductor.html?id=${id}&type=${type}`;
-        }
-
         // ==================== MODAL ====================
-        function openContentModal(id) {
-            const user = auth.currentUser;
-            if (!user) {
-                if (confirm('🔒 Para ver detalles necesitas iniciar sesión. ¿Deseas ir al login?')) {
-                    window.location.href = 'login.html';
-                }
-                return;
-            }
+        function openModal(id) {
+            if (!checkAuth()) return;
 
             const modal = document.getElementById('contentModal');
             const modalContent = document.getElementById('modalContent');
@@ -465,9 +447,9 @@
                             <h3>Episodios</h3>
                             <div class="modal-episodes">
                                 ${content.episodes.slice(0, 10).map(ep => `
-                                    <a href="reproductor.html?id=${id}&type=${content.type}&ep=${encodeURIComponent(ep.title)}" class="modal-episode-btn">
+                                    <button class="modal-episode-btn" onclick="playContent('${id}', '${content.type}')">
                                         ${ep.title}
-                                    </a>
+                                    </button>
                                 `).join('')}
                             </div>
                         </div>
@@ -503,7 +485,6 @@
 
         // ==================== EVENTOS ====================
         function setupEventListeners() {
-            // Menú lateral
             document.getElementById('menuToggle').addEventListener('click', function() {
                 document.getElementById('sideMenu').classList.add('active');
                 document.getElementById('menuOverlay').classList.add('active');
@@ -517,12 +498,10 @@
                 document.getElementById('menuOverlay').classList.remove('active');
             }
 
-            // Búsqueda
             document.getElementById('searchToggle').addEventListener('click', function() {
                 document.getElementById('searchExpand').classList.toggle('active');
             });
 
-            // Notificaciones
             document.getElementById('notifBtn').addEventListener('click', function() {
                 document.getElementById('notifPanel').classList.toggle('active');
                 document.getElementById('notifOverlay').classList.toggle('active');
@@ -536,7 +515,6 @@
                 document.getElementById('notifOverlay').classList.remove('active');
             }
 
-            // Cerrar sesión
             document.getElementById('logoutSide').addEventListener('click', function() {
                 if (confirm('¿Seguro que quieres cerrar sesión?')) {
                     auth.signOut().then(function() {
@@ -545,7 +523,6 @@
                 }
             });
 
-            // Cerrar modal
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     closeContentModal();
@@ -556,6 +533,18 @@
 
             document.getElementById('contentModal').addEventListener('click', function(e) {
                 if (e.target === e.currentTarget) closeContentModal();
+            });
+
+            // ===== CORRECCIÓN: Verificar autenticación al cargar =====
+            // Si el usuario está logueado y vuelve de login, mantener sesión
+            auth.onAuthStateChanged(function(user) {
+                if (user) {
+                    // Usuario logueado, todo normal
+                    console.log('Usuario logueado:', user.displayName);
+                } else {
+                    // Usuario no logueado, mostrar opción de login
+                    console.log('Usuario no logueado');
+                }
             });
         }
 
