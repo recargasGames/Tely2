@@ -22,28 +22,16 @@
         <div class="admin-container">
             <div class="admin-header">
                 <h2>Panel de Administración</h2>
-                <p>Gestiona el contenido personalizado</p>
+                <p>Agrega contenido personalizado con ID de TMDB</p>
             </div>
 
             <div class="admin-tabs">
-                <button class="admin-tab active" data-tab="manage">📋 Gestionar</button>
-                <button class="admin-tab" data-tab="add">➕ Agregar</button>
-                <button class="admin-tab" data-tab="stats">📊 Estadísticas</button>
-            </div>
-
-            <!-- GESTIONAR -->
-            <div class="admin-tab-content active" id="tab-manage">
-                <div class="manage-header">
-                    <h3>Contenido Personalizado</h3>
-                    <div class="search-box small">
-                        <input type="text" id="searchManage" placeholder="🔍 Buscar...">
-                    </div>
-                </div>
-                <div id="manageGrid" class="manage-grid"></div>
+                <button class="admin-tab active" data-tab="add">➕ Agregar</button>
+                <button class="admin-tab" data-tab="manage">📋 Gestionar</button>
             </div>
 
             <!-- AGREGAR -->
-            <div class="admin-tab-content" id="tab-add">
+            <div class="admin-tab-content active" id="tab-add">
                 <form id="adminForm" class="admin-form">
                     <div class="form-row">
                         <div class="form-group">
@@ -74,7 +62,7 @@
                         <div class="form-group">
                             <label>🎬 ID de TMDB *</label>
                             <input type="text" id="tmdbId" placeholder="Ej: 27205" required>
-                            <small>ID de la película/serie en TMDB</small>
+                            <small>Busca el ID en themoviedb.org</small>
                         </div>
                         <div class="form-group">
                             <label>🔗 URL Personalizada</label>
@@ -107,31 +95,12 @@
                 </form>
             </div>
 
-            <!-- ESTADÍSTICAS -->
-            <div class="admin-tab-content" id="tab-stats">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">🎬</div>
-                        <div class="stat-info">
-                            <h3 id="totalPeliculas">0</h3>
-                            <p>Películas</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">📺</div>
-                        <div class="stat-info">
-                            <h3 id="totalSeries">0</h3>
-                            <p>Series</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">📦</div>
-                        <div class="stat-info">
-                            <h3 id="totalContenido">0</h3>
-                            <p>Total</p>
-                        </div>
-                    </div>
+            <!-- GESTIONAR -->
+            <div class="admin-tab-content" id="tab-manage">
+                <div class="manage-header">
+                    <h3>Contenido Personalizado</h3>
                 </div>
+                <div id="manageGrid" class="manage-grid"></div>
             </div>
         </div>
     </main>
@@ -141,6 +110,183 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/admin.js"></script>
+    
+    <script>
+        // ==================== ADMIN PANEL ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Verificar autenticación
+            auth.onAuthStateChanged(user => {
+                if (!user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                loadManageContent();
+            });
+
+            // Tabs
+            document.querySelectorAll('.admin-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+                    if (this.dataset.tab === 'manage') loadManageContent();
+                });
+            });
+
+            // Formulario
+            document.getElementById('adminForm').addEventListener('submit', saveContent);
+        });
+
+        function addEpisode() {
+            const container = document.getElementById('episodeList');
+            const div = document.createElement('div');
+            div.className = 'episode-item';
+            const count = container.children.length + 1;
+            div.innerHTML = `
+                <input type="text" placeholder="Temporada X - Episodio X" value="Temporada 1 - Episodio ${count}">
+                <input type="text" placeholder="URL del video (opcional)">
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeEpisode(this)">✖</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeEpisode(btn) {
+            const items = document.querySelectorAll('.episode-item');
+            if (items.length > 1) {
+                btn.parentElement.remove();
+            } else {
+                alert('Debe haber al menos un episodio');
+            }
+        }
+
+        async function saveContent(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('title').value;
+            const year = document.getElementById('year').value;
+            const poster = document.getElementById('poster').value || 'https://via.placeholder.com/300x450/1A1A1A/ffffff?text=No+Image';
+            const type = document.getElementById('type').value;
+            const description = document.getElementById('description').value;
+            const tmdbId = document.getElementById('tmdbId').value;
+            const customUrl = document.getElementById('customUrl').value;
+
+            // Generar URL
+            let videoUrl = customUrl;
+            if (!videoUrl && tmdbId && type === 'pelicula') {
+                videoUrl = `https://unlimplay.co/play/movie/${tmdbId}`;
+            }
+
+            // Episodios
+            const episodeItems = document.querySelectorAll('.episode-item');
+            const episodes = [];
+            if (type === 'serie') {
+                episodeItems.forEach((item, index) => {
+                    const inputs = item.querySelectorAll('input');
+                    const epTitle = inputs[0].value || `Episodio ${index + 1}`;
+                    let epUrl = inputs[1].value;
+                    
+                    if (!epUrl && tmdbId) {
+                        const match = epTitle.match(/Temporada\s*(\d+)\s*[-–]\s*Episodio\s*(\d+)/i);
+                        if (match) {
+                            epUrl = `https://unlimplay.co/play/tv/${tmdbId}/${match[1]}/${match[2]}`;
+                        } else {
+                            epUrl = `https://unlimplay.co/play/tv/${tmdbId}/1/${index + 1}`;
+                        }
+                    }
+                    
+                    episodes.push({
+                        title: epTitle,
+                        url: epUrl || ''
+                    });
+                });
+            }
+
+            const content = {
+                title,
+                year: year || new Date().getFullYear().toString(),
+                poster,
+                type,
+                description,
+                tmdbId,
+                videoUrl: videoUrl || '',
+                customUrl: customUrl || '',
+                episodes: type === 'serie' ? episodes : [],
+                createdAt: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            try {
+                const newRef = database.ref('custom_content').push();
+                await newRef.set(content);
+                alert('✅ Contenido guardado exitosamente!');
+                document.getElementById('adminForm').reset();
+                document.querySelectorAll('.episode-item').forEach((item, index) => {
+                    if (index > 0) item.remove();
+                });
+                loadManageContent();
+            } catch (error) {
+                alert('❌ Error al guardar: ' + error.message);
+            }
+        }
+
+        function loadManageContent() {
+            const grid = document.getElementById('manageGrid');
+            
+            database.ref('custom_content').orderByChild('createdAt').on('value', (snapshot) => {
+                const data = snapshot.val();
+                let items = [];
+                
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        items.push({
+                            id: key,
+                            ...data[key]
+                        });
+                    });
+                    items.reverse();
+                }
+                
+                if (items.length === 0) {
+                    grid.innerHTML = `
+                        <div class="empty-state-premium">
+                            <div class="empty-icon">📭</div>
+                            <p>No hay contenido personalizado</p>
+                            <p style="color:#666;font-size:13px;">Agrega contenido desde la pestaña "Agregar"</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                grid.innerHTML = items.map(item => `
+                    <div class="manage-item">
+                        <div class="manage-item-info">
+                            <img src="${item.poster}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/50x75/1A1A1A/ffffff?text=No+Image'">
+                            <div>
+                                <h4>${item.title}</h4>
+                                <p>${item.year || 'Año desconocido'} • ${item.type === 'pelicula' ? '🎬 Película' : '📺 Serie'} ${item.tmdbId ? `• ID: ${item.tmdbId}` : ''}</p>
+                            </div>
+                        </div>
+                        <div class="manage-item-actions">
+                            <button class="btn btn-danger btn-sm" onclick="deleteContent('${item.id}')">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        async function deleteContent(id) {
+            if (confirm('¿Estás seguro de eliminar este contenido?')) {
+                try {
+                    await database.ref(`custom_content/${id}`).remove();
+                    alert('✅ Contenido eliminado');
+                    loadManageContent();
+                } catch (error) {
+                    alert('❌ Error: ' + error.message);
+                }
+            }
+        }
+
+        console.log('✅ Admin panel cargado');
+    </script>
 </body>
 </html>
