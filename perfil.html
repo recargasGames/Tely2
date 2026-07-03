@@ -6,6 +6,128 @@
     <title>Mi Cine - Perfil</title>
     <link rel="stylesheet" href="css/styles.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        .header-premium {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 12px 16px;
+            background: rgba(13, 13, 13, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .header-premium-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .logo-premium {
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #E50914, #f39c12);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .menu-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            padding: 8px;
+        }
+        .main-premium { max-width: 600px; margin: 0 auto; padding: 0 16px 20px; }
+        .profile-page { padding: 20px 0; }
+        .profile-header-page { text-align: center; padding: 20px 0; }
+        .profile-avatar-large {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 16px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #E50914;
+        }
+        .profile-avatar-large img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-header-page h2 { font-size: 22px; color: #fff; margin: 0; }
+        .profile-email { color: #888; font-size: 14px; margin: 4px 0 12px; }
+        .profile-badges { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+        .profile-badge {
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .profile-badge.premium { background: linear-gradient(135deg, #E50914, #f39c12); color: #fff; }
+        .profile-badge.since { background: rgba(255,255,255,0.05); color: #aaa; }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            padding: 16px 0;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 12px;
+            background: #1A1A1A;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .stat-number { display: block; font-size: 24px; font-weight: 700; color: #E50914; }
+        .stat-label { font-size: 12px; color: #888; }
+
+        .profile-menu-list { display: flex; flex-direction: column; gap: 8px; padding: 16px 0; }
+        .profile-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            width: 100%;
+            background: #1A1A1A;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 15px;
+        }
+        .profile-menu-item:hover { background: #2A2A2A; border-color: #E50914; }
+        .profile-menu-item .material-icons:first-child { font-size: 22px; color: #E50914; }
+        .profile-menu-item .material-icons:last-child { margin-left: auto; color: #666; }
+        .profile-menu-item.danger { color: #E50914; }
+        .profile-menu-item.danger .material-icons:first-child { color: #E50914; }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(13, 13, 13, 0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            padding: 6px 0 12px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            z-index: 100;
+        }
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: #666;
+            text-decoration: none;
+            font-size: 10px;
+            transition: all 0.3s ease;
+            padding: 4px 12px;
+            border-radius: 8px;
+            min-width: 50px;
+        }
+        .bottom-nav-item .material-icons { font-size: 24px; }
+        .bottom-nav-item:hover { color: #fff; }
+        .bottom-nav-item.active { color: #E50914; }
+    </style>
 </head>
 <body>
     <header class="header-premium">
@@ -14,13 +136,12 @@
                 <span class="material-icons">arrow_back</span>
             </button>
             <div class="logo-premium">🎬 Mi Cine</div>
-            <div></div>
+            <div style="width:40px;"></div>
         </div>
     </header>
 
     <main class="main-premium">
         <div class="profile-page">
-            <!-- HEADER -->
             <div class="profile-header-page">
                 <div class="profile-avatar-large">
                     <img id="profileAvatar" src="" alt="Avatar">
@@ -33,7 +154,6 @@
                 </div>
             </div>
 
-            <!-- ESTADÍSTICAS -->
             <div class="profile-stats">
                 <div class="stat-item">
                     <span class="stat-number" id="statFavorites">0</span>
@@ -53,7 +173,6 @@
                 </div>
             </div>
 
-            <!-- MENÚ -->
             <div class="profile-menu-list">
                 <button class="profile-menu-item" onclick="window.location.href='mi-lista.html'">
                     <span class="material-icons">bookmark</span>
@@ -84,58 +203,57 @@
         </div>
     </main>
 
-    <!-- BARRA INFERIOR -->
     <nav class="bottom-nav">
-        <a href="index.html" class="bottom-nav-item">
-            <span class="material-icons">home</span>
-            <span>Inicio</span>
-        </a>
-        <a href="peliculas.html" class="bottom-nav-item">
-            <span class="material-icons">movie</span>
-            <span>Películas</span>
-        </a>
-        <a href="series.html" class="bottom-nav-item">
-            <span class="material-icons">tv</span>
-            <span>Series</span>
-        </a>
-        <a href="mi-lista.html" class="bottom-nav-item">
-            <span class="material-icons">bookmark</span>
-            <span>Mi Lista</span>
-        </a>
-        <a href="perfil.html" class="bottom-nav-item active">
-            <span class="material-icons">person</span>
-            <span>Perfil</span>
-        </a>
+        <a href="index.html" class="bottom-nav-item">🏠 Inicio</a>
+        <a href="peliculas.html" class="bottom-nav-item">🎬 Películas</a>
+        <a href="series.html" class="bottom-nav-item">📺 Series</a>
+        <a href="mi-lista.html" class="bottom-nav-item">🔖 Mi Lista</a>
+        <a href="perfil.html" class="bottom-nav-item active">👤 Perfil</a>
     </nav>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="js/firebase-config.js"></script>
-    
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Verificar autenticación
-            const user = auth.currentUser;
+        // ==================== CONFIGURACIÓN ====================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBAdvlj4qzHSaPUIRIW5F51mHlnzoy1_es",
+            authDomain: "tely2-245d5.firebaseapp.com",
+            databaseURL: "https://tely2-245d5-default-rtdb.firebaseio.com",
+            projectId: "tely2-245d5",
+            storageBucket: "tely2-245d5.firebasestorage.app",
+            messagingSenderId: "37996516235",
+            appId: "1:37996516235:web:11f3d73fdc683de9d9558e",
+            measurementId: "G-L8W50JK7N3"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // ==================== VERIFICAR AUTENTICACIÓN ====================
+        auth.onAuthStateChanged(function(user) {
             if (!user) {
+                // Si no está logueado, redirigir a login
                 window.location.href = 'login.html';
                 return;
             }
 
-            // Mostrar datos del usuario
+            // Si está logueado, mostrar datos
             document.getElementById('profileAvatar').src = user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'Usuario') + '&background=E50914&color=fff&size=200';
             document.getElementById('profileName').textContent = user.displayName || 'Usuario';
             document.getElementById('profileEmail').textContent = user.email || 'email@ejemplo.com';
 
-            // Fecha de registro
             if (user.metadata && user.metadata.creationTime) {
                 const date = new Date(user.metadata.creationTime);
                 document.getElementById('profileSince').textContent = 'Desde ' + date.getFullYear();
             }
 
-            // Cargar estadísticas
-            const uid = user.uid;
+            loadStats(user.uid);
+        });
 
+        // ==================== CARGAR ESTADÍSTICAS ====================
+        function loadStats(uid) {
             // Favoritos
             database.ref(`favorites/${uid}`).on('value', function(snapshot) {
                 const data = snapshot.val() || {};
@@ -145,9 +263,7 @@
             // Progreso
             database.ref(`progress/${uid}`).on('value', function(snapshot) {
                 const data = snapshot.val() || {};
-                let watching = 0;
-                let completed = 0;
-                let total = 0;
+                let watching = 0, completed = 0, total = 0;
 
                 Object.values(data).forEach(function(progress) {
                     total++;
@@ -162,19 +278,9 @@
                 document.getElementById('statCompleted').textContent = completed;
                 document.getElementById('statTotal').textContent = total;
             });
+        }
 
-            // Cerrar sesión
-            document.getElementById('profileLogout').addEventListener('click', function() {
-                if (confirm('¿Seguro que quieres cerrar sesión?')) {
-                    auth.signOut().then(function() {
-                        window.location.href = 'login.html';
-                    }).catch(function(error) {
-                        alert('Error: ' + error.message);
-                    });
-                }
-            });
-        });
-
+        // ==================== FUNCIONES ====================
         function editProfile() {
             const user = auth.currentUser;
             if (!user) return;
@@ -206,6 +312,19 @@
                     });
             }
         }
+
+        // ==================== CERRAR SESIÓN ====================
+        document.getElementById('profileLogout').addEventListener('click', function() {
+            if (confirm('¿Seguro que quieres cerrar sesión?')) {
+                auth.signOut().then(function() {
+                    window.location.href = 'login.html';
+                }).catch(function(error) {
+                    alert('Error: ' + error.message);
+                });
+            }
+        });
+
+        console.log('✅ Perfil cargado');
     </script>
 </body>
-</html>2
+</html>
