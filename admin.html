@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cine - Administración</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">🎬 Mi Cine</div>
+            <nav class="nav-menu">
+                <a href="index.html">🏠 Inicio</a>
+                <a href="peliculas.html">🎬 Películas</a>
+                <a href="series.html">📺 Series</a>
+                <a href="admin.html" class="active">⚙️ Admin</a>
+            </nav>
+            <div class="auth-section">
+                <div id="userInfo" class="user-info hidden">
+                    <img id="userPhoto" src="" alt="User">
+                    <span id="userName"></span>
+                </div>
+                <button id="logoutBtn" class="btn btn-logout hidden">Cerrar Sesión</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h2>⚙️ Panel de Administración</h2>
+                <p>Gestiona todo el contenido de tu plataforma</p>
+            </div>
+
+            <!-- TABS ADMIN -->
+            <div class="admin-tabs">
+                <button class="admin-tab active" data-tab="add">➕ Agregar Contenido</button>
+                <button class="admin-tab" data-tab="manage">📋 Gestionar Contenido</button>
+                <button class="admin-tab" data-tab="stats">📊 Estadísticas</button>
+            </div>
+
+            <!-- TAB 1: AGREGAR CONTENIDO -->
+            <div class="admin-tab-content active" id="tab-add">
+                <form id="adminForm" class="admin-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>📌 Título *</label>
+                            <input type="text" id="title" placeholder="Ej: Inception" required>
+                        </div>
+                        <div class="form-group">
+                            <label>📅 Año</label>
+                            <input type="text" id="year" placeholder="Ej: 2010">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>🖼️ URL del Poster</label>
+                            <input type="url" id="poster" placeholder="https://ejemplo.com/poster.jpg">
+                        </div>
+                        <div class="form-group">
+                            <label>🎭 Tipo *</label>
+                            <select id="type">
+                                <option value="pelicula">🎬 Película</option>
+                                <option value="serie">📺 Serie</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>📝 Descripción</label>
+                        <textarea id="description" rows="3" placeholder="Describe el contenido..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>🎬 URL del Video (opcional)</label>
+                        <input type="url" id="videoUrl" placeholder="https://ejemplo.com/video.mp4">
+                    </div>
+
+                    <!-- GESTIÓN DE EPISODIOS -->
+                    <div class="episode-manager" id="episodeManager">
+                        <h4>📺 Episodios (para series)</h4>
+                        <div id="episodeList">
+                            <div class="episode-item">
+                                <input type="text" placeholder="Temporada X - Episodio X">
+                                <input type="text" placeholder="URL del video">
+                                <button type="button" class="btn btn-danger btn-sm" onclick="removeEpisode(this)">✖</button>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="addEpisode()">➕ Agregar Episodio</button>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">💾 Guardar Contenido</button>
+                        <button type="reset" class="btn btn-secondary">🗑️ Limpiar</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- TAB 2: GESTIONAR CONTENIDO -->
+            <div class="admin-tab-content" id="tab-manage">
+                <div class="manage-header">
+                    <h3>📋 Contenido Existente</h3>
+                    <div class="search-box small">
+                        <input type="text" id="searchManage" placeholder="🔍 Buscar...">
+                    </div>
+                </div>
+                <div id="manageGrid" class="manage-grid"></div>
+            </div>
+
+            <!-- TAB 3: ESTADÍSTICAS -->
+            <div class="admin-tab-content" id="tab-stats">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">🎬</div>
+                        <div class="stat-info">
+                            <h3 id="totalPeliculas">0</h3>
+                            <p>Películas</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📺</div>
+                        <div class="stat-info">
+                            <h3 id="totalSeries">0</h3>
+                            <p>Series</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-info">
+                            <h3 id="totalContenido">0</h3>
+                            <p>Total Contenido</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-bottom">
+            <p>&copy; 2024 Mi Cine - Panel de Administración</p>
+        </div>
+    </footer>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">✕</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/database.js"></script>
+    <script>
+        // Variables globales
+        let allContent = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Verificar autenticación
+            auth.onAuthStateChanged(user => {
+                if (!user) {
+                    window.location.href = 'login.html';
+                }
+            });
+
+            // Tabs
+            document.querySelectorAll('.admin-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+                    
+                    if (this.dataset.tab === 'manage') loadManageContent();
+                    if (this.dataset.tab === 'stats') loadStats();
+                });
+            });
+
+            // Formulario
+            document.getElementById('adminForm').addEventListener('submit', saveContent);
+
+            // Búsqueda en manage
+            document.getElementById('searchManage').addEventListener('input', function() {
+                loadManageContent(this.value);
+            });
+
+            // Cargar datos iniciales
+            loadManageContent();
+            loadStats();
+        });
+
+        // FUNCIONES ADMIN
+        function addEpisode() {
+            const container = document.getElementById('episodeList');
+            const div = document.createElement('div');
+            div.className = 'episode-item';
+            div.innerHTML = `
+                <input type="text" placeholder="Temporada X - Episodio X">
+                <input type="text" placeholder="URL del video">
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeEpisode(this)">✖</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeEpisode(btn) {
+            const items = document.querySelectorAll('.episode-item');
+            if (items.length > 1) {
+                btn.parentElement.remove();
+            } else {
+                alert('Debe haber al menos un episodio');
+            }
+        }
+
+        async function saveContent(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('title').value;
+            const year = document.getElementById('year').value;
+            const poster = document.getElementById('poster').value || 'https://via.placeholder.com/300x450/1a1a2e/ffffff?text=No+Image';
+            const type = document.getElementById('type').value;
+            const description = document.getElementById('description').value;
+            const videoUrl = document.getElementById('videoUrl').value;
+
+            // Obtener episodios
+            const episodeItems = document.querySelectorAll('.episode-item');
+            const episodes = [];
+            episodeItems.forEach(item => {
+                const inputs = item.querySelectorAll('input');
+                if (inputs[0].value && inputs[1].value) {
+                    episodes.push({
+                        title: inputs[0].value,
+                        url: inputs[1].value
+                    });
+                }
+            });
+
+            const content = {
+                title,
+                year: year || new Date().getFullYear().toString(),
+                poster,
+                type,
+                description,
+                videoUrl,
+                episodes: type === 'serie' ? episodes : [],
+                createdAt: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            try {
+                const newRef = database.ref('content').push();
+                await newRef.set(content);
+                alert('✅ Contenido guardado exitosamente!');
+                document.getElementById('adminForm').reset();
+                document.querySelectorAll('.episode-item').forEach((item, index) => {
+                    if (index > 0) item.remove();
+                });
+                loadManageContent();
+                loadStats();
+            } catch (error) {
+                alert('❌ Error al guardar: ' + error.message);
+            }
+        }
+
+        function loadManageContent(searchTerm = '') {
+            const grid = document.getElementById('manageGrid');
+            
+            database.ref('content').orderByChild('createdAt').on('value', (snapshot) => {
+                const data = snapshot.val();
+                allContent = [];
+                
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        allContent.push({
+                            id: key,
+                            ...data[key]
+                        });
+                    });
+                    allContent.reverse();
+                }
+
+                let filtered = allContent;
+                if (searchTerm) {
+                    filtered = filtered.filter(item => 
+                        item.title.toLowerCase().includes(searchTerm.toLowerCase())
+                    );
+                }
+
+                if (filtered.length === 0) {
+                    grid.innerHTML = '<div class="empty-state">No hay contenido para mostrar</div>';
+                    return;
+                }
+
+                grid.innerHTML = filtered.map(item => `
+                    <div class="manage-item">
+                        <div class="manage-item-info">
+                            <img src="${item.poster}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/50x75/1a1a2e/ffffff?text=No+Image'">
+                            <div>
+                                <h4>${item.title}</h4>
+                                <p>${item.year || 'Año desconocido'} • ${item.type === 'pelicula' ? '🎬 Película' : '📺 Serie'}</p>
+                            </div>
+                        </div>
+                        <div class="manage-item-actions">
+                            <button class="btn btn-danger btn-sm" onclick="deleteContent('${item.id}')">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        function deleteContent(id) {
+            if (confirm('¿Estás seguro de eliminar este contenido?')) {
+                database.ref(`content/${id}`).remove().then(() => {
+                    alert('✅ Contenido eliminado');
+                    loadManageContent();
+                    loadStats();
+                }).catch(error => {
+                    alert('❌ Error al eliminar: ' + error.message);
+                });
+            }
+        }
+
+        function loadStats() {
+            database.ref('content').on('value', (snapshot) => {
+                const data = snapshot.val();
+                let peliculas = 0;
+                let series = 0;
+                
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        if (data[key].type === 'pelicula') peliculas++;
+                        else if (data[key].type === 'serie') series++;
+                    });
+                }
+
+                document.getElementById('totalPeliculas').textContent = peliculas;
+                document.getElementById('totalSeries').textContent = series;
+                document.getElementById('totalContenido').textContent = peliculas + series;
+            });
+        }
+    </script>
+</body>
+</html>
