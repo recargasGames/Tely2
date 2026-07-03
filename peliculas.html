@@ -24,9 +24,6 @@
             <div class="search-input-wrapper">
                 <span class="material-icons">search</span>
                 <input type="text" id="searchPeliculas" placeholder="Buscar películas...">
-                <button class="clear-search" id="clearSearch">
-                    <span class="material-icons">close</span>
-                </button>
             </div>
         </div>
     </header>
@@ -107,148 +104,77 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/tmdb-api.js"></script>
-    <script src="js/database.js"></script>
     
     <script>
-        // ==================== VARIABLES ====================
-        let allMovies = [];
-        let currentPage = 1;
-        let isLoading = false;
-        let hasMore = true;
+        // ==================== CARGAR PELÍCULAS DESDE FIREBASE ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMovies();
+            setupEventListeners();
+        });
 
-        // ==================== CARGAR PELÍCULAS ====================
-        async function loadMovies(page = 1, append = false) {
-            if (isLoading) return;
-            if (!append) {
-                currentPage = 1;
-                hasMore = true;
-                document.getElementById('peliculasGrid').innerHTML = `
-                    <div class="skeleton-grid">
-                        ${Array(6).fill(0).map(() => `
-                            <div class="skeleton-card">
-                                <div class="skeleton-image"></div>
-                                <div class="skeleton-title"></div>
-                                <div class="skeleton-meta"></div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }
+        function loadMovies() {
+            const grid = document.getElementById('peliculasGrid');
+            
+            grid.innerHTML = `
+                <div class="skeleton-grid">
+                    ${Array(6).fill(0).map(() => `
+                        <div class="skeleton-card">
+                            <div class="skeleton-image"></div>
+                            <div class="skeleton-title"></div>
+                            <div class="skeleton-meta"></div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
 
-            isLoading = true;
+            database.ref('content').orderByChild('createdAt').on('value', (snapshot) => {
+                const data = snapshot.val();
+                let movies = [];
 
-            try {
-                const response = await fetch(
-                    `${TMDB_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&language=es-ES&page=${page}`
-                );
-                const data = await response.json();
-                const movies = data.results || [];
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        const item = data[key];
+                        if (item.type === 'pelicula') {
+                            movies.push({ id: key, ...item });
+                        }
+                    });
+                    movies.reverse();
+                }
 
                 if (movies.length === 0) {
-                    hasMore = false;
-                    isLoading = false;
+                    grid.innerHTML = `
+                        <div class="empty-state-premium" style="grid-column:1/-1;">
+                            <div class="empty-icon">🎬</div>
+                            <h3>No hay películas</h3>
+                            <p>Ve al panel de administración y presiona "AGREGAR TODAS LAS PELÍCULAS"</p>
+                            <a href="admin.html" class="btn btn-primary" style="margin-top:12px;">Ir al Admin</a>
+                        </div>
+                    `;
                     return;
                 }
 
-                if (!append) {
-                    allMovies = movies;
-                } else {
-                    allMovies = [...allMovies, ...movies];
-                }
-
-                renderMovies(allMovies, append);
-                isLoading = false;
-                hasMore = movies.length === 20;
-
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('peliculasGrid').innerHTML = `
-                    <div class="empty-state-premium" style="grid-column:1/-1;">
-                        <div class="empty-icon">❌</div>
-                        <h3>Error al cargar películas</h3>
-                        <p>${error.message}</p>
-                        <button class="btn btn-primary" onclick="loadMovies(1)">Reintentar</button>
-                    </div>
-                `;
-                isLoading = false;
-            }
-        }
-
-        // ==================== RENDERIZAR PELÍCULAS ====================
-        function renderMovies(movies, append = false) {
-            const grid = document.getElementById('peliculasGrid');
-
-            if (movies.length === 0) {
-                grid.innerHTML = `
-                    <div class="empty-state-premium" style="grid-column:1/-1;">
-                        <div class="empty-icon">🎬</div>
-                        <h3>No hay películas disponibles</h3>
-                        <p>Pronto agregaremos más contenido</p>
-                    </div>
-                `;
-                return;
-            }
-
-            const cards = movies.map(movie => `
-                <div class="content-card" onclick="openContentModal(${movie.id}, 'movie')">
-                    <div class="card-image">
-                        <img src="${getPosterUrl(movie.poster_path)}" alt="${movie.title}" loading="lazy">
-                        <div class="card-badge top">${movie.vote_average ? '⭐ ' + movie.vote_average.toFixed(1) : 'Nuevo'}</div>
-                        <div class="card-overlay">
-                            <button class="play-btn-small">
-                                <span class="material-icons">play_arrow</span>
-                            </button>
+                grid.innerHTML = movies.map(movie => `
+                    <div class="content-card" onclick="openContentModal('${movie.id}')">
+                        <div class="card-image">
+                            <img src="${movie.poster}" alt="${movie.title}" loading="lazy">
+                            <div class="card-badge top">${movie.vote_average ? '⭐ ' + movie.vote_average.toFixed(1) : 'Nuevo'}</div>
+                            <div class="card-overlay">
+                                <button class="play-btn-small">
+                                    <span class="material-icons">play_arrow</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-info">
+                            <h4>${movie.title}</h4>
+                            <span class="card-year">${movie.year || 'N/A'}</span>
                         </div>
                     </div>
-                    <div class="card-info">
-                        <h4>${movie.title}</h4>
-                        <span class="card-year">${movie.release_date ? movie.release_date.substring(0, 4) : 'N/A'}</span>
-                    </div>
-                </div>
-            `).join('');
-
-            if (append) {
-                grid.innerHTML += cards;
-            } else {
-                grid.innerHTML = cards;
-            }
-
-            // Botón "Cargar más"
-            const existingBtn = document.querySelector('.load-more-btn');
-            if (existingBtn) existingBtn.remove();
-
-            if (hasMore && movies.length > 0) {
-                const btn = document.createElement('button');
-                btn.className = 'btn btn-secondary load-more-btn';
-                btn.textContent = '📥 Cargar más películas';
-                btn.style.cssText = 'margin: 20px auto; display: block; padding: 12px 32px;';
-                btn.onclick = () => {
-                    currentPage++;
-                    loadMovies(currentPage, true);
-                };
-                grid.parentElement.appendChild(btn);
-            }
+                `).join('');
+            });
         }
 
-        // ==================== FUNCIONES GLOBALES ====================
-        function getPosterUrl(path) {
-            return path ? `https://image.tmdb.org/t/p/w500${path}` : 'https://via.placeholder.com/300x450/1A1A1A/ffffff?text=No+Image';
-        }
-
-        async function getMovieDetails(id) {
-            try {
-                const response = await fetch(
-                    `${TMDB_BASE_URL}/movie/${id}?api_key=${TMDB_API_KEY}&language=es-ES`
-                );
-                return await response.json();
-            } catch (error) {
-                console.error('Error:', error);
-                return null;
-            }
-        }
-
-        async function openContentModal(id, type) {
+        // ==================== ABRIR MODAL ====================
+        async function openContentModal(id) {
             const user = auth.currentUser;
             if (!user) {
                 if (confirm('🔒 Para ver detalles necesitas iniciar sesión. ¿Deseas ir al login?')) {
@@ -271,40 +197,33 @@
             document.body.style.overflow = 'hidden';
 
             try {
-                const data = await getMovieDetails(id);
-                if (!data) throw new Error('No se encontraron detalles');
+                const snapshot = await database.ref(`content/${id}`).once('value');
+                const data = snapshot.val();
 
-                const poster = getPosterUrl(data.poster_path);
-                const backdrop = data.backdrop_path ? `https://image.tmdb.org/t/p/original${data.backdrop_path}` : poster;
-                const genres = data.genres ? data.genres.map(g => g.name).join(', ') : 'No especificado';
+                if (!data) {
+                    throw new Error('No se encontró el contenido');
+                }
 
-                // Generar enlace
-                const videoUrl = `https://unlimplay.co/play/movie/${id}`;
+                const poster = data.poster;
+                const videoUrl = data.videoUrl || `https://unlimplay.co/play/movie/${data.tmdbId}`;
 
                 modalContent.innerHTML = `
-                    <div class="modal-hero" style="background-image: url(${backdrop})">
+                    <div class="modal-hero" style="background-image: url(${poster})">
                         <div class="modal-hero-gradient"></div>
                         <div class="modal-hero-content">
                             <img src="${poster}" alt="${data.title}" class="modal-poster-img">
                             <div class="modal-hero-info">
                                 <h2>${data.title}</h2>
                                 <div class="modal-meta">
-                                    <span class="modal-year">${data.release_date ? data.release_date.substring(0, 4) : 'N/A'}</span>
-                                    <span class="modal-rating">⭐ ${data.vote_average ? data.vote_average.toFixed(1) : 'N/A'}</span>
-                                    <span class="modal-runtime">${data.runtime ? data.runtime + 'min' : 'N/A'}</span>
-                                </div>
-                                <div class="modal-genres">
-                                    ${data.genres?.map(g => `<span class="genre-tag">${g.name}</span>`).join('') || 'Sin géneros'}
+                                    <span class="modal-year">${data.year || 'N/A'}</span>
+                                    <span class="modal-rating">⭐ ${data.vote_average || 'N/A'}</span>
                                 </div>
                                 <div class="modal-actions">
                                     <a href="${videoUrl}" target="_blank" class="modal-play-btn">
                                         <span class="material-icons">play_arrow</span> Reproducir
                                     </a>
-                                    <button class="modal-fav-btn" onclick="toggleFavorite(${id})">
+                                    <button class="modal-fav-btn" onclick="toggleFavorite('${id}')">
                                         <span class="material-icons">favorite_border</span>
-                                    </button>
-                                    <button class="modal-share-btn" onclick="shareContent('${data.title}')">
-                                        <span class="material-icons">share</span>
                                     </button>
                                 </div>
                             </div>
@@ -313,7 +232,7 @@
                     <div class="modal-body">
                         <div class="modal-description">
                             <h3>Sinopsis</h3>
-                            <p>${data.overview || 'Sin descripción disponible'}</p>
+                            <p>${data.description || 'Sin descripción disponible'}</p>
                         </div>
                     </div>
                 `;
@@ -324,7 +243,7 @@
                     <div class="modal-error">
                         <span class="error-icon">❌</span>
                         <p>Error al cargar los detalles</p>
-                        <button class="btn btn-primary" onclick="openContentModal(${id}, '${type}')">Reintentar</button>
+                        <button class="btn btn-primary" onclick="openContentModal('${id}')">Reintentar</button>
                     </div>
                 `;
             }
@@ -335,57 +254,26 @@
             document.body.style.overflow = 'auto';
         }
 
-        function shareContent(title) {
-            if (navigator.share) {
-                navigator.share({
-                    title: `Mi Cine - ${title}`,
-                    text: `Mira "${title}" en Mi Cine`,
-                    url: window.location.href
-                });
+        // ==================== FAVORITOS ====================
+        async function toggleFavorite(id) {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const ref = database.ref(`favorites/${user.uid}/${id}`);
+            const snapshot = await ref.once('value');
+            const exists = snapshot.exists();
+
+            if (exists) {
+                await ref.remove();
+                alert('❌ Eliminado de favoritos');
             } else {
-                navigator.clipboard.writeText(window.location.href);
-                alert('Enlace copiado al portapapeles');
+                await ref.set(true);
+                alert('✅ Agregado a favoritos');
             }
         }
 
         // ==================== EVENTOS ====================
-        document.addEventListener('DOMContentLoaded', () => {
-            loadMovies(1);
-
-            // Búsqueda
-            const searchInput = document.getElementById('searchPeliculas');
-            let searchTimeout;
-
-            searchInput.addEventListener('input', function() {
-                clearTimeout(searchTimeout);
-                const query = this.value.trim();
-
-                if (query === '') {
-                    loadMovies(1);
-                    return;
-                }
-
-                searchTimeout = setTimeout(async () => {
-                    try {
-                        const response = await fetch(
-                            `${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&language=es-ES`
-                        );
-                        const data = await response.json();
-                        const results = data.results || [];
-                        renderMovies(results);
-                        const btn = document.querySelector('.load-more-btn');
-                        if (btn) btn.remove();
-                    } catch (error) {
-                        console.error('Error:', error);
-                    }
-                }, 500);
-            });
-
-            document.getElementById('clearSearch').addEventListener('click', () => {
-                searchInput.value = '';
-                loadMovies(1);
-            });
-
+        function setupEventListeners() {
             // Menú lateral
             document.getElementById('menuToggle').addEventListener('click', () => {
                 document.getElementById('sideMenu').classList.add('active');
@@ -400,28 +288,22 @@
                 document.getElementById('menuOverlay').classList.remove('active');
             }
 
-            // Búsqueda toggle
+            // Búsqueda
             document.getElementById('searchToggle').addEventListener('click', () => {
                 document.getElementById('searchExpand').classList.toggle('active');
-                if (document.getElementById('searchExpand').classList.contains('active')) {
-                    searchInput.focus();
-                }
             });
 
-            // Cerrar modal con ESC
+            // Cerrar modal
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    closeContentModal();
-                    closeMenu();
-                }
+                if (e.key === 'Escape') closeContentModal();
             });
 
             document.getElementById('contentModal').addEventListener('click', (e) => {
                 if (e.target === e.currentTarget) closeContentModal();
             });
-        });
+        }
 
-        console.log('✅ Películas cargadas correctamente');
+        console.log('✅ Películas cargadas');
     </script>
 </body>
 </html>
