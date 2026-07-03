@@ -5,49 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Cine - Inicio</title>
     <link rel="stylesheet" href="css/styles.css">
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
-    <!-- HEADER -->
     <header class="header">
         <div class="header-content">
             <div class="logo">🎬 Mi Cine</div>
-            
             <nav class="nav-menu">
                 <a href="index.html" class="active">🏠 Inicio</a>
                 <a href="peliculas.html">🎬 Películas</a>
                 <a href="series.html">📺 Series</a>
                 <a href="admin.html" id="adminLink" class="hidden">⚙️ Admin</a>
             </nav>
-
             <div class="auth-section">
                 <div id="userInfo" class="user-info hidden">
                     <img id="userPhoto" src="" alt="User">
                     <span id="userName"></span>
                 </div>
-                <button id="loginBtn" class="btn btn-google" onclick="window.location.href='login.html'">
-                    🔑 Iniciar Sesión
-                </button>
+                <button id="loginBtn" class="btn btn-google" onclick="window.location.href='login.html'">🔑 Iniciar Sesión</button>
                 <button id="logoutBtn" class="btn btn-logout hidden">Cerrar Sesión</button>
             </div>
         </div>
-
-        <!-- BANNER PRINCIPAL -->
         <div class="hero-banner">
             <div class="hero-content">
                 <h1>🎥 Bienvenido a Mi Cine</h1>
                 <p>Descubre las mejores películas y series en un solo lugar</p>
                 <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="🔍 Buscar películas, series, actores...">
+                    <input type="text" id="searchInput" placeholder="🔍 Buscar películas, series...">
+                    <span class="search-icon">🔍</span>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- CONTENIDO PRINCIPAL -->
     <main class="main-content">
         <section class="section">
             <div class="section-header">
@@ -67,7 +56,6 @@
         </section>
     </main>
 
-    <!-- FOOTER -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
@@ -91,39 +79,35 @@
         </div>
     </footer>
 
-    <!-- MODAL -->
     <div id="modal" class="modal">
         <div class="modal-content">
-            <span class="modal-close" onclick="closeModal()">✕</span>
             <div id="modalContent"></div>
         </div>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/database.js"></script>
     <script>
-        // Cargar contenido al inicio
         document.addEventListener('DOMContentLoaded', () => {
             loadContent('contentGrid');
             loadFeaturedContent();
             
-            // Filtros
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
-                    const filter = this.dataset.filter;
-                    loadContent('contentGrid', filter);
+                    loadContent('contentGrid', this.dataset.filter);
                 });
             });
 
-            // Búsqueda
             document.getElementById('searchInput').addEventListener('input', function() {
-                const searchTerm = this.value;
-                loadContent('contentGrid', 'all', searchTerm);
+                loadContent('contentGrid', 'all', this.value);
             });
         });
     </script>
 </body>
-  </html>
+</html>
