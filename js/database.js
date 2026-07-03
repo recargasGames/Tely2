@@ -1,146 +1,133 @@
-// ==================== BASE DE DATOS ====================
+// ==================== BASE DE DATOS Y RENDERIZADO ====================
 
-// Función para generar enlace con TMDB
-function generateTMDBUrl(tmdbId, type, season = null, episode = null) {
-    if (!tmdbId) return null;
-    
-    if (type === 'pelicula') {
-        return `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&lang=es&sub=es`;
-    } else if (type === 'serie' && season && episode) {
-        return `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${season}&e=${episode}&lang=es&sub=es`;
-    }
-    return null;
-}
-
-// Cargar contenido
-function loadContent(containerId, filter = 'all', searchTerm = '') {
+// Renderizar tarjetas
+function renderCards(containerId, items, title = '') {
     const container = document.getElementById(containerId);
     if (!container) return;
-    
+
+    if (items.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="icon">🎬</div>
+                <p>No hay contenido disponible</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = items.map(item => {
+        const isMovie = item.media_type === 'movie' || item.media_type === 'movie' || !item.media_type;
+        const titleText = item.title || item.name;
+        const year = item.release_date || item.first_air_date || '';
+        const poster = getPosterUrl(item.poster_path);
+        const id = item.id;
+        const typeLabel = isMovie ? 'Película' : 'Serie';
+        const badgeClass = isMovie ? 'badge-pelicula' : 'badge-serie';
+        const icon = isMovie ? '🎬' : '📺';
+
+        return `
+            <div class="movie-card" onclick="openModalTMDB(${id}, '${isMovie ? 'movie' : 'tv'}')">
+                <div class="card-image">
+                    <img src="${poster}" alt="${titleText}" loading="lazy">
+                    <div class="badge-type">${icon}</div>
+                    <div class="badge-top">${year ? year.substring(0, 4) : 'N/A'}</div>
+                    <div class="card-overlay">
+                        <div class="play-btn">▶</div>
+                    </div>
+                </div>
+                <div class="movie-info">
+                    <h3>${titleText}</h3>
+                    <div class="meta">
+                        <span class="year">${year ? year.substring(0, 4) : 'Año desconocido'}</span>
+                        <span class="type-badge ${badgeClass}">${typeLabel}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Cargar contenido en una sección
+async function loadSection(containerId, type = 'movie', filter = 'popular', page = 1) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
     container.innerHTML = `
         <div class="loading">
             <div class="spinner"></div>
-            <p>Cargando contenido...</p>
+            <p>Cargando...</p>
         </div>
     `;
 
-    database.ref('content').orderByChild('createdAt').on('value', (snapshot) => {
-        const data = snapshot.val();
+    try {
         let items = [];
         
-        if (data) {
-            Object.keys(data).forEach(key => {
-                items.push({
-                    id: key,
-                    ...data[key]
-                });
-            });
-            items.reverse();
+        if (type === 'movie') {
+            if (filter === 'popular') {
+                items = await getPopularMovies(page);
+            } else if (filter === 'now_playing') {
+                items = await getNowPlayingMovies(page);
+            }
+            items = items.map(m => ({ ...m, media_type: 'movie' }));
+        } else if (type === 'tv') {
+            if (filter === 'popular') {
+                items = await getPopularSeries(page);
+            } else if (filter === 'on_the_air') {
+                items = await getOnTheAirSeries(page);
+            }
+            items = items.map(m => ({ ...m, media_type: 'tv' }));
         }
 
-        // Aplicar filtros
-        if (filter !== 'all') {
-            items = items.filter(item => item.type === filter);
-        }
-
-        if (searchTerm) {
-            const term = searchTerm.toLowerCase();
-            items = items.filter(item => 
-                item.title.toLowerCase().includes(term) ||
-                (item.description && item.description.toLowerCase().includes(term))
-            );
-        }
-
-        if (items.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <div class="icon">🎬</div>
-                    <p>No hay contenido disponible</p>
-                    <p style="font-size:14px;color:#666;">Agrega contenido desde el panel de administración</p>
-                </div>
-            `;
-            return;
-        }
-
-        container.innerHTML = items.map(item => `
-            <div class="movie-card" onclick="openModal('${item.id}')">
-                <div class="card-image">
-                    <img src="${item.poster}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/300x450/1a1a2e/ffffff?text=No+Image'">
-                    <div class="badge-type">${item.type === 'pelicula' ? '🎬' : '📺'}</div>
-                    <div class="badge-top">${item.year || 'N/A'}</div>
-                    <div class="card-overlay">
-                        <div class="play-btn">▶</div>
-                    </div>
-                </div>
-                <div class="movie-info">
-                    <h3>${item.title}</h3>
-                    <div class="meta">
-                        <span class="year">${item.year || 'Año desconocido'}</span>
-                        <span class="type-badge ${item.type === 'pelicula' ? 'badge-pelicula' : 'badge-serie'}">
-                            ${item.type === 'pelicula' ? 'Película' : 'Serie'}
-                        </span>
-                    </div>
-                </div>
+        renderCards(containerId, items);
+    } catch (error) {
+        console.error('Error:', error);
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="icon">❌</div>
+                <p>Error al cargar el contenido</p>
             </div>
-        `).join('');
-    });
+        `;
+    }
 }
 
-// Cargar contenido destacado
-function loadFeaturedContent() {
-    const container = document.getElementById('featuredGrid');
+// Buscar contenido
+async function searchContentAndRender(containerId, query, type = 'all') {
+    const container = document.getElementById(containerId);
     if (!container) return;
 
-    database.ref('content').orderByChild('createdAt').limitToLast(6).on('value', (snapshot) => {
-        const data = snapshot.val();
-        let items = [];
-        
-        if (data) {
-            Object.keys(data).forEach(key => {
-                items.push({
-                    id: key,
-                    ...data[key]
-                });
-            });
-            items.reverse();
-        }
-
-        if (items.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <div class="icon">⭐</div>
-                    <p>No hay contenido destacado</p>
-                </div>
-            `;
-            return;
-        }
-
-        container.innerHTML = items.map(item => `
-            <div class="movie-card" onclick="openModal('${item.id}')">
-                <div class="card-image">
-                    <img src="${item.poster}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/300x450/1a1a2e/ffffff?text=No+Image'">
-                    <div class="badge-type">${item.type === 'pelicula' ? '🎬' : '📺'}</div>
-                    <div class="card-overlay">
-                        <div class="play-btn">▶</div>
-                    </div>
-                </div>
-                <div class="movie-info">
-                    <h3>${item.title}</h3>
-                    <div class="meta">
-                        <span class="year">${item.year || 'Año desconocido'}</span>
-                        <span class="type-badge ${item.type === 'pelicula' ? 'badge-pelicula' : 'badge-serie'}">
-                            ${item.type === 'pelicula' ? 'Película' : 'Serie'}
-                        </span>
-                    </div>
-                </div>
+    if (!query || query.trim() === '') {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="icon">🔍</div>
+                <p>Escribe algo para buscar</p>
             </div>
-        `).join('');
-    });
+        `;
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Buscando...</p>
+        </div>
+    `;
+
+    try {
+        const results = await searchContent(query, type);
+        renderCards(containerId, results);
+    } catch (error) {
+        console.error('Error:', error);
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="icon">❌</div>
+                <p>Error al buscar</p>
+            </div>
+        `;
+    }
 }
 
-// Abrir modal
-function openModal(id) {
-    // Verificar si el usuario está logueado
+// Abrir modal con detalles
+async function openModalTMDB(id, type) {
     const user = auth.currentUser;
     if (!user) {
         if (confirm('🔒 Para ver este contenido necesitas iniciar sesión. ¿Deseas ir al login?')) {
@@ -149,82 +136,82 @@ function openModal(id) {
         return;
     }
 
-    database.ref(`content/${id}`).once('value', (snapshot) => {
-        const item = snapshot.val();
-        if (!item) {
-            alert('Contenido no encontrado');
+    const modal = document.getElementById('modal');
+    const modalContent = document.getElementById('modalContent');
+    
+    modalContent.innerHTML = `
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Cargando detalles...</p>
+        </div>
+    `;
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    try {
+        let data;
+        let isMovie = type === 'movie';
+        
+        if (isMovie) {
+            data = await getMovieDetails(id);
+        } else {
+            data = await getSeriesDetails(id);
+        }
+
+        if (!data) {
+            modalContent.innerHTML = `
+                <span class="modal-close" onclick="closeModal()">✕</span>
+                <p>No se encontraron detalles</p>
+            `;
             return;
         }
 
-        const modal = document.getElementById('modal');
-        const modalContent = document.getElementById('modalContent');
+        const title = data.title || data.name;
+        const year = data.release_date || data.first_air_date || '';
+        const poster = getPosterUrl(data.poster_path);
+        const overview = data.overview || 'Sin descripción disponible';
+        const voteAverage = data.vote_average ? data.vote_average.toFixed(1) : 'N/A';
+        const genres = data.genres ? data.genres.map(g => g.name).join(', ') : 'No especificado';
 
-        // Generar enlaces
         let videoLinkHTML = '';
         let episodesHTML = '';
 
-        if (item.type === 'pelicula') {
-            const videoUrl = item.videoUrl || generateTMDBUrl(item.tmdbId, 'pelicula');
-            if (videoUrl) {
-                videoLinkHTML = `
-                    <a href="${videoUrl}" target="_blank" class="btn btn-primary btn-lg" style="margin:15px 0;width:100%;justify-content:center;">
-                        ▶ Ver Película
-                    </a>
-                `;
-            }
-        } else if (item.type === 'serie') {
-            if (item.episodes && item.episodes.length > 0) {
-                // Generar enlaces para cada episodio
-                const episodesList = item.episodes.map((ep, index) => {
-                    // Intentar extraer temporada y episodio del título
-                    const match = ep.title.match(/Temporada\s*(\d+)\s*[-–]\s*Episodio\s*(\d+)/i);
-                    let url = ep.url;
+        if (isMovie) {
+            const movieUrl = getMovieUrl(id);
+            videoLinkHTML = `
+                <a href="${movieUrl}" target="_blank" class="btn btn-primary btn-lg" style="margin:15px 0;width:100%;justify-content:center;">
+                    ▶ Ver Película
+                </a>
+            `;
+        } else {
+            if (data.seasons && data.seasons.length > 0) {
+                const seasons = data.seasons.filter(s => s.season_number > 0);
+                if (seasons.length > 0) {
+                    const firstSeason = seasons[0];
+                    const seasonNumber = firstSeason.season_number;
                     
-                    if (!url && item.tmdbId) {
-                        if (match) {
-                            const season = match[1];
-                            const episode = match[2];
-                            url = generateTMDBUrl(item.tmdbId, 'serie', season, episode);
-                        } else {
-                            // Si no se puede extraer, usar el primer episodio
-                            const season = 1;
-                            const episode = index + 1;
-                            url = generateTMDBUrl(item.tmdbId, 'serie', season, episode);
-                        }
+                    const episodesList = [];
+                    for (let i = 1; i <= Math.min(firstSeason.episode_count || 10, 20); i++) {
+                        const seriesUrl = getSeriesUrl(id, seasonNumber, i);
+                        episodesList.push(`
+                            <a href="${seriesUrl}" target="_blank" class="episode-link">
+                                <span class="episode-number">T${seasonNumber}E${i}</span>
+                                Episodio ${i}
+                            </a>
+                        `);
                     }
                     
-                    return `
-                        <a href="${url || '#'}" target="_blank" class="episode-link">
-                            <span class="episode-number">${match ? `T${match[1]}E${match[2]}` : `E${index + 1}`}</span>
-                            ${ep.title}
-                            ${url ? '' : ' 🔒 Sin enlace'}
-                        </a>
+                    episodesHTML = `
+                        <h3 style="margin-top:20px;margin-bottom:15px;">📺 Temporada ${seasonNumber}</h3>
+                        <div class="episode-list">
+                            ${episodesList.join('')}
+                        </div>
                     `;
-                }).join('');
-
-                episodesHTML = `
-                    <h3 style="margin-top:20px;margin-bottom:15px;">📺 Episodios</h3>
-                    <div class="episode-list">
-                        ${episodesList}
-                    </div>
-                `;
-
-                // Enlace para ver la serie completa (primer episodio)
-                const firstEpisode = item.episodes[0];
-                const firstMatch = firstEpisode.title.match(/Temporada\s*(\d+)\s*[-–]\s*Episodio\s*(\d+)/i);
-                let firstUrl = firstEpisode.url;
-                if (!firstUrl && item.tmdbId) {
-                    if (firstMatch) {
-                        firstUrl = generateTMDBUrl(item.tmdbId, 'serie', firstMatch[1], firstMatch[2]);
-                    } else {
-                        firstUrl = generateTMDBUrl(item.tmdbId, 'serie', 1, 1);
-                    }
-                }
-                
-                if (firstUrl) {
+                    
+                    const firstUrl = getSeriesUrl(id, seasonNumber, 1);
                     videoLinkHTML = `
                         <a href="${firstUrl}" target="_blank" class="btn btn-primary btn-lg" style="margin:15px 0;width:100%;justify-content:center;">
-                            ▶ Ver Serie (Episodio 1)
+                            ▶ Ver Serie
                         </a>
                     `;
                 }
@@ -234,23 +221,27 @@ function openModal(id) {
         modalContent.innerHTML = `
             <span class="modal-close" onclick="closeModal()">✕</span>
             <div class="poster-container">
-                <img src="${item.poster}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/800x450/1a1a2e/ffffff?text=No+Image'">
+                <img src="${poster}" alt="${title}">
             </div>
-            <h2>${item.title}</h2>
+            <h2>${title}</h2>
             <div class="info-grid">
-                <p><strong>📅 Año:</strong> ${item.year || 'N/A'}</p>
-                <p><strong>🎭 Tipo:</strong> ${item.type === 'pelicula' ? '🎬 Película' : '📺 Serie'}</p>
-                ${item.tmdbId ? `<p><strong>🆔 TMDB:</strong> ${item.tmdbId}</p>` : ''}
-                <p><strong>👤 Agregado por:</strong> ${auth.currentUser?.displayName || 'Usuario'}</p>
+                <p><strong>📅 Año:</strong> ${year ? year.substring(0, 4) : 'N/A'}</p>
+                <p><strong>🎭 Tipo:</strong> ${isMovie ? '🎬 Película' : '📺 Serie'}</p>
+                <p><strong>⭐ Rating:</strong> ⭐ ${voteAverage}/10</p>
+                <p><strong>🎭 Géneros:</strong> ${genres}</p>
             </div>
-            ${item.description ? `<div class="description">${item.description}</div>` : ''}
+            <div class="description">${overview}</div>
             ${videoLinkHTML}
             ${episodesHTML}
         `;
 
-        modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    });
+    } catch (error) {
+        console.error('Error:', error);
+        modalContent.innerHTML = `
+            <span class="modal-close" onclick="closeModal()">✕</span>
+            <p>❌ Error al cargar los detalles</p>
+        `;
+    }
 }
 
 // Cerrar modal
@@ -259,12 +250,10 @@ function closeModal() {
     document.body.style.overflow = 'auto';
 }
 
-// Cerrar modal con ESC
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeModal();
 });
 
-// Cerrar modal al hacer clic fuera
 document.addEventListener('click', (e) => {
     const modal = document.getElementById('modal');
     if (e.target === modal) closeModal();
