@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mi Cine - Reproductor</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/player.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div class="player-container" id="playerContainer">
+        <!-- ===== CONTROLES ===== -->
+        <div class="player-controls" id="playerControls">
+            <div class="player-top-controls">
+                <button class="player-back" onclick="goBack()">
+                    <span class="material-icons">arrow_back</span>
+                </button>
+                <div class="player-title" id="playerTitle">Título del contenido</div>
+                <div class="player-top-right">
+                    <button class="player-quality-btn" onclick="toggleQuality()">
+                        <span class="material-icons">hd</span>
+                    </button>
+                    <button class="player-subtitles-btn" onclick="toggleSubtitles()">
+                        <span class="material-icons">subtitles</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ===== REPRODUCTOR ===== -->
+            <div class="player-video-wrapper">
+                <video id="playerVideo" class="player-video" controls>
+                    <source id="videoSource" src="" type="video/mp4">
+                    Tu navegador no soporta el reproductor de video.
+                </video>
+                <div class="player-overlay" id="playerOverlay">
+                    <button class="player-big-play" id="bigPlayBtn">
+                        <span class="material-icons">play_arrow</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ===== CONTROLES INFERIORES ===== -->
+            <div class="player-bottom-controls">
+                <div class="player-progress-container">
+                    <div class="player-progress-bar" id="progressBar">
+                        <div class="player-progress-fill" id="progressFill"></div>
+                        <div class="player-progress-buffer" id="progressBuffer"></div>
+                        <div class="player-progress-dot" id="progressDot"></div>
+                    </div>
+                    <div class="player-time">
+                        <span id="currentTime">0:00</span>
+                        <span id="totalTime">0:00</span>
+                    </div>
+                </div>
+
+                <div class="player-bottom-row">
+                    <div class="player-left-controls">
+                        <button class="player-control-btn" id="playPauseBtn">
+                            <span class="material-icons">pause</span>
+                        </button>
+                        <button class="player-control-btn" id="rewindBtn">
+                            <span class="material-icons">replay_10</span>
+                        </button>
+                        <button class="player-control-btn" id="forwardBtn">
+                            <span class="material-icons">forward_10</span>
+                        </button>
+                        <button class="player-control-btn" id="volumeBtn">
+                            <span class="material-icons">volume_up</span>
+                        </button>
+                        <div class="player-volume-slider">
+                            <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+                        </div>
+                    </div>
+
+                    <div class="player-right-controls">
+                        <button class="player-control-btn" id="nextEpisodeBtn" style="display:none;">
+                            <span class="material-icons">skip_next</span>
+                            <span>Siguiente</span>
+                        </button>
+                        <button class="player-control-btn" id="fullscreenBtn">
+                            <span class="material-icons">fullscreen</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ===== EPISODIOS ===== -->
+                <div class="player-episodes" id="playerEpisodes" style="display:none;">
+                    <h4>Episodios</h4>
+                    <div id="episodesList"></div>
+                </div>
+
+                <!-- ===== CALIDAD ===== -->
+                <div class="player-quality-menu" id="qualityMenu" style="display:none;">
+                    <button class="quality-option" data-quality="4k">4K</button>
+                    <button class="quality-option" data-quality="1080p">1080p</button>
+                    <button class="quality-option active" data-quality="720p">720p</button>
+                    <button class="quality-option" data-quality="480p">480p</button>
+                </div>
+
+                <!-- ===== SUBTÍTULOS ===== -->
+                <div class="player-subtitles-menu" id="subtitlesMenu" style="display:none;">
+                    <button class="sub-option active" data-sub="off">Desactivados</button>
+                    <button class="sub-option" data-sub="es">Español</button>
+                    <button class="sub-option" data-sub="en">Inglés</button>
+                    <button class="sub-option" data-sub="fr">Francés</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== LOADING ===== -->
+        <div class="player-loading" id="playerLoading">
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+            <p>Cargando...</p>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/player.js"></script>
+</body>
+</html>
