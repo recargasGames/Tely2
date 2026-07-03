@@ -13,6 +13,10 @@ const firebaseConfig = {
 // Inicializar Firebase
 firebase.initializeApp(firebaseConfig);
 
-// Exportar servicios para usar en otros archivos
+// Crear variables globales para usar en toda la aplicación
 const auth = firebase.auth();
 const database = firebase.database();
+
+// También exponerlas como variables globales (window)
+window.auth = auth;
+window.database = database;
