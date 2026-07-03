@@ -6,8 +6,91 @@
     <title>Mi Cine - Registro</title>
     <link rel="stylesheet" href="css/styles.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #0D0D0D;
+            padding: 20px;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .auth-container { width: 100%; max-width: 400px; }
+        .auth-box {
+            background: #1A1A1A;
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .auth-header { text-align: center; margin-bottom: 28px; }
+        .auth-header h1 {
+            font-size: 28px;
+            background: linear-gradient(135deg, #E50914, #f39c12);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+        .auth-header p { color: #888; font-size: 14px; }
+        .auth-form { display: flex; flex-direction: column; gap: 16px; }
+        .auth-form .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .auth-form .form-group label { color: #aaa; font-size: 13px; font-weight: 500; }
+        .auth-form .form-group input {
+            padding: 12px 14px;
+            background: #0D0D0D;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .auth-form .form-group input:focus {
+            outline: none;
+            border-color: #E50914;
+            box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.1);
+        }
+        .auth-form .form-group input::placeholder { color: #666; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-primary { background: #E50914; color: #fff; }
+        .btn-primary:hover { background: #b2070f; transform: scale(1.02); }
+        .btn-google { background: #DB4437; color: #fff; }
+        .btn-google:hover { background: #c33c2e; }
+        .btn-block { width: 100%; justify-content: center; }
+        .auth-divider {
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+            position: relative;
+            margin: 8px 0;
+        }
+        .auth-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(255,255,255,0.08);
+        }
+        .auth-divider span { background: #1A1A1A; padding: 0 12px; position: relative; z-index: 1; }
+        .auth-footer { text-align: center; margin-top: 20px; color: #666; font-size: 14px; }
+        .auth-footer a { color: #E50914; text-decoration: none; font-weight: 600; }
+    </style>
 </head>
-<body class="auth-page">
+<body>
     <div class="auth-container">
         <div class="auth-box">
             <div class="auth-header">
@@ -33,15 +116,14 @@
                     <input type="password" id="registerConfirm" placeholder="Repite la contraseña" required>
                 </div>
                 
-                <button type="submit" class="btn btn-primary btn-block">Registrarse</button>
+                <button type="submit" class="btn btn-primary btn-block" id="registerBtn">Registrarse</button>
                 
                 <div class="auth-divider">
                     <span>o continúa con</span>
                 </div>
                 
                 <button type="button" id="googleRegister" class="btn btn-google btn-block">
-                    <span class="material-icons">google</span>
-                    Google
+                    <span style="font-size:20px;">🔑</span> Google
                 </button>
             </form>
 
@@ -54,11 +136,24 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="js/firebase-config.js"></script>
-    
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBAdvlj4qzHSaPUIRIW5F51mHlnzoy1_es",
+            authDomain: "tely2-245d5.firebaseapp.com",
+            databaseURL: "https://tely2-245d5-default-rtdb.firebaseio.com",
+            projectId: "tely2-245d5",
+            storageBucket: "tely2-245d5.firebasestorage.app",
+            messagingSenderId: "37996516235",
+            appId: "1:37996516235:web:11f3d73fdc683de9d9558e",
+            measurementId: "G-L8W50JK7N3"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Si ya está logueado, redirigir
         auth.onAuthStateChanged(function(user) {
-            if (user) {
+            if (user && window.location.pathname.includes('registro.html')) {
                 window.location.href = 'index.html';
             }
         });
@@ -70,6 +165,7 @@
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
             const confirm = document.getElementById('registerConfirm').value;
+            const btn = document.getElementById('registerBtn');
 
             if (password !== confirm) {
                 alert('❌ Las contraseñas no coinciden');
@@ -81,15 +177,12 @@
                 return;
             }
 
-            const btn = this.querySelector('button[type="submit"]');
             btn.disabled = true;
             btn.textContent = '⏳ Cargando...';
 
             auth.createUserWithEmailAndPassword(email, password)
                 .then(function(userCredential) {
-                    return userCredential.user.updateProfile({
-                        displayName: name
-                    });
+                    return userCredential.user.updateProfile({ displayName: name });
                 })
                 .then(function() {
                     alert('✅ Registro exitoso!');
@@ -101,17 +194,10 @@
                     
                     let mensaje = '❌ Error: ';
                     switch(error.code) {
-                        case 'auth/email-already-in-use':
-                            mensaje += 'Este correo ya está registrado';
-                            break;
-                        case 'auth/invalid-email':
-                            mensaje += 'Correo electrónico inválido';
-                            break;
-                        case 'auth/weak-password':
-                            mensaje += 'La contraseña debe tener al menos 6 caracteres';
-                            break;
-                        default:
-                            mensaje += error.message;
+                        case 'auth/email-already-in-use': mensaje += 'Este correo ya está registrado'; break;
+                        case 'auth/invalid-email': mensaje += 'Correo electrónico inválido'; break;
+                        case 'auth/weak-password': mensaje += 'La contraseña debe tener al menos 6 caracteres'; break;
+                        default: mensaje += error.message;
                     }
                     alert(mensaje);
                 });
@@ -119,8 +205,9 @@
 
         document.getElementById('googleRegister').addEventListener('click', function() {
             const provider = new firebase.auth.GoogleAuthProvider();
-            this.disabled = true;
-            this.textContent = '⏳ Cargando...';
+            const btn = this;
+            btn.disabled = true;
+            btn.textContent = '⏳ Cargando...';
 
             auth.signInWithPopup(provider)
                 .then(function() {
@@ -128,8 +215,8 @@
                 })
                 .catch(function(error) {
                     alert('❌ Error con Google: ' + error.message);
-                    document.getElementById('googleRegister').disabled = false;
-                    document.getElementById('googleRegister').innerHTML = '<span class="material-icons">google</span> Google';
+                    btn.disabled = false;
+                    btn.innerHTML = '<span style="font-size:20px;">🔑</span> Google';
                 });
         });
     </script>
