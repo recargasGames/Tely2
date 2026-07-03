@@ -57,70 +57,80 @@
     <script src="js/firebase-config.js"></script>
     
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            auth.onAuthStateChanged(function(user) {
-                if (user) {
+        auth.onAuthStateChanged(function(user) {
+            if (user) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirm = document.getElementById('registerConfirm').value;
+
+            if (password !== confirm) {
+                alert('❌ Las contraseñas no coinciden');
+                return;
+            }
+
+            if (password.length < 6) {
+                alert('❌ La contraseña debe tener al menos 6 caracteres');
+                return;
+            }
+
+            const btn = this.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = '⏳ Cargando...';
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(function(userCredential) {
+                    return userCredential.user.updateProfile({
+                        displayName: name
+                    });
+                })
+                .then(function() {
+                    alert('✅ Registro exitoso!');
                     window.location.href = 'index.html';
-                }
-            });
+                })
+                .catch(function(error) {
+                    btn.disabled = false;
+                    btn.textContent = 'Registrarse';
+                    
+                    let mensaje = '❌ Error: ';
+                    switch(error.code) {
+                        case 'auth/email-already-in-use':
+                            mensaje += 'Este correo ya está registrado';
+                            break;
+                        case 'auth/invalid-email':
+                            mensaje += 'Correo electrónico inválido';
+                            break;
+                        case 'auth/weak-password':
+                            mensaje += 'La contraseña debe tener al menos 6 caracteres';
+                            break;
+                        default:
+                            mensaje += error.message;
+                    }
+                    alert(mensaje);
+                });
+        });
 
-            document.getElementById('registerForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const name = document.getElementById('registerName').value;
-                const email = document.getElementById('registerEmail').value;
-                const password = document.getElementById('registerPassword').value;
-                const confirm = document.getElementById('registerConfirm').value;
+        document.getElementById('googleRegister').addEventListener('click', function() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            this.disabled = true;
+            this.textContent = '⏳ Cargando...';
 
-                if (password !== confirm) {
-                    alert('❌ Las contraseñas no coinciden');
-                    return;
-                }
-
-                if (password.length < 6) {
-                    alert('❌ La contraseña debe tener al menos 6 caracteres');
-                    return;
-                }
-
-                auth.createUserWithEmailAndPassword(email, password)
-                    .then(function(userCredential) {
-                        return userCredential.user.updateProfile({
-                            displayName: name
-                        });
-                    })
-                    .then(function() {
-                        alert('✅ Registro exitoso!');
-                        window.location.href = 'index.html';
-                    })
-                    .catch(function(error) {
-                        let mensaje = '❌ Error: ';
-                        switch(error.code) {
-                            case 'auth/email-already-in-use':
-                                mensaje += 'Este correo ya está registrado';
-                                break;
-                            case 'auth/invalid-email':
-                                mensaje += 'Correo electrónico inválido';
-                                break;
-                            case 'auth/weak-password':
-                                mensaje += 'La contraseña debe tener al menos 6 caracteres';
-                                break;
-                            default:
-                                mensaje += error.message;
-                        }
-                        alert(mensaje);
-                    });
-            });
-
-            document.getElementById('googleRegister').addEventListener('click', function() {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                auth.signInWithPopup(provider)
-                    .then(function() {
-                        window.location.href = 'index.html';
-                    })
-                    .catch(function(error) {
-                        alert('❌ Error con Google: ' + error.message);
-                    });
-            });
+            auth.signInWithPopup(provider)
+                .then(function() {
+                    window.location.href = 'index.html';
+                })
+                .catch(function(error) {
+                    alert('❌ Error con Google: ' + error.message);
+                    document.getElementById('googleRegister').disabled = false;
+                    document.getElementById('googleRegister').innerHTML = '<span class="material-icons">google</span> Google';
+                });
         });
     </script>
 </body>
