@@ -2,56 +2,102 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mi Cine - Películas</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-    <header class="header">
-        <div class="header-content">
-            <div class="logo">🎬 Mi Cine</div>
-            <nav class="nav-menu">
-                <a href="index.html">🏠 Inicio</a>
-                <a href="peliculas.html" class="active">🎬 Películas</a>
-                <a href="series.html">📺 Series</a>
-            </nav>
-            <div class="auth-section">
-                <div id="userInfo" class="user-info hidden">
-                    <img id="userPhoto" src="" alt="User">
-                    <span id="userName"></span>
-                </div>
-                <button id="loginBtn" class="btn btn-google" onclick="window.location.href='login.html'">🔑 Iniciar Sesión</button>
-                <button id="logoutBtn" class="btn btn-logout hidden">Cerrar Sesión</button>
+    <header class="header-premium">
+        <div class="header-premium-content">
+            <button class="menu-btn" id="menuToggle">
+                <span class="material-icons">menu</span>
+            </button>
+            <div class="logo-premium">🎬 Mi Cine</div>
+            <div class="header-actions">
+                <button class="search-btn" id="searchToggle">
+                    <span class="material-icons">search</span>
+                </button>
+            </div>
+        </div>
+        <div class="search-expand" id="searchExpand">
+            <div class="search-input-wrapper">
+                <span class="material-icons">search</span>
+                <input type="text" id="searchPeliculas" placeholder="Buscar películas...">
+                <button class="clear-search" id="clearSearch">
+                    <span class="material-icons">close</span>
+                </button>
             </div>
         </div>
     </header>
 
-    <main class="main-content">
-        <section class="section">
-            <div class="section-header">
-                <h2>🎬 Todas las Películas</h2>
-                <div class="search-box small">
-                    <input type="text" id="searchPeliculas" placeholder="🔍 Buscar películas...">
-                </div>
+    <!-- MENÚ LATERAL -->
+    <div class="side-menu" id="sideMenu">
+        <div class="side-menu-header">
+            <div class="logo-premium">🎬 Mi Cine</div>
+            <button class="close-menu" id="closeMenu">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <div class="side-user-info">
+            <img id="sideUserAvatar" src="" alt="Avatar">
+            <div>
+                <h4 id="sideUserName">Usuario</h4>
+                <span class="side-user-badge">Premium</span>
             </div>
-            <div id="peliculasGrid" class="content-grid"></div>
-        </section>
+        </div>
+        <nav class="side-nav">
+            <a href="index.html" class="side-nav-item">🏠 Inicio</a>
+            <a href="peliculas.html" class="side-nav-item active">🎬 Películas</a>
+            <a href="series.html" class="side-nav-item">📺 Series</a>
+            <a href="mi-lista.html" class="side-nav-item">🔖 Mi Lista</a>
+            <a href="perfil.html" class="side-nav-item">👤 Perfil</a>
+        </nav>
+        <div class="side-menu-footer">
+            <button class="btn-logout-side" id="logoutSide">Cerrar Sesión</button>
+        </div>
+    </div>
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <main class="main-premium">
+        <div class="section-header-premium">
+            <h2 class="section-title-premium">
+                <span class="material-icons">movie</span> Todas las Películas
+            </h2>
+        </div>
+        <div id="peliculasGrid" class="content-grid"></div>
     </main>
 
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>🎬 Mi Cine</h3>
-                <p>Tu plataforma de entretenimiento favorita</p>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 Mi Cine - Todos los derechos reservados</p>
-        </div>
-    </footer>
+    <!-- BARRA INFERIOR -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="bottom-nav-item">
+            <span class="material-icons">home</span>
+            <span>Inicio</span>
+        </a>
+        <a href="peliculas.html" class="bottom-nav-item active">
+            <span class="material-icons">movie</span>
+            <span>Películas</span>
+        </a>
+        <a href="series.html" class="bottom-nav-item">
+            <span class="material-icons">tv</span>
+            <span>Series</span>
+        </a>
+        <a href="mi-lista.html" class="bottom-nav-item">
+            <span class="material-icons">bookmark</span>
+            <span>Mi Lista</span>
+        </a>
+        <a href="perfil.html" class="bottom-nav-item">
+            <span class="material-icons">person</span>
+            <span>Perfil</span>
+        </a>
+    </nav>
 
-    <div id="modal" class="modal">
-        <div class="modal-content">
+    <!-- MODAL -->
+    <div id="contentModal" class="modal-premium">
+        <div class="modal-premium-content">
+            <button class="modal-close-premium" onclick="closeContentModal()">
+                <span class="material-icons">close</span>
+            </button>
             <div id="modalContent"></div>
         </div>
     </div>
@@ -65,117 +111,317 @@
     <script src="js/database.js"></script>
     
     <script>
+        // ==================== VARIABLES ====================
+        let allMovies = [];
         let currentPage = 1;
-        const loadMoreBtn = document.createElement('button');
-        loadMoreBtn.className = 'btn btn-secondary';
-        loadMoreBtn.textContent = 'Cargar más';
-        loadMoreBtn.style.margin = '20px auto';
-        loadMoreBtn.style.display = 'block';
+        let isLoading = false;
+        let hasMore = true;
 
-        async function loadMovies(page = 1) {
-            const container = document.getElementById('peliculasGrid');
-            
-            if (page === 1) {
-                container.innerHTML = `
-                    <div class="loading">
-                        <div class="spinner"></div>
-                        <p>Cargando películas...</p>
+        // ==================== CARGAR PELÍCULAS ====================
+        async function loadMovies(page = 1, append = false) {
+            if (isLoading) return;
+            if (!append) {
+                currentPage = 1;
+                hasMore = true;
+                document.getElementById('peliculasGrid').innerHTML = `
+                    <div class="skeleton-grid">
+                        ${Array(6).fill(0).map(() => `
+                            <div class="skeleton-card">
+                                <div class="skeleton-image"></div>
+                                <div class="skeleton-title"></div>
+                                <div class="skeleton-meta"></div>
+                            </div>
+                        `).join('')}
                     </div>
                 `;
             }
 
-            try {
-                const movies = await getPopularMovies(page);
-                const items = movies.map(m => ({ ...m, media_type: 'movie' }));
-                
-                if (page === 1) {
-                    renderCards('peliculasGrid', items);
-                    // Agregar botón "Cargar más"
-                    if (movies.length > 0) {
-                        const parent = container.parentElement;
-                        const existingBtn = parent.querySelector('.load-more-btn');
-                        if (existingBtn) existingBtn.remove();
-                        const btn = document.createElement('button');
-                        btn.className = 'btn btn-secondary load-more-btn';
-                        btn.textContent = '📥 Cargar más películas';
-                        btn.style.margin = '30px auto';
-                        btn.style.display = 'block';
-                        btn.onclick = () => {
-                            currentPage++;
-                            loadMovies(currentPage);
-                        };
-                        parent.appendChild(btn);
-                    }
-                } else {
-                    // Agregar más películas
-                    const existingItems = container.querySelectorAll('.movie-card');
-                    const newItems = items.map(item => {
-                        const isMovie = true;
-                        const title = item.title || item.name;
-                        const year = item.release_date || item.first_air_date || '';
-                        const poster = getPosterUrl(item.poster_path);
-                        const id = item.id;
+            isLoading = true;
 
-                        return `
-                            <div class="movie-card" onclick="openModalTMDB(${id}, 'movie')">
-                                <div class="card-image">
-                                    <img src="${poster}" alt="${title}" loading="lazy">
-                                    <div class="badge-type">🎬</div>
-                                    <div class="badge-top">${year ? year.substring(0, 4) : 'N/A'}</div>
-                                    <div class="card-overlay">
-                                        <div class="play-btn">▶</div>
-                                    </div>
-                                </div>
-                                <div class="movie-info">
-                                    <h3>${title}</h3>
-                                    <div class="meta">
-                                        <span class="year">${year ? year.substring(0, 4) : 'Año desconocido'}</span>
-                                        <span class="type-badge badge-pelicula">Película</span>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-                    
-                    container.innerHTML += newItems;
-                    
-                    // Quitar botón si no hay más
-                    if (movies.length === 0) {
-                        const btn = container.parentElement.querySelector('.load-more-btn');
-                        if (btn) btn.remove();
-                    }
+            try {
+                const response = await fetch(
+                    `${TMDB_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&language=es-ES&page=${page}`
+                );
+                const data = await response.json();
+                const movies = data.results || [];
+
+                if (movies.length === 0) {
+                    hasMore = false;
+                    isLoading = false;
+                    return;
                 }
+
+                if (!append) {
+                    allMovies = movies;
+                } else {
+                    allMovies = [...allMovies, ...movies];
+                }
+
+                renderMovies(allMovies, append);
+                isLoading = false;
+                hasMore = movies.length === 20;
+
             } catch (error) {
                 console.error('Error:', error);
-                if (page === 1) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="icon">❌</div>
-                            <p>Error al cargar las películas</p>
-                        </div>
-                    `;
-                }
+                document.getElementById('peliculasGrid').innerHTML = `
+                    <div class="empty-state-premium" style="grid-column:1/-1;">
+                        <div class="empty-icon">❌</div>
+                        <h3>Error al cargar películas</h3>
+                        <p>${error.message}</p>
+                        <button class="btn btn-primary" onclick="loadMovies(1)">Reintentar</button>
+                    </div>
+                `;
+                isLoading = false;
             }
         }
 
+        // ==================== RENDERIZAR PELÍCULAS ====================
+        function renderMovies(movies, append = false) {
+            const grid = document.getElementById('peliculasGrid');
+
+            if (movies.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state-premium" style="grid-column:1/-1;">
+                        <div class="empty-icon">🎬</div>
+                        <h3>No hay películas disponibles</h3>
+                        <p>Pronto agregaremos más contenido</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const cards = movies.map(movie => `
+                <div class="content-card" onclick="openContentModal(${movie.id}, 'movie')">
+                    <div class="card-image">
+                        <img src="${getPosterUrl(movie.poster_path)}" alt="${movie.title}" loading="lazy">
+                        <div class="card-badge top">${movie.vote_average ? '⭐ ' + movie.vote_average.toFixed(1) : 'Nuevo'}</div>
+                        <div class="card-overlay">
+                            <button class="play-btn-small">
+                                <span class="material-icons">play_arrow</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-info">
+                        <h4>${movie.title}</h4>
+                        <span class="card-year">${movie.release_date ? movie.release_date.substring(0, 4) : 'N/A'}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            if (append) {
+                grid.innerHTML += cards;
+            } else {
+                grid.innerHTML = cards;
+            }
+
+            // Botón "Cargar más"
+            const existingBtn = document.querySelector('.load-more-btn');
+            if (existingBtn) existingBtn.remove();
+
+            if (hasMore && movies.length > 0) {
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-secondary load-more-btn';
+                btn.textContent = '📥 Cargar más películas';
+                btn.style.cssText = 'margin: 20px auto; display: block; padding: 12px 32px;';
+                btn.onclick = () => {
+                    currentPage++;
+                    loadMovies(currentPage, true);
+                };
+                grid.parentElement.appendChild(btn);
+            }
+        }
+
+        // ==================== FUNCIONES GLOBALES ====================
+        function getPosterUrl(path) {
+            return path ? `https://image.tmdb.org/t/p/w500${path}` : 'https://via.placeholder.com/300x450/1A1A1A/ffffff?text=No+Image';
+        }
+
+        async function getMovieDetails(id) {
+            try {
+                const response = await fetch(
+                    `${TMDB_BASE_URL}/movie/${id}?api_key=${TMDB_API_KEY}&language=es-ES`
+                );
+                return await response.json();
+            } catch (error) {
+                console.error('Error:', error);
+                return null;
+            }
+        }
+
+        async function openContentModal(id, type) {
+            const user = auth.currentUser;
+            if (!user) {
+                if (confirm('🔒 Para ver detalles necesitas iniciar sesión. ¿Deseas ir al login?')) {
+                    window.location.href = 'login.html';
+                }
+                return;
+            }
+
+            const modal = document.getElementById('contentModal');
+            const modalContent = document.getElementById('modalContent');
+
+            modalContent.innerHTML = `
+                <div class="modal-loading">
+                    <div class="loader-dot"></div>
+                    <div class="loader-dot"></div>
+                    <div class="loader-dot"></div>
+                </div>
+            `;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            try {
+                const data = await getMovieDetails(id);
+                if (!data) throw new Error('No se encontraron detalles');
+
+                const poster = getPosterUrl(data.poster_path);
+                const backdrop = data.backdrop_path ? `https://image.tmdb.org/t/p/original${data.backdrop_path}` : poster;
+                const genres = data.genres ? data.genres.map(g => g.name).join(', ') : 'No especificado';
+
+                // Generar enlace
+                const videoUrl = `https://unlimplay.co/play/movie/${id}`;
+
+                modalContent.innerHTML = `
+                    <div class="modal-hero" style="background-image: url(${backdrop})">
+                        <div class="modal-hero-gradient"></div>
+                        <div class="modal-hero-content">
+                            <img src="${poster}" alt="${data.title}" class="modal-poster-img">
+                            <div class="modal-hero-info">
+                                <h2>${data.title}</h2>
+                                <div class="modal-meta">
+                                    <span class="modal-year">${data.release_date ? data.release_date.substring(0, 4) : 'N/A'}</span>
+                                    <span class="modal-rating">⭐ ${data.vote_average ? data.vote_average.toFixed(1) : 'N/A'}</span>
+                                    <span class="modal-runtime">${data.runtime ? data.runtime + 'min' : 'N/A'}</span>
+                                </div>
+                                <div class="modal-genres">
+                                    ${data.genres?.map(g => `<span class="genre-tag">${g.name}</span>`).join('') || 'Sin géneros'}
+                                </div>
+                                <div class="modal-actions">
+                                    <a href="${videoUrl}" target="_blank" class="modal-play-btn">
+                                        <span class="material-icons">play_arrow</span> Reproducir
+                                    </a>
+                                    <button class="modal-fav-btn" onclick="toggleFavorite(${id})">
+                                        <span class="material-icons">favorite_border</span>
+                                    </button>
+                                    <button class="modal-share-btn" onclick="shareContent('${data.title}')">
+                                        <span class="material-icons">share</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <div class="modal-description">
+                            <h3>Sinopsis</h3>
+                            <p>${data.overview || 'Sin descripción disponible'}</p>
+                        </div>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error:', error);
+                modalContent.innerHTML = `
+                    <div class="modal-error">
+                        <span class="error-icon">❌</span>
+                        <p>Error al cargar los detalles</p>
+                        <button class="btn btn-primary" onclick="openContentModal(${id}, '${type}')">Reintentar</button>
+                    </div>
+                `;
+            }
+        }
+
+        function closeContentModal() {
+            document.getElementById('contentModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function shareContent(title) {
+            if (navigator.share) {
+                navigator.share({
+                    title: `Mi Cine - ${title}`,
+                    text: `Mira "${title}" en Mi Cine`,
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert('Enlace copiado al portapapeles');
+            }
+        }
+
+        // ==================== EVENTOS ====================
         document.addEventListener('DOMContentLoaded', () => {
             loadMovies(1);
 
-            document.getElementById('searchPeliculas').addEventListener('input', function() {
+            // Búsqueda
+            const searchInput = document.getElementById('searchPeliculas');
+            let searchTimeout;
+
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
                 const query = this.value.trim();
-                const container = document.getElementById('peliculasGrid');
-                const loadBtn = container.parentElement.querySelector('.load-more-btn');
-                if (loadBtn) loadBtn.style.display = 'none';
-                
+
                 if (query === '') {
-                    currentPage = 1;
                     loadMovies(1);
                     return;
                 }
-                
-                searchContentAndRender('peliculasGrid', query, 'pelicula');
+
+                searchTimeout = setTimeout(async () => {
+                    try {
+                        const response = await fetch(
+                            `${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&language=es-ES`
+                        );
+                        const data = await response.json();
+                        const results = data.results || [];
+                        renderMovies(results);
+                        const btn = document.querySelector('.load-more-btn');
+                        if (btn) btn.remove();
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                }, 500);
+            });
+
+            document.getElementById('clearSearch').addEventListener('click', () => {
+                searchInput.value = '';
+                loadMovies(1);
+            });
+
+            // Menú lateral
+            document.getElementById('menuToggle').addEventListener('click', () => {
+                document.getElementById('sideMenu').classList.add('active');
+                document.getElementById('menuOverlay').classList.add('active');
+            });
+
+            document.getElementById('closeMenu').addEventListener('click', closeMenu);
+            document.getElementById('menuOverlay').addEventListener('click', closeMenu);
+
+            function closeMenu() {
+                document.getElementById('sideMenu').classList.remove('active');
+                document.getElementById('menuOverlay').classList.remove('active');
+            }
+
+            // Búsqueda toggle
+            document.getElementById('searchToggle').addEventListener('click', () => {
+                document.getElementById('searchExpand').classList.toggle('active');
+                if (document.getElementById('searchExpand').classList.contains('active')) {
+                    searchInput.focus();
+                }
+            });
+
+            // Cerrar modal con ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeContentModal();
+                    closeMenu();
+                }
+            });
+
+            document.getElementById('contentModal').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) closeContentModal();
             });
         });
+
+        console.log('✅ Películas cargadas correctamente');
     </script>
 </body>
 </html>
