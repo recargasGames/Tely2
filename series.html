@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-    <!-- ==================== HEADER ==================== -->
     <header class="header-premium">
         <div class="header-premium-content">
             <button class="menu-btn" id="menuToggle">
@@ -19,26 +18,20 @@
                 <button class="search-btn" id="searchToggle">
                     <span class="material-icons">search</span>
                 </button>
-                <button class="notifications-btn">
-                    <span class="material-icons">notifications</span>
-                    <span class="notification-dot"></span>
-                </button>
             </div>
         </div>
-        
-        <!-- Barra de búsqueda expandible -->
         <div class="search-expand" id="searchExpand">
             <div class="search-input-wrapper">
                 <span class="material-icons">search</span>
-                <input type="text" id="searchInput" placeholder="Buscar series...">
-                <button class="filters-btn" id="filtersToggle">
-                    <span class="material-icons">tune</span>
+                <input type="text" id="searchSeries" placeholder="Buscar series...">
+                <button class="clear-search" id="clearSearch">
+                    <span class="material-icons">close</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- ==================== MENÚ LATERAL ==================== -->
+    <!-- MENÚ LATERAL -->
     <div class="side-menu" id="sideMenu">
         <div class="side-menu-header">
             <div class="logo-premium">🎬 Mi Cine</div>
@@ -46,205 +39,36 @@
                 <span class="material-icons">close</span>
             </button>
         </div>
+        <div class="side-user-info">
+            <img id="sideUserAvatar" src="" alt="Avatar">
+            <div>
+                <h4 id="sideUserName">Usuario</h4>
+                <span class="side-user-badge">Premium</span>
+            </div>
+        </div>
         <nav class="side-nav">
-            <a href="index.html" class="side-nav-item">
-                <span class="material-icons">home</span>
-                <span>Inicio</span>
-            </a>
-            <a href="peliculas.html" class="side-nav-item">
-                <span class="material-icons">movie</span>
-                <span>Películas</span>
-            </a>
-            <a href="series.html" class="side-nav-item active">
-                <span class="material-icons">tv</span>
-                <span>Series</span>
-            </a>
-            <a href="#" class="side-nav-item" id="miListaLink">
-                <span class="material-icons">bookmark</span>
-                <span>Mi Lista</span>
-            </a>
-            <a href="perfil.html" class="side-nav-item">
-                <span class="material-icons">person</span>
-                <span>Perfil</span>
-            </a>
+            <a href="index.html" class="side-nav-item">🏠 Inicio</a>
+            <a href="peliculas.html" class="side-nav-item">🎬 Películas</a>
+            <a href="series.html" class="side-nav-item active">📺 Series</a>
+            <a href="mi-lista.html" class="side-nav-item">🔖 Mi Lista</a>
+            <a href="perfil.html" class="side-nav-item">👤 Perfil</a>
         </nav>
         <div class="side-menu-footer">
-            <button class="btn-logout-side" id="logoutSide">
-                <span class="material-icons">logout</span>
-                <span>Cerrar Sesión</span>
-            </button>
+            <button class="btn-logout-side" id="logoutSide">Cerrar Sesión</button>
         </div>
     </div>
-
-    <!-- ==================== OVERLAY MENÚ ==================== -->
     <div class="menu-overlay" id="menuOverlay"></div>
 
-    <!-- ==================== CONTENIDO PRINCIPAL ==================== -->
     <main class="main-premium">
-        <!-- ===== PERFIL DEL USUARIO ===== -->
-        <section class="profile-section">
-            <div class="profile-card">
-                <div class="profile-avatar" id="profileAvatar">
-                    <img src="" alt="Avatar" id="userAvatarImg">
-                    <div class="profile-status-badge">👑</div>
-                </div>
-                <div class="profile-info">
-                    <h3 id="userDisplayName">Usuario</h3>
-                    <p class="profile-greeting">Bienvenido de vuelta</p>
-                    <span class="profile-badge premium">Miembro Premium</span>
-                </div>
-                <button class="btn-logout-profile" id="logoutBtn">
-                    <span class="material-icons">logout</span>
-                    <span>Cerrar Sesión</span>
-                </button>
-            </div>
-        </section>
-
-        <!-- ===== CATEGORÍAS ===== -->
-        <section class="categories-section">
-            <div class="categories-scroll">
-                <button class="category-btn active" data-filter="all">
-                    <span class="material-icons">grid_view</span> Todas
-                </button>
-                <button class="category-btn" data-filter="watching">
-                    <span class="material-icons">play_circle</span> Continuar viendo
-                </button>
-                <button class="category-btn" data-filter="watched">
-                    <span class="material-icons">visibility</span> Vistas
-                </button>
-                <button class="category-btn" data-filter="favorites">
-                    <span class="material-icons">favorite</span> Favoritas
-                </button>
-            </div>
-        </section>
-
-        <!-- ===== PANEL DE FILTROS ===== -->
-        <div class="filters-panel" id="filtersPanel">
-            <div class="filters-header">
-                <h3>Filtros</h3>
-                <button class="close-filters" id="closeFilters">
-                    <span class="material-icons">close</span>
-                </button>
-            </div>
-            <div class="filters-body">
-                <div class="filter-group">
-                    <label>Género</label>
-                    <select id="filterGenre">
-                        <option value="">Todos</option>
-                        <option value="Drama">Drama</option>
-                        <option value="Acción">Acción</option>
-                        <option value="Comedia">Comedia</option>
-                        <option value="Terror">Terror</option>
-                        <option value="Anime">Anime</option>
-                        <option value="Ciencia Ficción">Ciencia Ficción</option>
-                        <option value="Crimen">Crimen</option>
-                        <option value="Aventura">Aventura</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Año</label>
-                    <select id="filterYear">
-                        <option value="">Todos</option>
-                        <option value="2024">2024</option>
-                        <option value="2023">2023</option>
-                        <option value="2022">2022</option>
-                        <option value="2021">2021</option>
-                        <option value="2020">2020</option>
-                        <option value="2019">2019</option>
-                        <option value="2018">2018</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Idioma</label>
-                    <select id="filterLanguage">
-                        <option value="">Todos</option>
-                        <option value="es">Español</option>
-                        <option value="en">Inglés</option>
-                        <option value="ja">Japonés</option>
-                        <option value="ko">Coreano</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Calificación</label>
-                    <select id="filterRating">
-                        <option value="">Todas</option>
-                        <option value="4">4+ ⭐</option>
-                        <option value="3">3+ ⭐</option>
-                        <option value="2">2+ ⭐</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Ordenar por</label>
-                    <select id="filterSort">
-                        <option value="popular">Más populares</option>
-                        <option value="latest">Más recientes</option>
-                        <option value="views">Más vistas</option>
-                        <option value="alphabetical">Alfabético</option>
-                        <option value="seasons">Más temporadas</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Estado</label>
-                    <select id="filterStatus">
-                        <option value="">Todos</option>
-                        <option value="airing">En emisión</option>
-                        <option value="ended">Finalizadas</option>
-                    </select>
-                </div>
-                <button class="btn-apply-filters" id="applyFilters">Aplicar Filtros</button>
-            </div>
-        </div>
-
-        <!-- ===== TÍTULO Y ORDENAR ===== -->
         <div class="section-header-premium">
             <h2 class="section-title-premium">
                 <span class="material-icons">tv</span> Todas las Series
             </h2>
-            <div class="sort-container">
-                <select id="sortSelect">
-                    <option value="popular">Más populares</option>
-                    <option value="latest">Más recientes</option>
-                    <option value="alphabetical">Alfabético</option>
-                </select>
-                <span class="material-icons sort-icon">sort</span>
-            </div>
         </div>
-
-        <!-- ===== CONTINUAR VIENDO (Fila Especial) ===== -->
-        <section class="continue-watching-section" id="continueWatchingSection">
-            <h3 class="section-subtitle">
-                <span class="material-icons">play_circle</span> Continuar viendo
-            </h3>
-            <div class="continue-grid" id="continueGrid"></div>
-        </section>
-
-        <!-- ===== GRID DE SERIES ===== -->
-        <div class="series-grid" id="seriesGrid"></div>
-
-        <!-- ===== ESTADO DE CARGA ===== -->
-        <div class="skeleton-grid" id="skeletonGrid">
-            <!-- 6 skeletons -->
-        </div>
-
-        <!-- ===== BOTÓN REINTENTAR ===== -->
-        <div class="error-container" id="errorContainer" style="display:none;">
-            <div class="error-card">
-                <span class="error-icon">❌</span>
-                <h3>No se pudieron cargar las series</h3>
-                <p>Intenta nuevamente más tarde</p>
-                <button class="btn-retry" id="retryBtn">Reintentar</button>
-            </div>
-        </div>
-
-        <!-- ===== LOADER INFINITO ===== -->
-        <div class="infinite-loader" id="infiniteLoader">
-            <div class="loader-dot"></div>
-            <div class="loader-dot"></div>
-            <div class="loader-dot"></div>
-        </div>
+        <div id="seriesGrid" class="content-grid"></div>
     </main>
 
-    <!-- ==================== BARRA INFERIOR ==================== -->
+    <!-- BARRA INFERIOR -->
     <nav class="bottom-nav">
         <a href="index.html" class="bottom-nav-item">
             <span class="material-icons">home</span>
@@ -258,7 +82,7 @@
             <span class="material-icons">tv</span>
             <span>Series</span>
         </a>
-        <a href="#" class="bottom-nav-item" id="bottomMiLista">
+        <a href="mi-lista.html" class="bottom-nav-item">
             <span class="material-icons">bookmark</span>
             <span>Mi Lista</span>
         </a>
@@ -268,76 +92,30 @@
         </a>
     </nav>
 
-    <!-- ==================== MENÚ DE TRES PUNTOS ==================== -->
-    <div class="series-menu" id="seriesMenu">
-        <div class="series-menu-content">
-            <button class="menu-option" data-action="play">
-                <span class="material-icons">play_arrow</span> Reproducir
-            </button>
-            <button class="menu-option" data-action="info">
-                <span class="material-icons">info</span> Información
-            </button>
-            <button class="menu-option" data-action="favorite">
-                <span class="material-icons">favorite_border</span> Agregar a favoritos
-            </button>
-            <button class="menu-option" data-action="download">
-                <span class="material-icons">download</span> Descargar
-            </button>
-            <button class="menu-option" data-action="share">
-                <span class="material-icons">share</span> Compartir
-            </button>
-            <button class="menu-option danger" data-action="delete">
-                <span class="material-icons">delete</span> Eliminar historial
-            </button>
-        </div>
-        <div class="menu-overlay-close" id="menuOverlayClose"></div>
-    </div>
-
-    <!-- ==================== MODAL ==================== -->
-    <div id="modal" class="modal-premium">
+    <!-- MODAL -->
+    <div id="contentModal" class="modal-premium">
         <div class="modal-premium-content">
-            <button class="modal-close-premium" onclick="closeModal()">
+            <button class="modal-close-premium" onclick="closeContentModal()">
                 <span class="material-icons">close</span>
             </button>
             <div id="modalContent"></div>
         </div>
     </div>
 
-    <!-- ==================== SCRIPTS ==================== -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/tmdb-api.js"></script>
+    <script src="js/database.js"></script>
     
     <script>
-        // ==================== VARIABLES GLOBALES ====================
+        // ==================== VARIABLES ====================
         let allSeries = [];
         let currentPage = 1;
         let isLoading = false;
         let hasMore = true;
-        let currentFilter = 'all';
-        let userProgress = {};
-        let userFavorites = [];
-
-        // ==================== INICIALIZACIÓN ====================
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Cargar datos del usuario
-            loadUserData();
-            
-            // Cargar series
-            await loadSeries();
-            
-            // Configurar eventos
-            setupEventListeners();
-            
-            // Cargar progreso del usuario
-            loadUserProgress();
-            
-            // Cargar favoritos
-            loadUserFavorites();
-        });
 
         // ==================== CARGAR SERIES ====================
         async function loadSeries(page = 1, append = false) {
@@ -345,62 +123,66 @@
             if (!append) {
                 currentPage = 1;
                 hasMore = true;
-                document.getElementById('seriesGrid').innerHTML = '';
+                document.getElementById('seriesGrid').innerHTML = `
+                    <div class="skeleton-grid">
+                        ${Array(6).fill(0).map(() => `
+                            <div class="skeleton-card">
+                                <div class="skeleton-image"></div>
+                                <div class="skeleton-title"></div>
+                                <div class="skeleton-meta"></div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
             }
-            
+
             isLoading = true;
-            showSkeleton(append);
-            
+
             try {
                 const response = await fetch(
                     `${TMDB_BASE_URL}/tv/popular?api_key=${TMDB_API_KEY}&language=es-ES&page=${page}`
                 );
                 const data = await response.json();
                 const series = data.results || [];
-                
+
                 if (series.length === 0) {
                     hasMore = false;
-                    hideSkeleton();
                     isLoading = false;
                     return;
                 }
-                
-                // Procesar y renderizar
-                const processedSeries = await Promise.all(series.map(async s => {
-                    const details = await getSeriesDetails(s.id);
-                    return {
-                        ...s,
-                        genres: details?.genres?.map(g => g.name) || [],
-                        seasons: details?.seasons?.filter(season => season.season_number > 0) || []
-                    };
-                }));
-                
-                allSeries = append ? [...allSeries, ...processedSeries] : processedSeries;
-                renderSeries(allSeries);
-                
-                // Ocultar skeleton
-                hideSkeleton();
+
+                if (!append) {
+                    allSeries = series;
+                } else {
+                    allSeries = [...allSeries, ...series];
+                }
+
+                renderSeries(allSeries, append);
                 isLoading = false;
-                
-                // Verificar si hay más
-                if (processedSeries.length < 20) hasMore = false;
-                
+                hasMore = series.length === 20;
+
             } catch (error) {
                 console.error('Error:', error);
-                hideSkeleton();
-                showError();
+                document.getElementById('seriesGrid').innerHTML = `
+                    <div class="empty-state-premium" style="grid-column:1/-1;">
+                        <div class="empty-icon">❌</div>
+                        <h3>Error al cargar series</h3>
+                        <p>${error.message}</p>
+                        <button class="btn btn-primary" onclick="loadSeries(1)">Reintentar</button>
+                    </div>
+                `;
                 isLoading = false;
             }
         }
 
         // ==================== RENDERIZAR SERIES ====================
-        function renderSeries(series) {
+        function renderSeries(series, append = false) {
             const grid = document.getElementById('seriesGrid');
-            
+
             if (series.length === 0) {
                 grid.innerHTML = `
-                    <div class="empty-state-premium">
-                        <span class="empty-icon">📺</span>
+                    <div class="empty-state-premium" style="grid-column:1/-1;">
+                        <div class="empty-icon">📺</div>
                         <h3>No hay series disponibles</h3>
                         <p>Pronto agregaremos más contenido</p>
                     </div>
@@ -408,226 +190,64 @@
                 return;
             }
 
-            grid.innerHTML = series.map((serie, index) => {
-                const progress = userProgress[serie.id] || { season: 1, episode: 0, total: 10 };
-                const progressPercent = progress.total > 0 ? (progress.episode / progress.total) * 100 : 0;
-                const isFavorite = userFavorites.includes(serie.id);
-                const genres = serie.genres?.slice(0, 2).join(', ') || 'Sin género';
-                const seasons = serie.seasons?.length || 0;
-                const seasonText = seasons > 0 ? `T${progress.season}` : '';
-                const episodeText = progress.episode > 0 ? `${progress.episode}/${progress.total}` : '';
-
-                return `
-                    <div class="series-card" data-id="${serie.id}" style="animation-delay: ${index * 0.05}s">
-                        <div class="series-card-image" onclick="openSeriesModal(${serie.id})">
-                            <img src="${getPosterUrl(serie.poster_path)}" alt="${serie.name}" loading="lazy">
-                            <div class="series-badges">
-                                ${index < 3 ? '<span class="badge-top">Top ' + (index + 1) + '</span>' : ''}
-                                ${index === 0 ? '<span class="badge-popular">🔥 Popular</span>' : ''}
-                                ${index < 2 ? '<span class="badge-new">Nuevo</span>' : ''}
-                            </div>
-                            <div class="series-progress-bar" style="width: ${progressPercent}%"></div>
-                            <div class="series-overlay">
-                                <button class="play-btn-small" onclick="event.stopPropagation(); playSeries(${serie.id})">
-                                    <span class="material-icons">play_arrow</span>
-                                </button>
-                            </div>
-                            <div class="series-meta-top">
-                                <span class="series-season">${seasonText}</span>
-                                <span class="series-episodes">${episodeText}</span>
-                            </div>
-                        </div>
-                        <div class="series-card-info">
-                            <div class="series-card-header">
-                                <h4 onclick="openSeriesModal(${serie.id})">${serie.name}</h4>
-                                <button class="series-menu-btn" onclick="event.stopPropagation(); openSeriesMenu(${serie.id})">
-                                    <span class="material-icons">more_horiz</span>
-                                </button>
-                            </div>
-                            <div class="series-card-meta">
-                                <span class="series-genres">${genres}</span>
-                                <span class="series-rating">⭐ ${serie.vote_average?.toFixed(1) || 'N/A'}</span>
-                            </div>
-                            <div class="series-progress-text">
-                                ${progress.episode > 0 ? `${progress.episode}/${progress.total} capítulos vistos` : 'No visto'}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // ==================== SKELETON LOADING ====================
-        function showSkeleton(append = false) {
-            const skeleton = document.getElementById('skeletonGrid');
-            skeleton.style.display = 'grid';
-            
-            if (!append) {
-                skeleton.innerHTML = Array(6).fill(0).map(() => `
-                    <div class="skeleton-card">
-                        <div class="skeleton-image"></div>
-                        <div class="skeleton-title"></div>
-                        <div class="skeleton-meta"></div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function hideSkeleton() {
-            document.getElementById('skeletonGrid').style.display = 'none';
-        }
-
-        // ==================== ERROR ====================
-        function showError() {
-            document.getElementById('errorContainer').style.display = 'block';
-        }
-
-        function hideError() {
-            document.getElementById('errorContainer').style.display = 'none';
-        }
-
-        // ==================== CONTINUAR VIENDO ====================
-        function renderContinueWatching() {
-            const container = document.getElementById('continueGrid');
-            const watchingSeries = allSeries.filter(s => userProgress[s.id] && userProgress[s.id].episode > 0);
-            
-            if (watchingSeries.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-continue">
-                        <span class="material-icons">play_circle</span>
-                        <p>No tienes series en progreso</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = watchingSeries.slice(0, 6).map(serie => {
-                const progress = userProgress[serie.id];
-                const percent = progress.total > 0 ? (progress.episode / progress.total) * 100 : 0;
-                
-                return `
-                    <div class="continue-card" onclick="openSeriesModal(${serie.id})">
+            const cards = series.map(serie => `
+                <div class="content-card" onclick="openContentModal(${serie.id}, 'tv')">
+                    <div class="card-image">
                         <img src="${getPosterUrl(serie.poster_path)}" alt="${serie.name}" loading="lazy">
-                        <div class="continue-progress" style="width: ${percent}%"></div>
-                        <div class="continue-overlay">
-                            <span class="continue-episode">T${progress.season} E${progress.episode}</span>
+                        <div class="card-badge top">${serie.vote_average ? '⭐ ' + serie.vote_average.toFixed(1) : 'Nuevo'}</div>
+                        <div class="card-overlay">
+                            <button class="play-btn-small">
+                                <span class="material-icons">play_arrow</span>
+                            </button>
                         </div>
                     </div>
-                `;
-            }).join('');
-        }
+                    <div class="card-info">
+                        <h4>${serie.name}</h4>
+                        <span class="card-year">${serie.first_air_date ? serie.first_air_date.substring(0, 4) : 'N/A'}</span>
+                    </div>
+                </div>
+            `).join('');
 
-        // ==================== FUNCIONES DEL USUARIO ====================
-        function loadUserData() {
-            const user = auth.currentUser;
-            if (user) {
-                document.getElementById('userDisplayName').textContent = user.displayName || 'Usuario';
-                const avatarImg = document.getElementById('userAvatarImg');
-                avatarImg.src = user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'Usuario') + '&background=E50914&color=fff&size=100';
-            }
-        }
-
-        function loadUserProgress() {
-            const user = auth.currentUser;
-            if (!user) return;
-            
-            database.ref(`progress/${user.uid}`).on('value', (snapshot) => {
-                userProgress = snapshot.val() || {};
-                renderContinueWatching();
-                // Re-renderizar series con progreso
-                renderSeries(allSeries);
-            });
-        }
-
-        function loadUserFavorites() {
-            const user = auth.currentUser;
-            if (!user) return;
-            
-            database.ref(`favorites/${user.uid}`).on('value', (snapshot) => {
-                const data = snapshot.val();
-                userFavorites = data ? Object.keys(data) : [];
-                renderSeries(allSeries);
-            });
-        }
-
-        // ==================== GUARDAR PROGRESO ====================
-        function saveProgress(serieId, season, episode, total) {
-            const user = auth.currentUser;
-            if (!user) return;
-            
-            const progress = {
-                season: season,
-                episode: episode,
-                total: total,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            };
-            
-            database.ref(`progress/${user.uid}/${serieId}`).set(progress);
-        }
-
-        // ==================== FAVORITOS ====================
-        function toggleFavorite(serieId) {
-            const user = auth.currentUser;
-            if (!user) return;
-            
-            const isFavorite = userFavorites.includes(serieId);
-            const ref = database.ref(`favorites/${user.uid}/${serieId}`);
-            
-            if (isFavorite) {
-                ref.remove();
+            if (append) {
+                grid.innerHTML += cards;
             } else {
-                ref.set(true);
+                grid.innerHTML = cards;
+            }
+
+            const existingBtn = document.querySelector('.load-more-btn');
+            if (existingBtn) existingBtn.remove();
+
+            if (hasMore && series.length > 0) {
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-secondary load-more-btn';
+                btn.textContent = '📥 Cargar más series';
+                btn.style.cssText = 'margin: 20px auto; display: block; padding: 12px 32px;';
+                btn.onclick = () => {
+                    currentPage++;
+                    loadSeries(currentPage, true);
+                };
+                grid.parentElement.appendChild(btn);
             }
         }
 
-        // ==================== MENÚ DE SERIE ====================
-        let currentMenuSerieId = null;
-
-        function openSeriesMenu(serieId) {
-            currentMenuSerieId = serieId;
-            const menu = document.getElementById('seriesMenu');
-            menu.classList.add('active');
-            
-            // Actualizar estado del botón favorito
-            const isFavorite = userFavorites.includes(serieId);
-            const favBtn = menu.querySelector('[data-action="favorite"]');
-            favBtn.innerHTML = `
-                <span class="material-icons">${isFavorite ? 'favorite' : 'favorite_border'}</span>
-                ${isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
-            `;
+        // ==================== FUNCIONES GLOBALES ====================
+        function getPosterUrl(path) {
+            return path ? `https://image.tmdb.org/t/p/w500${path}` : 'https://via.placeholder.com/300x450/1A1A1A/ffffff?text=No+Image';
         }
 
-        function closeSeriesMenu() {
-            document.getElementById('seriesMenu').classList.remove('active');
-            currentMenuSerieId = null;
-        }
-
-        // ==================== REPRODUCIR SERIE ====================
-        function playSeries(serieId) {
-            const user = auth.currentUser;
-            if (!user) {
-                alert('Inicia sesión para ver series');
-                return;
-            }
-            
-            const serie = allSeries.find(s => s.id === serieId);
-            if (!serie) return;
-            
-            // Usar el primer episodio de la primera temporada
-            const firstSeason = serie.seasons?.find(s => s.season_number > 0);
-            if (firstSeason) {
-                const season = firstSeason.season_number;
-                const episode = 1;
-                const url = getSeriesUrl(serieId, season, episode);
-                window.open(url, '_blank');
-                
-                // Guardar progreso
-                saveProgress(serieId, season, episode, firstSeason.episode_count || 10);
+        async function getSeriesDetails(id) {
+            try {
+                const response = await fetch(
+                    `${TMDB_BASE_URL}/tv/${id}?api_key=${TMDB_API_KEY}&language=es-ES`
+                );
+                return await response.json();
+            } catch (error) {
+                console.error('Error:', error);
+                return null;
             }
         }
 
-        // ==================== MODAL DE SERIE ====================
-        async function openSeriesModal(serieId) {
+        async function openContentModal(id, type) {
             const user = auth.currentUser;
             if (!user) {
                 if (confirm('🔒 Para ver detalles necesitas iniciar sesión. ¿Deseas ir al login?')) {
@@ -635,10 +255,10 @@
                 }
                 return;
             }
-            
-            const modal = document.getElementById('modal');
+
+            const modal = document.getElementById('contentModal');
             const modalContent = document.getElementById('modalContent');
-            
+
             modalContent.innerHTML = `
                 <div class="modal-loading">
                     <div class="loader-dot"></div>
@@ -648,351 +268,179 @@
             `;
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
-            
+
             try {
-                const data = await getSeriesDetails(serieId);
+                const data = await getSeriesDetails(id);
                 if (!data) throw new Error('No se encontraron detalles');
-                
-                const progress = userProgress[serieId] || { season: 1, episode: 0, total: 10 };
-                const isFavorite = userFavorites.includes(serieId);
-                
-                let seasonsHTML = '';
-                const validSeasons = data.seasons?.filter(s => s.season_number > 0) || [];
-                
-                if (validSeasons.length > 0) {
-                    seasonsHTML = validSeasons.map(season => `
-                        <div class="modal-season">
-                            <h4>Temporada ${season.season_number}</h4>
+
+                const poster = getPosterUrl(data.poster_path);
+                const backdrop = data.backdrop_path ? `https://image.tmdb.org/t/p/original${data.backdrop_path}` : poster;
+
+                // Generar enlace para primer episodio
+                const firstSeason = data.seasons?.find(s => s.season_number > 0);
+                const seasonNum = firstSeason?.season_number || 1;
+                const videoUrl = `https://unlimplay.co/play/tv/${id}/${seasonNum}/1`;
+
+                // Episodios
+                let episodesHTML = '';
+                if (firstSeason) {
+                    const epCount = Math.min(firstSeason.episode_count || 10, 10);
+                    episodesHTML = `
+                        <div class="modal-seasons">
+                            <h3>Temporada ${seasonNum}</h3>
                             <div class="modal-episodes">
-                                ${Array.from({length: Math.min(season.episode_count || 10, 20)}, (_, i) => {
-                                    const epNum = i + 1;
-                                    const url = getSeriesUrl(serieId, season.season_number, epNum);
-                                    return `
-                                        <a href="${url}" target="_blank" class="modal-episode">
-                                            <span class="episode-number">E${epNum}</span>
-                                            <span class="episode-title">Episodio ${epNum}</span>
-                                            <span class="episode-play">▶</span>
-                                        </a>
-                                    `;
-                                }).join('')}
+                                ${Array.from({length: epCount}, (_, i) => `
+                                    <a href="https://unlimplay.co/play/tv/${id}/${seasonNum}/${i+1}" target="_blank" class="modal-episode-btn">
+                                        Episodio ${i+1}
+                                    </a>
+                                `).join('')}
                             </div>
                         </div>
-                    `).join('');
+                    `;
                 }
-                
+
                 modalContent.innerHTML = `
-                    <div class="modal-premium-body">
-                        <div class="modal-poster">
-                            <img src="${getPosterUrl(data.poster_path)}" alt="${data.name}">
-                            <div class="modal-poster-overlay">
-                                <button class="modal-play-btn" onclick="playSeries(${serieId})">
-                                    <span class="material-icons">play_arrow</span>
-                                    Reproducir
-                                </button>
-                            </div>
-                        </div>
-                        <div class="modal-info">
-                            <h2>${data.name}</h2>
-                            <div class="modal-meta">
-                                <span class="modal-year">${data.first_air_date ? data.first_air_date.substring(0, 4) : 'N/A'}</span>
-                                <span class="modal-rating">⭐ ${data.vote_average?.toFixed(1) || 'N/A'}</span>
-                                <span class="modal-seasons">${validSeasons.length} temporadas</span>
-                            </div>
-                            <div class="modal-genres">
-                                ${data.genres?.map(g => `<span class="genre-tag">${g.name}</span>`).join('') || 'Sin géneros'}
-                            </div>
-                            <div class="modal-progress">
-                                <p>Progreso: ${progress.episode}/${progress.total} capítulos</p>
-                                <div class="modal-progress-bar">
-                                    <div class="modal-progress-fill" style="width: ${progress.total > 0 ? (progress.episode / progress.total) * 100 : 0}%"></div>
+                    <div class="modal-hero" style="background-image: url(${backdrop})">
+                        <div class="modal-hero-gradient"></div>
+                        <div class="modal-hero-content">
+                            <img src="${poster}" alt="${data.name}" class="modal-poster-img">
+                            <div class="modal-hero-info">
+                                <h2>${data.name}</h2>
+                                <div class="modal-meta">
+                                    <span class="modal-year">${data.first_air_date ? data.first_air_date.substring(0, 4) : 'N/A'}</span>
+                                    <span class="modal-rating">⭐ ${data.vote_average ? data.vote_average.toFixed(1) : 'N/A'}</span>
+                                    <span class="modal-seasons-count">${data.seasons?.filter(s => s.season_number > 0).length || 0} temporadas</span>
+                                </div>
+                                <div class="modal-genres">
+                                    ${data.genres?.map(g => `<span class="genre-tag">${g.name}</span>`).join('') || 'Sin géneros'}
+                                </div>
+                                <div class="modal-actions">
+                                    <a href="${videoUrl}" target="_blank" class="modal-play-btn">
+                                        <span class="material-icons">play_arrow</span> Reproducir
+                                    </a>
+                                    <button class="modal-fav-btn" onclick="toggleFavorite(${id})">
+                                        <span class="material-icons">favorite_border</span>
+                                    </button>
+                                    <button class="modal-share-btn" onclick="shareContent('${data.name}')">
+                                        <span class="material-icons">share</span>
+                                    </button>
                                 </div>
                             </div>
-                            <div class="modal-actions">
-                                <button class="modal-action-btn favorite-btn" onclick="toggleFavorite(${serieId})">
-                                    <span class="material-icons">${isFavorite ? 'favorite' : 'favorite_border'}</span>
-                                    ${isFavorite ? 'Favorito' : 'Agregar a favoritos'}
-                                </button>
-                            </div>
-                            <div class="modal-description">
-                                <p>${data.overview || 'Sin descripción disponible'}</p>
-                            </div>
-                            ${seasonsHTML}
                         </div>
                     </div>
+                    <div class="modal-body">
+                        <div class="modal-description">
+                            <h3>Sinopsis</h3>
+                            <p>${data.overview || 'Sin descripción disponible'}</p>
+                        </div>
+                        ${episodesHTML}
+                    </div>
                 `;
-                
+
             } catch (error) {
                 console.error('Error:', error);
                 modalContent.innerHTML = `
                     <div class="modal-error">
                         <span class="error-icon">❌</span>
                         <p>Error al cargar los detalles</p>
+                        <button class="btn btn-primary" onclick="openContentModal(${id}, '${type}')">Reintentar</button>
                     </div>
                 `;
             }
         }
 
-        function closeModal() {
-            document.getElementById('modal').classList.remove('active');
+        function closeContentModal() {
+            document.getElementById('contentModal').classList.remove('active');
             document.body.style.overflow = 'auto';
         }
 
+        function shareContent(title) {
+            if (navigator.share) {
+                navigator.share({
+                    title: `Mi Cine - ${title}`,
+                    text: `Mira "${title}" en Mi Cine`,
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert('Enlace copiado al portapapeles');
+            }
+        }
+
         // ==================== EVENTOS ====================
-        function setupEventListeners() {
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSeries(1);
+
+            // Búsqueda
+            const searchInput = document.getElementById('searchSeries');
+            let searchTimeout;
+
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const query = this.value.trim();
+
+                if (query === '') {
+                    loadSeries(1);
+                    return;
+                }
+
+                searchTimeout = setTimeout(async () => {
+                    try {
+                        const response = await fetch(
+                            `${TMDB_BASE_URL}/search/tv?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&language=es-ES`
+                        );
+                        const data = await response.json();
+                        const results = data.results || [];
+                        renderSeries(results);
+                        const btn = document.querySelector('.load-more-btn');
+                        if (btn) btn.remove();
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                }, 500);
+            });
+
+            document.getElementById('clearSearch').addEventListener('click', () => {
+                searchInput.value = '';
+                loadSeries(1);
+            });
+
             // Menú lateral
             document.getElementById('menuToggle').addEventListener('click', () => {
                 document.getElementById('sideMenu').classList.add('active');
                 document.getElementById('menuOverlay').classList.add('active');
             });
-            
+
             document.getElementById('closeMenu').addEventListener('click', closeMenu);
             document.getElementById('menuOverlay').addEventListener('click', closeMenu);
-            
+
             function closeMenu() {
                 document.getElementById('sideMenu').classList.remove('active');
                 document.getElementById('menuOverlay').classList.remove('active');
             }
-            
-            // Búsqueda
+
+            // Búsqueda toggle
             document.getElementById('searchToggle').addEventListener('click', () => {
                 document.getElementById('searchExpand').classList.toggle('active');
-            });
-            
-            let searchTimeout;
-            document.getElementById('searchInput').addEventListener('input', function() {
-                clearTimeout(searchTimeout);
-                const query = this.value.trim();
-                searchTimeout = setTimeout(async () => {
-                    if (query === '') {
-                        await loadSeries(1);
-                        return;
-                    }
-                    const results = await searchContent(query);
-                    const series = results.filter(r => r.media_type === 'tv');
-                    allSeries = series;
-                    renderSeries(series);
-                    document.getElementById('continueWatchingSection').style.display = 'none';
-                }, 500);
-            });
-            
-            // Filtros
-            document.getElementById('filtersToggle').addEventListener('click', () => {
-                document.getElementById('filtersPanel').classList.add('active');
-            });
-            
-            document.getElementById('closeFilters').addEventListener('click', () => {
-                document.getElementById('filtersPanel').classList.remove('active');
-            });
-            
-            document.getElementById('applyFilters').addEventListener('click', applyFilters);
-            
-            // Categorías
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    currentFilter = this.dataset.filter;
-                    applyCategoryFilter(currentFilter);
-                });
-            });
-            
-            // Ordenar
-            document.getElementById('sortSelect').addEventListener('change', function() {
-                const sorted = [...allSeries];
-                switch(this.value) {
-                    case 'popular':
-                        sorted.sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0));
-                        break;
-                    case 'latest':
-                        sorted.sort((a, b) => (b.first_air_date || '').localeCompare(a.first_air_date || ''));
-                        break;
-                    case 'alphabetical':
-                        sorted.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-                        break;
-                }
-                renderSeries(sorted);
-            });
-            
-            // Scroll infinito
-            window.addEventListener('scroll', () => {
-                if (isLoading || !hasMore) return;
-                const scrollBottom = window.innerHeight + window.scrollY;
-                const documentHeight = document.documentElement.scrollHeight;
-                if (scrollBottom >= documentHeight - 300) {
-                    currentPage++;
-                    loadSeries(currentPage, true);
+                if (document.getElementById('searchExpand').classList.contains('active')) {
+                    searchInput.focus();
                 }
             });
-            
-            // Reintentar
-            document.getElementById('retryBtn').addEventListener('click', () => {
-                hideError();
-                loadSeries(1);
-            });
-            
-            // Cerrar menú de serie
-            document.getElementById('menuOverlayClose').addEventListener('click', closeSeriesMenu);
-            
-            // Acciones del menú de serie
-            document.querySelectorAll('.menu-option').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const action = this.dataset.action;
-                    const serieId = currentMenuSerieId;
-                    if (!serieId) return;
-                    
-                    switch(action) {
-                        case 'play':
-                            playSeries(serieId);
-                            break;
-                        case 'info':
-                            closeSeriesMenu();
-                            openSeriesModal(serieId);
-                            break;
-                        case 'favorite':
-                            toggleFavorite(serieId);
-                            closeSeriesMenu();
-                            break;
-                        case 'delete':
-                            if (confirm('¿Eliminar historial de esta serie?')) {
-                                const user = auth.currentUser;
-                                if (user) {
-                                    database.ref(`progress/${user.uid}/${serieId}`).remove();
-                                }
-                                closeSeriesMenu();
-                            }
-                            break;
-                        default:
-                            closeSeriesMenu();
-                            alert('Función en desarrollo');
-                    }
-                });
-            });
-            
-            // Cerrar modal con ESC
+
+            // Cerrar modal
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
-                    closeModal();
-                    closeSeriesMenu();
+                    closeContentModal();
                     closeMenu();
                 }
             });
-            
-            // Cerrar modal al hacer clic fuera
-            document.getElementById('modal').addEventListener('click', (e) => {
-                if (e.target === e.currentTarget) closeModal();
-            });
-        }
 
-        // ==================== APLICAR FILTROS ====================
-        async function applyFilters() {
-            document.getElementById('filtersPanel').classList.remove('active');
-            
-            const genre = document.getElementById('filterGenre').value;
-            const year = document.getElementById('filterYear').value;
-            const language = document.getElementById('filterLanguage').value;
-            const rating = document.getElementById('filterRating').value;
-            const sort = document.getElementById('filterSort').value;
-            const status = document.getElementById('filterStatus').value;
-            
-            // Simular filtrado (en producción se haría desde la API)
-            let filtered = [...allSeries];
-            
-            if (genre) {
-                filtered = filtered.filter(s => 
-                    s.genres?.some(g => g.toLowerCase().includes(genre.toLowerCase()))
-                );
-            }
-            
-            if (year) {
-                filtered = filtered.filter(s => 
-                    s.first_air_date?.startsWith(year)
-                );
-            }
-            
-            if (rating) {
-                filtered = filtered.filter(s => 
-                    (s.vote_average || 0) >= parseFloat(rating)
-                );
-            }
-            
-            // Ordenar
-            switch(sort) {
-                case 'popular':
-                    filtered.sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0));
-                    break;
-                case 'latest':
-                    filtered.sort((a, b) => (b.first_air_date || '').localeCompare(a.first_air_date || ''));
-                    break;
-                case 'views':
-                    filtered.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
-                    break;
-                case 'alphabetical':
-                    filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-                    break;
-                case 'seasons':
-                    filtered.sort((a, b) => (b.seasons?.length || 0) - (a.seasons?.length || 0));
-                    break;
-            }
-            
-            renderSeries(filtered);
-        }
-
-        // ==================== APLICAR CATEGORÍA ====================
-        function applyCategoryFilter(filter) {
-            let filtered = [...allSeries];
-            
-            switch(filter) {
-                case 'watching':
-                    filtered = filtered.filter(s => userProgress[s.id] && userProgress[s.id].episode > 0);
-                    break;
-                case 'watched':
-                    filtered = filtered.filter(s => {
-                        const progress = userProgress[s.id];
-                        return progress && progress.episode === progress.total;
-                    });
-                    break;
-                case 'favorites':
-                    filtered = filtered.filter(s => userFavorites.includes(s.id));
-                    break;
-                default:
-                    filtered = allSeries;
-            }
-            
-            renderSeries(filtered);
-        }
-
-        // ==================== FUNCIONES DE UTILIDAD ====================
-        function getSeriesUrl(tmdbId, season, episode) {
-            return `https://unlimplay.co/play/tv/${tmdbId}/${season}/${episode}`;
-        }
-
-        function getPosterUrl(path) {
-            return path ? `https://image.tmdb.org/t/p/w500${path}` : 'https://via.placeholder.com/300x450/1A1A1A/ffffff?text=No+Image';
-        }
-
-        // ==================== BOTÓN MI LISTA ====================
-        document.getElementById('miListaLink')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.querySelector('.category-btn[data-filter="favorites"]')?.click();
-            document.querySelector('.category-btn[data-filter="favorites"]')?.scrollIntoView({ behavior: 'smooth' });
-        });
-
-        document.getElementById('bottomMiLista')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.querySelector('.category-btn[data-filter="favorites"]')?.click();
-            document.querySelector('.category-btn[data-filter="favorites"]')?.scrollIntoView({ behavior: 'smooth' });
-        });
-
-        // ==================== CERRAR SESIÓN ====================
-        document.querySelectorAll('#logoutBtn, #logoutSide').forEach(btn => {
-            btn.addEventListener('click', () => {
-                auth.signOut().then(() => {
-                    window.location.href = 'login.html';
-                });
+            document.getElementById('contentModal').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) closeContentModal();
             });
         });
 
-        console.log('✅ Series premium cargadas');
+        console.log('✅ Series cargadas correctamente');
     </script>
 </body>
 </html>
