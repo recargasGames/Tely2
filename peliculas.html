@@ -6,80 +6,310 @@
     <title>Mi Cine - Películas</title>
     <link rel="stylesheet" href="css/styles.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        .header-premium {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 12px 16px;
+            background: rgba(13, 13, 13, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .header-premium-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .logo-premium {
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #E50914, #f39c12);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .menu-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            padding: 8px;
+        }
+        .main-premium { max-width: 1400px; margin: 0 auto; padding: 0 16px 20px; }
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 16px;
+        }
+        .content-card {
+            background: #1A1A1A;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .content-card:hover { transform: translateY(-6px); border-color: #E50914; box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
+        .card-image {
+            position: relative;
+            aspect-ratio: 2/3;
+            overflow: hidden;
+        }
+        .card-image img { width: 100%; height: 100%; object-fit: cover; }
+        .card-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 700;
+            background: #E50914;
+            color: #fff;
+        }
+        .card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .content-card:hover .card-overlay { opacity: 1; }
+        .play-btn-small {
+            width: 44px;
+            height: 44px;
+            background: #E50914;
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .play-btn-small .material-icons { font-size: 24px; }
+        .card-info { padding: 12px; }
+        .card-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            margin: 0 0 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .card-year { font-size: 12px; color: #888; }
+        .empty-state-premium {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .empty-state-premium .empty-icon { font-size: 48px; display: block; margin-bottom: 12px; }
+        .empty-state-premium h3 { color: #fff; margin: 0 0 8px; }
+        .empty-state-premium p { color: #888; margin: 0; }
+        .skeleton-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 16px;
+        }
+        .skeleton-card {
+            background: #1A1A1A;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .skeleton-image {
+            aspect-ratio: 2/3;
+            background: linear-gradient(90deg, #2A2A2A 25%, #3A3A3A 50%, #2A2A2A 75%);
+            background-size: 200% 100%;
+            animation: skeletonLoading 1.5s infinite;
+        }
+        .skeleton-title {
+            height: 14px;
+            margin: 12px 12px 6px;
+            background: linear-gradient(90deg, #2A2A2A 25%, #3A3A3A 50%, #2A2A2A 75%);
+            background-size: 200% 100%;
+            animation: skeletonLoading 1.5s infinite;
+            border-radius: 4px;
+        }
+        .skeleton-meta {
+            height: 10px;
+            margin: 0 12px 12px;
+            width: 60%;
+            background: linear-gradient(90deg, #2A2A2A 25%, #3A3A3A 50%, #2A2A2A 75%);
+            background-size: 200% 100%;
+            animation: skeletonLoading 1.5s infinite;
+            border-radius: 4px;
+        }
+        @keyframes skeletonLoading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(13, 13, 13, 0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            padding: 6px 0 12px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            z-index: 100;
+        }
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: #666;
+            text-decoration: none;
+            font-size: 10px;
+            transition: all 0.3s ease;
+            padding: 4px 12px;
+            border-radius: 8px;
+            min-width: 50px;
+        }
+        .bottom-nav-item .material-icons { font-size: 24px; }
+        .bottom-nav-item:hover { color: #fff; }
+        .bottom-nav-item.active { color: #E50914; }
+
+        .modal-premium {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 500;
+            overflow-y: auto;
+            padding: 16px;
+        }
+        .modal-premium.active { display: flex; align-items: center; justify-content: center; }
+        .modal-premium-content {
+            background: #1A1A1A;
+            border-radius: 16px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-close-premium {
+            position: sticky;
+            top: 12px;
+            right: 12px;
+            float: right;
+            background: rgba(0,0,0,0.5);
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            z-index: 10;
+        }
+        .modal-hero {
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            min-height: 280px;
+        }
+        .modal-hero-gradient {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background: linear-gradient(to top, #1A1A1A 0%, transparent 100%);
+        }
+        .modal-hero-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            gap: 20px;
+            padding: 24px;
+            align-items: flex-end;
+            min-height: 280px;
+        }
+        .modal-poster-img {
+            width: 120px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .modal-hero-info { flex: 1; }
+        .modal-hero-info h2 { font-size: 22px; margin: 0 0 8px; color: #fff; }
+        .modal-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px; color: #aaa; margin-bottom: 12px; }
+        .modal-rating { color: #f39c12; }
+        .modal-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .modal-play-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #E50914;
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .modal-play-btn:hover { background: #b2070f; }
+        .modal-fav-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            color: #fff;
+            cursor: pointer;
+        }
+        .modal-fav-btn:hover { background: rgba(255,255,255,0.1); }
+        .modal-body { padding: 20px 24px 24px; }
+        .modal-description h3 { font-size: 16px; color: #fff; margin: 0 0 8px; }
+        .modal-description p { color: #aaa; line-height: 1.6; font-size: 14px; margin: 0; }
+    </style>
 </head>
 <body>
     <header class="header-premium">
         <div class="header-premium-content">
-            <button class="menu-btn" id="menuToggle">
-                <span class="material-icons">menu</span>
+            <button class="menu-btn" onclick="window.location.href='index.html'">
+                <span class="material-icons">arrow_back</span>
             </button>
             <div class="logo-premium">🎬 Mi Cine</div>
-            <div></div>
+            <div style="width:40px;"></div>
         </div>
     </header>
 
-    <!-- MENÚ LATERAL -->
-    <div class="side-menu" id="sideMenu">
-        <div class="side-menu-header">
-            <div class="logo-premium">🎬 Mi Cine</div>
-            <button class="close-menu" id="closeMenu">
-                <span class="material-icons">close</span>
-            </button>
-        </div>
-        <div class="side-user-info">
-            <img id="sideUserAvatar" src="" alt="Avatar">
-            <div>
-                <h4 id="sideUserName">Usuario</h4>
-                <span class="side-user-badge">Premium</span>
-            </div>
-        </div>
-        <nav class="side-nav">
-            <a href="index.html" class="side-nav-item">🏠 Inicio</a>
-            <a href="peliculas.html" class="side-nav-item active">🎬 Películas</a>
-            <a href="series.html" class="side-nav-item">📺 Series</a>
-            <a href="mi-lista.html" class="side-nav-item">🔖 Mi Lista</a>
-            <a href="perfil.html" class="side-nav-item">👤 Perfil</a>
-        </nav>
-        <div class="side-menu-footer">
-            <button class="btn-logout-side" id="logoutSide">Cerrar Sesión</button>
-        </div>
-    </div>
-    <div class="menu-overlay" id="menuOverlay"></div>
-
     <main class="main-premium">
-        <div class="section-header-premium">
-            <h2 class="section-title-premium">
-                <span class="material-icons">movie</span> Todas las Películas
-            </h2>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 0 8px;">
+            <h2 style="color:#fff;font-size:20px;margin:0;">🎬 Películas</h2>
         </div>
         <div id="peliculasGrid" class="content-grid"></div>
     </main>
 
-    <!-- BARRA INFERIOR -->
     <nav class="bottom-nav">
-        <a href="index.html" class="bottom-nav-item">
-            <span class="material-icons">home</span>
-            <span>Inicio</span>
-        </a>
-        <a href="peliculas.html" class="bottom-nav-item active">
-            <span class="material-icons">movie</span>
-            <span>Películas</span>
-        </a>
-        <a href="series.html" class="bottom-nav-item">
-            <span class="material-icons">tv</span>
-            <span>Series</span>
-        </a>
-        <a href="mi-lista.html" class="bottom-nav-item">
-            <span class="material-icons">bookmark</span>
-            <span>Mi Lista</span>
-        </a>
-        <a href="perfil.html" class="bottom-nav-item">
-            <span class="material-icons">person</span>
-            <span>Perfil</span>
-        </a>
+        <a href="index.html" class="bottom-nav-item">🏠 Inicio</a>
+        <a href="peliculas.html" class="bottom-nav-item active">🎬 Películas</a>
+        <a href="series.html" class="bottom-nav-item">📺 Series</a>
+        <a href="mi-lista.html" class="bottom-nav-item">🔖 Mi Lista</a>
+        <a href="perfil.html" class="bottom-nav-item">👤 Perfil</a>
     </nav>
 
-    <!-- MODAL -->
     <div id="contentModal" class="modal-premium">
         <div class="modal-premium-content">
             <button class="modal-close-premium" onclick="closeContentModal()">
@@ -95,17 +325,31 @@
     <script src="js/firebase-config.js"></script>
     
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Verificar autenticación
-            auth.onAuthStateChanged(function(user) {
-                if (user) {
-                    document.getElementById('sideUserAvatar').src = user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'Usuario') + '&background=E50914&color=fff&size=100';
-                    document.getElementById('sideUserName').textContent = user.displayName || 'Usuario';
-                }
-            });
+        let isLoggedIn = false;
+        let allContent = [];
 
+        auth.onAuthStateChanged(function(user) {
+            isLoggedIn = !!user;
+        });
+
+        function checkAuth() {
+            if (!isLoggedIn) {
+                if (confirm('🔒 Para ver contenido necesitas iniciar sesión. ¿Deseas ir al login?')) {
+                    localStorage.setItem('returnUrl', window.location.href);
+                    window.location.href = 'login.html';
+                }
+                return false;
+            }
+            return true;
+        }
+
+        function playContent(id, type) {
+            if (!checkAuth()) return;
+            window.location.href = `reproductor.html?id=${id}&type=${type}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
             loadMovies();
-            setupEventListeners();
         });
 
         function loadMovies() {
@@ -135,6 +379,7 @@
                         }
                     });
                     movies.reverse();
+                    allContent = movies;
                 }
 
                 if (movies.length === 0) {
@@ -142,18 +387,18 @@
                         <div class="empty-state-premium" style="grid-column:1/-1;">
                             <div class="empty-icon">🎬</div>
                             <h3>No hay películas</h3>
-                            <p>Ve al panel de administración y agrega contenido</p>
-                            <a href="admin.html" class="btn btn-primary" style="margin-top:12px;">Ir al Admin</a>
+                            <p>Ve al Admin y sincroniza con TMDB</p>
+                            <button class="btn btn-primary" style="margin-top:12px;" onclick="window.location.href='admin.html'">Ir al Admin</button>
                         </div>
                     `;
                     return;
                 }
 
                 grid.innerHTML = movies.map(movie => `
-                    <div class="content-card" onclick="openContentModal('${movie.id}')">
+                    <div class="content-card" onclick="openModal('${movie.id}')">
                         <div class="card-image">
                             <img src="${movie.poster}" alt="${movie.title}" loading="lazy">
-                            <div class="card-badge top">${movie.vote_average ? '⭐ ' + movie.vote_average.toFixed(1) : 'Nuevo'}</div>
+                            <div class="card-badge">${movie.vote_average ? '⭐ ' + movie.vote_average.toFixed(1) : 'Nuevo'}</div>
                             <div class="card-overlay">
                                 <button class="play-btn-small" onclick="event.stopPropagation(); playContent('${movie.id}', 'pelicula')">
                                     <span class="material-icons">play_arrow</span>
@@ -169,69 +414,50 @@
             });
         }
 
-        function playContent(id, type) {
-            const user = auth.currentUser;
-            if (!user) {
-                if (confirm('🔒 Para ver contenido necesitas iniciar sesión. ¿Deseas ir al login?')) {
-                    window.location.href = 'login.html';
-                }
-                return;
-            }
-            window.location.href = `reproductor.html?id=${id}&type=${type}`;
-        }
-
-        function openContentModal(id) {
-            const user = auth.currentUser;
-            if (!user) {
-                if (confirm('🔒 Para ver detalles necesitas iniciar sesión. ¿Deseas ir al login?')) {
-                    window.location.href = 'login.html';
-                }
-                return;
-            }
+        function openModal(id) {
+            if (!checkAuth()) return;
 
             const modal = document.getElementById('contentModal');
             const modalContent = document.getElementById('modalContent');
+            const content = allContent.find(c => c.id === id);
 
-            database.ref(`content/${id}`).once('value', function(snapshot) {
-                const data = snapshot.val();
-                if (!data) {
-                    alert('Contenido no encontrado');
-                    return;
-                }
+            if (!content) {
+                alert('Contenido no encontrado');
+                return;
+            }
 
-                modalContent.innerHTML = `
-                    <div class="modal-hero" style="background-image: url(${data.poster})">
-                        <div class="modal-hero-gradient"></div>
-                        <div class="modal-hero-content">
-                            <img src="${data.poster}" alt="${data.title}" class="modal-poster-img">
-                            <div class="modal-hero-info">
-                                <h2>${data.title}</h2>
-                                <div class="modal-meta">
-                                    <span class="modal-year">${data.year || 'N/A'}</span>
-                                    <span class="modal-rating">⭐ ${data.vote_average || 'N/A'}</span>
-                                </div>
-                                <div class="modal-actions">
-                                    <button class="modal-play-btn" onclick="playContent('${id}', 'pelicula')">
-                                        <span class="material-icons">play_arrow</span> Reproducir
-                                    </button>
-                                    <button class="modal-fav-btn" onclick="toggleFavorite('${id}')">
-                                        <span class="material-icons">favorite_border</span>
-                                    </button>
-                                </div>
+            modalContent.innerHTML = `
+                <div class="modal-hero" style="background-image: url(${content.poster})">
+                    <div class="modal-hero-gradient"></div>
+                    <div class="modal-hero-content">
+                        <img src="${content.poster}" alt="${content.title}" class="modal-poster-img">
+                        <div class="modal-hero-info">
+                            <h2>${content.title}</h2>
+                            <div class="modal-meta">
+                                <span class="modal-year">${content.year || 'N/A'}</span>
+                                <span class="modal-rating">⭐ ${content.vote_average || 'N/A'}</span>
+                            </div>
+                            <div class="modal-actions">
+                                <button class="modal-play-btn" onclick="playContent('${id}', 'pelicula')">
+                                    <span class="material-icons">play_arrow</span> Reproducir
+                                </button>
+                                <button class="modal-fav-btn" onclick="toggleFavorite('${id}')">
+                                    <span class="material-icons">favorite_border</span>
+                                </button>
                             </div>
                         </div>
                     </div>
-                    <div class="modal-body">
-                        <div class="modal-description">
-                            <h3>Sinopsis</h3>
-                            <p>${data.description || 'Sin descripción disponible'}</p>
-                        </div>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-description">
+                        <h3>Sinopsis</h3>
+                        <p>${content.description || 'Sin descripción disponible'}</p>
                     </div>
-                `;
+                </div>
+            `;
 
-                modal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            });
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
 
         function closeContentModal() {
@@ -255,31 +481,13 @@
             });
         }
 
-        function setupEventListeners() {
-            document.getElementById('menuToggle').addEventListener('click', function() {
-                document.getElementById('sideMenu').classList.add('active');
-                document.getElementById('menuOverlay').classList.add('active');
-            });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeContentModal();
+        });
 
-            document.getElementById('closeMenu').addEventListener('click', closeMenu);
-            document.getElementById('menuOverlay').addEventListener('click', closeMenu);
-
-            function closeMenu() {
-                document.getElementById('sideMenu').classList.remove('active');
-                document.getElementById('menuOverlay').classList.remove('active');
-            }
-
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    closeContentModal();
-                    closeMenu();
-                }
-            });
-
-            document.getElementById('contentModal').addEventListener('click', function(e) {
-                if (e.target === e.currentTarget) closeContentModal();
-            });
-        }
+        document.getElementById('contentModal').addEventListener('click', function(e) {
+            if (e.target === e.currentTarget) closeContentModal();
+        });
     </script>
 </body>
 </html>
