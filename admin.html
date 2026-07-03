@@ -6,6 +6,141 @@
     <title>Mi Cine - Admin</title>
     <link rel="stylesheet" href="css/styles.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        .btn-magic {
+            background: linear-gradient(135deg, #E50914, #f39c12);
+            color: #fff;
+            padding: 16px 32px;
+            font-size: 18px;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(229, 9, 20, 0.4);
+        }
+
+        .btn-magic:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 30px rgba(229, 9, 20, 0.6);
+        }
+
+        .btn-magic:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-magic .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .btn-magic.loading .spinner {
+            display: inline-block;
+        }
+
+        .btn-magic.loading .btn-text {
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .progress-bar-container {
+            display: none;
+            margin: 20px 0;
+            background: #1A1A1A;
+            border-radius: 8px;
+            overflow: hidden;
+            height: 30px;
+            position: relative;
+        }
+
+        .progress-bar-container.active {
+            display: block;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #E50914, #f39c12);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .stat-box {
+            background: #1A1A1A;
+            padding: 16px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #2A2A2A;
+        }
+
+        .stat-box .number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #E50914;
+        }
+
+        .stat-box .label {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .log-container {
+            background: #0D0D0D;
+            border-radius: 8px;
+            padding: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            color: #888;
+            margin-top: 12px;
+            border: 1px solid #1A1A1A;
+        }
+
+        .log-container .log-item {
+            padding: 2px 0;
+            border-bottom: 1px solid #1A1A1A;
+        }
+
+        .log-container .log-item.success {
+            color: #00b894;
+        }
+
+        .log-container .log-item.error {
+            color: #E50914;
+        }
+
+        .log-container .log-item.info {
+            color: #3498db;
+        }
+    </style>
 </head>
 <body>
     <header class="header-premium">
@@ -22,84 +157,44 @@
         <div class="admin-container">
             <div class="admin-header">
                 <h2>Panel de Administración</h2>
-                <p>Agrega contenido personalizado con ID de TMDB</p>
+                <p>Agrega TODO el contenido de TMDB con un solo clic</p>
             </div>
 
-            <div class="admin-tabs">
-                <button class="admin-tab active" data-tab="add">➕ Agregar</button>
-                <button class="admin-tab" data-tab="manage">📋 Gestionar</button>
+            <!-- BOTÓN MÁGICO -->
+            <button class="btn-magic" id="btnMagic">
+                <span class="spinner"></span>
+                <span class="btn-text">✨ AGREGAR TODAS LAS PELÍCULAS Y SERIES</span>
+            </button>
+
+            <!-- PROGRESS BAR -->
+            <div class="progress-bar-container" id="progressContainer">
+                <div class="progress-bar-fill" id="progressFill">0%</div>
             </div>
 
-            <!-- AGREGAR -->
-            <div class="admin-tab-content active" id="tab-add">
-                <form id="adminForm" class="admin-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>📌 Título *</label>
-                            <input type="text" id="title" placeholder="Ej: Inception" required>
-                        </div>
-                        <div class="form-group">
-                            <label>📅 Año</label>
-                            <input type="text" id="year" placeholder="Ej: 2010">
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>🖼️ URL del Poster</label>
-                            <input type="url" id="poster" placeholder="https://image.tmdb.org/t/p/w500/...">
-                        </div>
-                        <div class="form-group">
-                            <label>🎭 Tipo *</label>
-                            <select id="type">
-                                <option value="pelicula">🎬 Película</option>
-                                <option value="serie">📺 Serie</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>🎬 ID de TMDB *</label>
-                            <input type="text" id="tmdbId" placeholder="Ej: 27205" required>
-                            <small>Busca el ID en themoviedb.org</small>
-                        </div>
-                        <div class="form-group">
-                            <label>🔗 URL Personalizada</label>
-                            <input type="url" id="customUrl" placeholder="https://ejemplo.com/video">
-                            <small>Opcional - reemplaza el enlace automático</small>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>📝 Descripción</label>
-                        <textarea id="description" rows="3" placeholder="Describe el contenido..."></textarea>
-                    </div>
-
-                    <div class="episode-manager" id="episodeManager">
-                        <h4>📺 Episodios (para series)</h4>
-                        <div id="episodeList">
-                            <div class="episode-item">
-                                <input type="text" placeholder="Temporada 1 - Episodio 1" value="Temporada 1 - Episodio 1">
-                                <input type="text" placeholder="URL del video (opcional)">
-                                <button type="button" class="btn btn-danger btn-sm" onclick="removeEpisode(this)">✖</button>
-                            </div>
-                        </div>
-                        <button type="button" class="btn btn-primary btn-sm" onclick="addEpisode()">➕ Agregar Episodio</button>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">💾 Guardar</button>
-                        <button type="reset" class="btn btn-secondary">🗑️ Limpiar</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- GESTIONAR -->
-            <div class="admin-tab-content" id="tab-manage">
-                <div class="manage-header">
-                    <h3>Contenido Personalizado</h3>
+            <!-- ESTADÍSTICAS -->
+            <div class="stats-container" id="statsContainer">
+                <div class="stat-box">
+                    <div class="number" id="statMovies">0</div>
+                    <div class="label">🎬 Películas</div>
                 </div>
+                <div class="stat-box">
+                    <div class="number" id="statSeries">0</div>
+                    <div class="label">📺 Series</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number" id="statTotal">0</div>
+                    <div class="label">📦 Total</div>
+                </div>
+            </div>
+
+            <!-- LOG -->
+            <div class="log-container" id="logContainer">
+                <div class="log-item info">📋 Esperando acción...</div>
+            </div>
+
+            <!-- CONTENIDO PERSONALIZADO -->
+            <div style="margin-top: 24px;">
+                <h3 style="color:#888;font-size:14px;margin-bottom:12px;">📋 Contenido guardado en Firebase</h3>
                 <div id="manageGrid" class="manage-grid"></div>
             </div>
         </div>
@@ -112,130 +207,249 @@
     <script src="js/auth.js"></script>
     
     <script>
-        // ==================== ADMIN PANEL ====================
+        // ==================== VARIABLES ====================
+        const TMDB_API_KEY = '6196750b1fd09dd276a6106e75ee34f6';
+        const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
+        const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
+
+        let isRunning = false;
+        let totalProcessed = 0;
+        let totalMovies = 0;
+        let totalSeries = 0;
+
+        // ==================== INICIALIZACIÓN ====================
         document.addEventListener('DOMContentLoaded', () => {
-            // Verificar autenticación
             auth.onAuthStateChanged(user => {
                 if (!user) {
                     window.location.href = 'login.html';
                     return;
                 }
                 loadManageContent();
+                loadStats();
             });
 
-            // Tabs
-            document.querySelectorAll('.admin-tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
-                    this.classList.add('active');
-                    document.getElementById('tab-' + this.dataset.tab).classList.add('active');
-                    if (this.dataset.tab === 'manage') loadManageContent();
-                });
-            });
-
-            // Formulario
-            document.getElementById('adminForm').addEventListener('submit', saveContent);
+            document.getElementById('btnMagic').addEventListener('click', startImport);
         });
 
-        function addEpisode() {
-            const container = document.getElementById('episodeList');
-            const div = document.createElement('div');
-            div.className = 'episode-item';
-            const count = container.children.length + 1;
-            div.innerHTML = `
-                <input type="text" placeholder="Temporada X - Episodio X" value="Temporada 1 - Episodio ${count}">
-                <input type="text" placeholder="URL del video (opcional)">
-                <button type="button" class="btn btn-danger btn-sm" onclick="removeEpisode(this)">✖</button>
-            `;
-            container.appendChild(div);
-        }
-
-        function removeEpisode(btn) {
-            const items = document.querySelectorAll('.episode-item');
-            if (items.length > 1) {
-                btn.parentElement.remove();
-            } else {
-                alert('Debe haber al menos un episodio');
-            }
-        }
-
-        async function saveContent(e) {
-            e.preventDefault();
+        // ==================== BOTÓN MÁGICO ====================
+        async function startImport() {
+            if (isRunning) return;
             
-            const title = document.getElementById('title').value;
-            const year = document.getElementById('year').value;
-            const poster = document.getElementById('poster').value || 'https://via.placeholder.com/300x450/1A1A1A/ffffff?text=No+Image';
-            const type = document.getElementById('type').value;
-            const description = document.getElementById('description').value;
-            const tmdbId = document.getElementById('tmdbId').value;
-            const customUrl = document.getElementById('customUrl').value;
-
-            // Generar URL
-            let videoUrl = customUrl;
-            if (!videoUrl && tmdbId && type === 'pelicula') {
-                videoUrl = `https://unlimplay.co/play/movie/${tmdbId}`;
+            if (!confirm('⚠️ ¿Estás seguro? Esto agregará TODAS las películas y series de TMDB a Firebase.\n\nPuede tomar varios minutos.')) {
+                return;
             }
 
-            // Episodios
-            const episodeItems = document.querySelectorAll('.episode-item');
-            const episodes = [];
-            if (type === 'serie') {
-                episodeItems.forEach((item, index) => {
-                    const inputs = item.querySelectorAll('input');
-                    const epTitle = inputs[0].value || `Episodio ${index + 1}`;
-                    let epUrl = inputs[1].value;
-                    
-                    if (!epUrl && tmdbId) {
-                        const match = epTitle.match(/Temporada\s*(\d+)\s*[-–]\s*Episodio\s*(\d+)/i);
-                        if (match) {
-                            epUrl = `https://unlimplay.co/play/tv/${tmdbId}/${match[1]}/${match[2]}`;
-                        } else {
-                            epUrl = `https://unlimplay.co/play/tv/${tmdbId}/1/${index + 1}`;
-                        }
-                    }
-                    
-                    episodes.push({
-                        title: epTitle,
-                        url: epUrl || ''
-                    });
-                });
-            }
+            isRunning = true;
+            const btn = document.getElementById('btnMagic');
+            btn.classList.add('loading');
+            btn.disabled = true;
 
-            const content = {
-                title,
-                year: year || new Date().getFullYear().toString(),
-                poster,
-                type,
-                description,
-                tmdbId,
-                videoUrl: videoUrl || '',
-                customUrl: customUrl || '',
-                episodes: type === 'serie' ? episodes : [],
-                createdAt: firebase.database.ServerValue.TIMESTAMP
-            };
+            const progressContainer = document.getElementById('progressContainer');
+            progressContainer.classList.add('active');
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('progressFill').textContent = '0%';
+
+            clearLog();
+            addLog('🚀 Iniciando importación masiva...', 'info');
 
             try {
-                const newRef = database.ref('custom_content').push();
-                await newRef.set(content);
-                alert('✅ Contenido guardado exitosamente!');
-                document.getElementById('adminForm').reset();
-                document.querySelectorAll('.episode-item').forEach((item, index) => {
-                    if (index > 0) item.remove();
-                });
-                loadManageContent();
+                // 1. Obtener TODAS las películas
+                addLog('📥 Obteniendo películas de TMDB...', 'info');
+                const movies = await getAllMovies();
+                totalMovies = movies.length;
+                addLog(`✅ ${totalMovies} películas encontradas`, 'success');
+
+                // 2. Obtener TODAS las series
+                addLog('📥 Obteniendo series de TMDB...', 'info');
+                const series = await getAllSeries();
+                totalSeries = series.length;
+                addLog(`✅ ${totalSeries} series encontradas`, 'success');
+
+                const total = totalMovies + totalSeries;
+                document.getElementById('statTotal').textContent = total;
+
+                // 3. Guardar en Firebase
+                let processed = 0;
+
+                // Guardar películas
+                for (const movie of movies) {
+                    await saveContent({
+                        id: movie.id,
+                        title: movie.title,
+                        year: movie.release_date ? movie.release_date.substring(0, 4) : 'N/A',
+                        poster: movie.poster_path ? `${IMAGE_BASE_URL}${movie.poster_path}` : 'https://via.placeholder.com/300x450/1A1A1A/ffffff?text=No+Image',
+                        type: 'pelicula',
+                        description: movie.overview || 'Sin descripción',
+                        tmdbId: movie.id,
+                        videoUrl: `https://unlimplay.co/play/movie/${movie.id}`,
+                        episodes: [],
+                        vote_average: movie.vote_average || 0
+                    });
+                    processed++;
+                    updateProgress(processed, total, `Película ${processed}/${totalMovies}`);
+                    addLog(`🎬 ${movie.title} (${movie.release_date ? movie.release_date.substring(0, 4) : 'N/A'})`, 'success');
+                }
+
+                // Guardar series
+                for (const serie of series) {
+                    // Obtener detalles de la serie para las temporadas
+                    const details = await getSeriesDetails(serie.id);
+                    const episodes = [];
+                    
+                    if (details && details.seasons) {
+                        const validSeasons = details.seasons.filter(s => s.season_number > 0);
+                        for (const season of validSeasons) {
+                            const epCount = Math.min(season.episode_count || 10, 20);
+                            for (let i = 1; i <= epCount; i++) {
+                                episodes.push({
+                                    title: `Temporada ${season.season_number} - Episodio ${i}`,
+                                    url: `https://unlimplay.co/play/tv/${serie.id}/${season.season_number}/${i}`
+                                });
+                            }
+                        }
+                    }
+
+                    await saveContent({
+                        id: serie.id,
+                        title: serie.name,
+                        year: serie.first_air_date ? serie.first_air_date.substring(0, 4) : 'N/A',
+                        poster: serie.poster_path ? `${IMAGE_BASE_URL}${serie.poster_path}` : 'https://via.placeholder.com/300x450/1A1A1A/ffffff?text=No+Image',
+                        type: 'serie',
+                        description: serie.overview || 'Sin descripción',
+                        tmdbId: serie.id,
+                        videoUrl: `https://unlimplay.co/play/tv/${serie.id}/1/1`,
+                        episodes: episodes,
+                        vote_average: serie.vote_average || 0
+                    });
+                    processed++;
+                    updateProgress(processed, total, `Serie ${processed - totalMovies}/${totalSeries}`);
+                    addLog(`📺 ${serie.name} (${serie.first_air_date ? serie.first_air_date.substring(0, 4) : 'N/A'}) - ${episodes.length} episodios`, 'success');
+                }
+
+                // Actualizar estadísticas
+                document.getElementById('statMovies').textContent = totalMovies;
+                document.getElementById('statSeries').textContent = totalSeries;
+                document.getElementById('statTotal').textContent = total;
+
+                addLog(`✅ ¡COMPLETADO! ${total} contenidos guardados en Firebase`, 'success');
+
             } catch (error) {
-                alert('❌ Error al guardar: ' + error.message);
+                console.error('Error:', error);
+                addLog(`❌ Error: ${error.message}`, 'error');
+            }
+
+            isRunning = false;
+            btn.classList.remove('loading');
+            btn.disabled = false;
+            document.getElementById('progressFill').textContent = '100% ✅';
+            loadManageContent();
+        }
+
+        // ==================== FUNCIONES DE TMDB ====================
+        async function getAllMovies() {
+            let allMovies = [];
+            let page = 1;
+            let hasMore = true;
+
+            while (hasMore && page <= 10) {
+                try {
+                    const response = await fetch(
+                        `${TMDB_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&language=es-ES&page=${page}`
+                    );
+                    const data = await response.json();
+                    if (data.results && data.results.length > 0) {
+                        allMovies = [...allMovies, ...data.results];
+                        page++;
+                    } else {
+                        hasMore = false;
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    hasMore = false;
+                }
+            }
+            return allMovies;
+        }
+
+        async function getAllSeries() {
+            let allSeries = [];
+            let page = 1;
+            let hasMore = true;
+
+            while (hasMore && page <= 10) {
+                try {
+                    const response = await fetch(
+                        `${TMDB_BASE_URL}/tv/popular?api_key=${TMDB_API_KEY}&language=es-ES&page=${page}`
+                    );
+                    const data = await response.json();
+                    if (data.results && data.results.length > 0) {
+                        allSeries = [...allSeries, ...data.results];
+                        page++;
+                    } else {
+                        hasMore = false;
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    hasMore = false;
+                }
+            }
+            return allSeries;
+        }
+
+        async function getSeriesDetails(id) {
+            try {
+                const response = await fetch(
+                    `${TMDB_BASE_URL}/tv/${id}?api_key=${TMDB_API_KEY}&language=es-ES`
+                );
+                return await response.json();
+            } catch (error) {
+                return null;
             }
         }
 
+        // ==================== GUARDAR EN FIREBASE ====================
+        async function saveContent(content) {
+            try {
+                await database.ref(`content/${content.id}`).set({
+                    ...content,
+                    createdAt: firebase.database.ServerValue.TIMESTAMP
+                });
+                return true;
+            } catch (error) {
+                console.error('Error guardando:', error);
+                return false;
+            }
+        }
+
+        // ==================== PROGRESS ====================
+        function updateProgress(current, total, label) {
+            const percent = Math.round((current / total) * 100);
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressFill').textContent = `${percent}% - ${label || ''}`;
+        }
+
+        // ==================== LOG ====================
+        function addLog(message, type = 'info') {
+            const container = document.getElementById('logContainer');
+            const div = document.createElement('div');
+            div.className = `log-item ${type}`;
+            div.textContent = message;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('logContainer').innerHTML = '';
+        }
+
+        // ==================== CARGAR CONTENIDO GUARDADO ====================
         function loadManageContent() {
             const grid = document.getElementById('manageGrid');
-            
-            database.ref('custom_content').orderByChild('createdAt').on('value', (snapshot) => {
+
+            database.ref('content').orderByChild('createdAt').on('value', (snapshot) => {
                 const data = snapshot.val();
                 let items = [];
-                
+
                 if (data) {
                     Object.keys(data).forEach(key => {
                         items.push({
@@ -245,25 +459,25 @@
                     });
                     items.reverse();
                 }
-                
+
                 if (items.length === 0) {
                     grid.innerHTML = `
-                        <div class="empty-state-premium">
+                        <div class="empty-state-premium" style="grid-column:1/-1;">
                             <div class="empty-icon">📭</div>
-                            <p>No hay contenido personalizado</p>
-                            <p style="color:#666;font-size:13px;">Agrega contenido desde la pestaña "Agregar"</p>
+                            <p>No hay contenido guardado</p>
+                            <p style="color:#666;font-size:13px;">Presiona el botón "AGREGAR TODAS LAS PELÍCULAS Y SERIES"</p>
                         </div>
                     `;
                     return;
                 }
-                
-                grid.innerHTML = items.map(item => `
+
+                grid.innerHTML = items.slice(0, 50).map(item => `
                     <div class="manage-item">
                         <div class="manage-item-info">
                             <img src="${item.poster}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/50x75/1A1A1A/ffffff?text=No+Image'">
                             <div>
                                 <h4>${item.title}</h4>
-                                <p>${item.year || 'Año desconocido'} • ${item.type === 'pelicula' ? '🎬 Película' : '📺 Serie'} ${item.tmdbId ? `• ID: ${item.tmdbId}` : ''}</p>
+                                <p>${item.year || 'Año desconocido'} • ${item.type === 'pelicula' ? '🎬 Película' : '📺 Serie'} • ${item.episodes?.length || 0} episodios</p>
                             </div>
                         </div>
                         <div class="manage-item-actions">
@@ -271,22 +485,43 @@
                         </div>
                     </div>
                 `).join('');
+
+                // Mostrar total
+                document.getElementById('statTotal').textContent = items.length;
+                const movies = items.filter(i => i.type === 'pelicula');
+                const series = items.filter(i => i.type === 'serie');
+                document.getElementById('statMovies').textContent = movies.length;
+                document.getElementById('statSeries').textContent = series.length;
             });
         }
 
         async function deleteContent(id) {
             if (confirm('¿Estás seguro de eliminar este contenido?')) {
                 try {
-                    await database.ref(`custom_content/${id}`).remove();
+                    await database.ref(`content/${id}`).remove();
                     alert('✅ Contenido eliminado');
-                    loadManageContent();
                 } catch (error) {
                     alert('❌ Error: ' + error.message);
                 }
             }
         }
 
-        console.log('✅ Admin panel cargado');
+        function loadStats() {
+            database.ref('content').on('value', (snapshot) => {
+                const data = snapshot.val() || {};
+                let movies = 0;
+                let series = 0;
+                Object.values(data).forEach(item => {
+                    if (item.type === 'pelicula') movies++;
+                    else if (item.type === 'serie') series++;
+                });
+                document.getElementById('statMovies').textContent = movies;
+                document.getElementById('statSeries').textContent = series;
+                document.getElementById('statTotal').textContent = movies + series;
+            });
+        }
+
+        console.log('✅ Admin Magic cargado');
     </script>
 </body>
 </html>
