@@ -3,415 +3,440 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mi Cine - Admin</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <title>Admin - Subir Videos</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
-        .btn-magic {
-            background: linear-gradient(135deg, #E50914, #f39c12);
+        /* Mismos estilos de antes */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0D0D0D;
             color: #fff;
-            padding: 18px 36px;
-            font-size: 20px;
-            font-weight: 700;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        .card {
+            background: #1A1A1A;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        h1 { font-size: 28px; margin-bottom: 8px; }
+        p { color: #888; font-size: 17px; margin-bottom: 20px; }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+        .form-group label { color: #aaa; font-size: 17px; font-weight: 600; }
+        .form-group input, .form-group textarea {
+            padding: 14px 18px;
+            background: #0D0D0D;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 18px;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #E50914;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 30px;
             border: none;
-            border-radius: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 18px;
             cursor: pointer;
             transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            width: 100%;
-            justify-content: center;
-            box-shadow: 0 4px 25px rgba(229, 9, 20, 0.4);
         }
-        .btn-magic:hover { transform: scale(1.02); box-shadow: 0 6px 35px rgba(229, 9, 20, 0.6); }
-        .btn-magic:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-        .btn-magic .spinner { display: none; width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
-        .btn-magic.loading .spinner { display: inline-block; }
-        .btn-magic.loading .btn-text { display: none; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .progress-bar-container { display: none; margin: 20px 0; background: #1A1A1A; border-radius: 10px; overflow: hidden; height: 36px; position: relative; }
-        .progress-bar-container.active { display: block; }
-        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #E50914, #f39c12); transition: width 0.3s ease; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; font-weight: 600; }
-
-        .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 18px 0; }
-        .stat-box { background: #1A1A1A; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #2A2A2A; }
-        .stat-box .number { font-size: 32px; font-weight: 800; color: #E50914; }
-        .stat-box .label { font-size: 15px; color: #888; margin-top: 4px; }
-
-        .log-container { background: #0D0D0D; border-radius: 10px; padding: 14px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 13px; color: #888; margin-top: 14px; border: 1px solid #1A1A1A; }
-        .log-container .log-item { padding: 4px 0; border-bottom: 1px solid #1A1A1A; }
-        .log-container .log-item.success { color: #00b894; }
-        .log-container .log-item.error { color: #E50914; }
-        .log-container .log-item.info { color: #3498db; }
-        .log-container .log-item.warning { color: #f39c12; }
-
-        .manage-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
-        .manage-item {
+        .btn-primary { background: #E50914; color: #fff; }
+        .btn-primary:hover { background: #b2070f; transform: scale(1.02); }
+        .btn-secondary { background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.08); }
+        .btn-block { width: 100%; justify-content: center; }
+        .file-upload {
+            border: 2px dashed rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .file-upload:hover { border-color: #E50914; background: rgba(229, 9, 20, 0.05); }
+        .file-upload .material-icons { font-size: 48px; color: #666; }
+        .file-upload p { color: #666; margin: 8px 0 0; }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #2A2A2A;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-bar .fill {
+            height: 100%;
+            background: #E50914;
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .video-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .video-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 14px 18px;
             background: #0D0D0D;
             border-radius: 12px;
-            border: 1px solid #2A2A2A;
-            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.08);
         }
-        .manage-item:hover { border-color: #E50914; }
-        .manage-item-info { display: flex; align-items: center; gap: 14px; }
-        .manage-item-info img { width: 45px; height: 68px; object-fit: cover; border-radius: 8px; }
-        .manage-item-info h4 { font-size: 17px; color: #fff; margin: 0; }
-        .manage-item-info p { color: #888; font-size: 14px; margin: 0; }
-        .manage-item-actions { display: flex; gap: 10px; }
+        .video-item .info h4 { font-size: 17px; color: #fff; margin: 0; }
+        .video-item .info span { font-size: 14px; color: #666; }
+        .video-item .actions { display: flex; gap: 8px; }
+        .video-item .actions .btn-sm { padding: 6px 14px; font-size: 14px; border-radius: 8px; }
+        .link-copy {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: #0D0D0D;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+        .link-copy input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #3498db;
+            font-size: 15px;
+            outline: none;
+        }
+        .link-copy button {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+        }
+        .link-copy button:hover { color: #fff; }
     </style>
 </head>
 <body>
-    <header class="header-premium">
-        <div class="header-premium-content">
-            <button class="menu-btn" onclick="window.location.href='index.html'">
-                <span class="material-icons">arrow_back</span>
+<div class="container">
+    <div class="card">
+        <h1>📤 Subir Video</h1>
+        <p>Sube un video y obtén un enlace público para compartir</p>
+
+        <form id="uploadForm">
+            <div class="form-group">
+                <label>📌 Título del Video *</label>
+                <input type="text" id="videoTitle" placeholder="Ej: Mi video increíble" required>
+            </div>
+
+            <div class="form-group">
+                <label>📝 Descripción</label>
+                <textarea id="videoDescription" rows="3" placeholder="Descripción del video..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>🎬 Archivo de Video *</label>
+                <div class="file-upload" id="fileDrop">
+                    <span class="material-icons">cloud_upload</span>
+                    <p>Arrastra tu video aquí o haz clic para seleccionar</p>
+                    <input type="file" id="videoFile" accept="video/*" style="display:none;">
+                </div>
+                <div id="fileInfo" style="display:none; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px; margin-top: 8px;">
+                    <span id="fileName"></span>
+                    <span id="fileSize" style="color:#666; margin-left: 12px;"></span>
+                </div>
+            </div>
+
+            <div class="progress-bar" id="progressContainer">
+                <div class="fill" id="progressFill"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" id="uploadBtn">
+                <span class="material-icons">upload</span> Subir Video
             </button>
-            <div class="logo-premium">⚙️ Admin</div>
-            <div style="width:40px;"></div>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>📋 Mis Videos</h2>
+        <div id="videoList" class="video-list">
+            <p style="color:#666; text-align:center; padding:20px;">No has subido ningún video aún</p>
         </div>
-    </header>
+    </div>
+</div>
 
-    <main class="main-premium">
-        <div class="admin-container">
-            <div class="admin-header">
-                <h2>Panel de Administración</h2>
-                <p style="color:#E50914;font-weight:600;">⚠️ Solo para el administrador</p>
-            </div>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 
-            <button class="btn-magic" id="btnMagic">
-                <span class="spinner"></span>
-                <span class="btn-text">🚀 Sincronizar con TMDB (TODAS)</span>
-            </button>
-            <p style="color:#666;font-size:15px;text-align:center;margin:10px 0 0;">
-                Trae TODAS las películas y series populares de TMDB
-            </p>
+<script>
+// ==================== CONFIGURACIÓN ====================
+const firebaseConfig = {
+    apiKey: "AIzaSyBAdvlj4qzHSaPUIRIW5F51mHlnzoy1_es",
+    authDomain: "tely2-245d5.firebaseapp.com",
+    databaseURL: "https://tely2-245d5-default-rtdb.firebaseio.com",
+    projectId: "tely2-245d5",
+    storageBucket: "tely2-245d5.appspot.com",
+    messagingSenderId: "37996516235",
+    appId: "1:37996516235:web:11f3d73fdc683de9d9558e",
+    measurementId: "G-L8W50JK7N3"
+};
 
-            <div class="progress-bar-container" id="progressContainer">
-                <div class="progress-bar-fill" id="progressFill">0%</div>
-            </div>
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const database = firebase.database();
+const storage = firebase.storage();
 
-            <div class="stats-container">
-                <div class="stat-box">
-                    <div class="number" id="statMovies">0</div>
-                    <div class="label">🎬 Películas</div>
-                </div>
-                <div class="stat-box">
-                    <div class="number" id="statSeries">0</div>
-                    <div class="label">📺 Series</div>
-                </div>
-                <div class="stat-box">
-                    <div class="number" id="statTotal">0</div>
-                    <div class="label">📦 Total</div>
-                </div>
-            </div>
+let selectedFile = null;
+let currentUser = null;
 
-            <div class="log-container" id="logContainer">
-                <div class="log-item info">📋 Esperando acción...</div>
-            </div>
+// ==================== AUTENTICACIÓN ====================
+auth.onAuthStateChanged(function(user) {
+    if (!user) {
+        window.location.href = 'login.html';
+        return;
+    }
+    currentUser = user;
+    loadVideos();
+});
 
-            <div style="margin-top:28px;">
-                <h3 style="color:#888;font-size:17px;margin-bottom:14px;">📋 Contenido en Firebase</h3>
-                <div id="manageGrid" class="manage-grid"></div>
-            </div>
-        </div>
-    </main>
+// ==================== SELECCIONAR ARCHIVO ====================
+const fileDrop = document.getElementById('fileDrop');
+const fileInput = document.getElementById('videoFile');
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="js/firebase-config.js"></script>
-    
-    <script>
-        const TMDB_API_KEY = '6196750b1fd09dd276a6106e75ee34f6';
-        const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
-        const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
+fileDrop.addEventListener('click', function() {
+    fileInput.click();
+});
 
-        let isRunning = false;
+fileDrop.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    this.style.borderColor = '#E50914';
+});
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // VERIFICAR QUE EL USUARIO ESTÁ LOGUEADO
-            auth.onAuthStateChanged(function(user) {
-                if (!user) {
-                    alert('🔒 Debes iniciar sesión primero');
-                    window.location.href = 'login.html';
-                    return;
-                }
-                // SI ESTÁ LOGUEADO, CARGAR TODO
-                console.log('✅ Usuario logueado:', user.email);
-                loadStats();
-                loadManageContent();
-            });
+fileDrop.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    this.style.borderColor = 'rgba(255,255,255,0.15)';
+});
 
-            document.getElementById('btnMagic').addEventListener('click', startImport);
-        });
+fileDrop.addEventListener('drop', function(e) {
+    e.preventDefault();
+    this.style.borderColor = 'rgba(255,255,255,0.15)';
+    if (e.dataTransfer.files.length > 0) {
+        handleFile(e.dataTransfer.files[0]);
+    }
+});
 
-        // ==================== FUNCIÓN PRINCIPAL ====================
-        async function startImport() {
-            if (isRunning) return;
-            if (!confirm('⚠️ ¿Sincronizar con TMDB? Se traerán TODAS las películas y series populares.\n\nEsto puede tomar varios minutos.')) return;
+fileInput.addEventListener('change', function() {
+    if (this.files.length > 0) {
+        handleFile(this.files[0]);
+    }
+});
 
-            isRunning = true;
-            const btn = document.getElementById('btnMagic');
-            btn.classList.add('loading');
-            btn.disabled = true;
+function handleFile(file) {
+    if (!file.type.startsWith('video/')) {
+        alert('❌ Por favor selecciona un archivo de video');
+        return;
+    }
+    selectedFile = file;
+    document.getElementById('fileInfo').style.display = 'block';
+    document.getElementById('fileName').textContent = '📹 ' + file.name;
+    document.getElementById('fileSize').textContent = formatFileSize(file.size);
+}
 
-            document.getElementById('progressContainer').classList.add('active');
-            clearLog();
-            addLog('🚀 Conectando con TMDB...', 'info');
+function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
+}
 
-            try {
-                // ===== 1. OBTENER TODAS LAS PELÍCULAS =====
-                addLog('📥 Obteniendo TODAS las películas populares...', 'info');
-                const movies = await getAllMovies();
-                addLog(`✅ ${movies.length} películas encontradas`, 'success');
+// ==================== SUBIR VIDEO ====================
+document.getElementById('uploadForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (!selectedFile) {
+        alert('❌ Selecciona un video primero');
+        return;
+    }
 
-                // ===== 2. OBTENER TODAS LAS SERIES =====
-                addLog('📥 Obteniendo TODAS las series populares...', 'info');
-                const series = await getAllSeries();
-                addLog(`✅ ${series.length} series encontradas`, 'success');
+    const title = document.getElementById('videoTitle').value.trim();
+    if (!title) {
+        alert('❌ Ingresa un título para el video');
+        return;
+    }
 
-                const total = movies.length + series.length;
-                let processed = 0;
+    const description = document.getElementById('videoDescription').value.trim();
+    const btn = document.getElementById('uploadBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner" style="display:inline-block;width:20px;height:20px;border:2px solid rgba(255,255,255,0.3);border-top:2px solid #fff;border-radius:50%;animation:spin 0.8s linear infinite;"></span> Subiendo...';
 
-                // ===== 3. GUARDAR PELÍCULAS =====
-                addLog('💾 Guardando películas en Firebase...', 'info');
-                for (const movie of movies) {
-                    const content = {
-                        id: movie.id,
-                        title: movie.title,
-                        year: movie.release_date ? movie.release_date.substring(0, 4) : 'N/A',
-                        poster: movie.poster_path ? `${IMAGE_BASE_URL}${movie.poster_path}` : 'https://via.placeholder.com/300x450/1A1A1A/ffffff?text=No+Image',
-                        type: 'pelicula',
-                        description: movie.overview || 'Sin descripción',
-                        vote_average: movie.vote_average || 0,
-                        videoUrl: `https://multiembed.mov/?video_id=${movie.id}&tmdb=1&lang=es&sub=es`,
-                        episodes: []
-                    };
-                    await saveContent(content);
-                    processed++;
-                    updateProgress(processed, total, `Película ${processed}/${total}`);
-                }
+    const fileName = Date.now() + '_' + selectedFile.name;
+    const storageRef = storage.ref('videos/' + currentUser.uid + '/' + fileName);
+    const uploadTask = storageRef.put(selectedFile);
 
-                // ===== 4. GUARDAR SERIES =====
-                addLog('💾 Guardando series en Firebase...', 'info');
-                for (const serie of series) {
-                    const episodes = [];
-                    try {
-                        const details = await getSeriesDetails(serie.id);
-                        if (details && details.seasons) {
-                            const validSeasons = details.seasons.filter(s => s.season_number > 0);
-                            for (const season of validSeasons) {
-                                const epCount = Math.min(season.episode_count || 10, 20);
-                                for (let i = 1; i <= epCount; i++) {
-                                    episodes.push({
-                                        title: `Temporada ${season.season_number} - Episodio ${i}`,
-                                        url: `https://multiembed.mov/?video_id=${serie.id}&tmdb=1&s=${season.season_number}&e=${i}&lang=es&sub=es`
-                                    });
-                                }
-                            }
-                        }
-                    } catch (e) {
-                        addLog(`⚠️ Error en episodios de ${serie.name}`, 'warning');
-                    }
-
-                    const content = {
-                        id: serie.id,
-                        title: serie.name,
-                        year: serie.first_air_date ? serie.first_air_date.substring(0, 4) : 'N/A',
-                        poster: serie.poster_path ? `${IMAGE_BASE_URL}${serie.poster_path}` : 'https://via.placeholder.com/300x450/1A1A1A/ffffff?text=No+Image',
-                        type: 'serie',
-                        description: serie.overview || 'Sin descripción',
-                        vote_average: serie.vote_average || 0,
-                        videoUrl: episodes.length > 0 ? episodes[0].url : `https://multiembed.mov/?video_id=${serie.id}&tmdb=1&s=1&e=1&lang=es&sub=es`,
-                        episodes: episodes
-                    };
-                    await saveContent(content);
-                    processed++;
-                    updateProgress(processed, total, `Serie ${processed - movies.length}/${total}`);
-                }
-
-                addLog(`✅ ¡COMPLETADO! ${total} contenidos guardados en Firebase`, 'success');
-                loadStats();
-                loadManageContent();
-
-            } catch (error) {
-                addLog(`❌ Error: ${error.message}`, 'error');
-                console.error(error);
-            }
-
-            isRunning = false;
-            btn.classList.remove('loading');
+    uploadTask.on('state_changed',
+        function(snapshot) {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        },
+        function(error) {
+            alert('❌ Error al subir: ' + error.message);
             btn.disabled = false;
-            document.getElementById('progressFill').textContent = '100% ✅';
-        }
+            btn.innerHTML = '<span class="material-icons">upload</span> Subir Video';
+        },
+        function() {
+            // Obtener la URL de descarga
+            uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+                // Guardar en la base de datos
+                const videoData = {
+                    title: title,
+                    description: description,
+                    url: downloadURL,
+                    fileName: fileName,
+                    size: selectedFile.size,
+                    type: selectedFile.type,
+                    createdAt: firebase.database.ServerValue.TIMESTAMP,
+                    userId: currentUser.uid,
+                    userName: currentUser.displayName || 'Usuario'
+                };
 
-        // ==================== FUNCIONES DE TMDB ====================
-        
-        async function getAllMovies() {
-            let allMovies = [];
-            let page = 1;
-            let hasMore = true;
-            
-            while (hasMore && page <= 25) {
-                try {
-                    const response = await fetch(
-                        `${TMDB_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&language=es-ES&page=${page}`
-                    );
-                    const data = await response.json();
-                    if (data.results && data.results.length > 0) {
-                        allMovies = [...allMovies, ...data.results];
-                        addLog(`📄 Página ${page}: ${data.results.length} películas`, 'info');
-                        page++;
-                    } else {
-                        hasMore = false;
-                    }
-                } catch (error) {
-                    addLog(`⚠️ Error en página ${page}: ${error.message}`, 'warning');
-                    hasMore = false;
-                }
-            }
-            return allMovies;
-        }
-
-        async function getAllSeries() {
-            let allSeries = [];
-            let page = 1;
-            let hasMore = true;
-            
-            while (hasMore && page <= 25) {
-                try {
-                    const response = await fetch(
-                        `${TMDB_BASE_URL}/tv/popular?api_key=${TMDB_API_KEY}&language=es-ES&page=${page}`
-                    );
-                    const data = await response.json();
-                    if (data.results && data.results.length > 0) {
-                        allSeries = [...allSeries, ...data.results];
-                        addLog(`📄 Página ${page}: ${data.results.length} series`, 'info');
-                        page++;
-                    } else {
-                        hasMore = false;
-                    }
-                } catch (error) {
-                    addLog(`⚠️ Error en página ${page}: ${error.message}`, 'warning');
-                    hasMore = false;
-                }
-            }
-            return allSeries;
-        }
-
-        async function getSeriesDetails(id) {
-            try {
-                const response = await fetch(
-                    `${TMDB_BASE_URL}/tv/${id}?api_key=${TMDB_API_KEY}&language=es-ES`
-                );
-                return await response.json();
-            } catch (error) {
-                return null;
-            }
-        }
-
-        // ==================== GUARDAR EN FIREBASE ====================
-        async function saveContent(content) {
-            try {
-                await database.ref(`content/${content.id}`).set({
-                    ...content,
-                    createdAt: firebase.database.ServerValue.TIMESTAMP
+                database.ref('videos').push(videoData).then(function() {
+                    alert('✅ Video subido exitosamente!');
+                    btn.disabled = false;
+                    btn.innerHTML = '<span class="material-icons">upload</span> Subir Video';
+                    document.getElementById('progressFill').style.width = '0%';
+                    document.getElementById('fileInfo').style.display = 'none';
+                    document.getElementById('videoTitle').value = '';
+                    document.getElementById('videoDescription').value = '';
+                    selectedFile = null;
+                    fileInput.value = '';
+                    loadVideos();
                 });
-                return true;
-            } catch (error) {
-                console.error('Error guardando:', error);
-                return false;
-            }
-        }
-
-        // ==================== PROGRESS ====================
-        function updateProgress(current, total, label) {
-            const percent = Math.round((current / total) * 100);
-            document.getElementById('progressFill').style.width = percent + '%';
-            document.getElementById('progressFill').textContent = `${percent}% - ${label || ''}`;
-        }
-
-        // ==================== LOG ====================
-        function addLog(message, type = 'info') {
-            const container = document.getElementById('logContainer');
-            const div = document.createElement('div');
-            div.className = `log-item ${type}`;
-            div.textContent = message;
-            container.appendChild(div);
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function clearLog() {
-            document.getElementById('logContainer').innerHTML = '';
-        }
-
-        // ==================== ESTADÍSTICAS ====================
-        function loadStats() {
-            database.ref('content').on('value', function(snapshot) {
-                const data = snapshot.val() || {};
-                let movies = 0, series = 0;
-                Object.values(data).forEach(item => {
-                    if (item.type === 'pelicula') movies++;
-                    else if (item.type === 'serie') series++;
-                });
-                document.getElementById('statMovies').textContent = movies;
-                document.getElementById('statSeries').textContent = series;
-                document.getElementById('statTotal').textContent = movies + series;
             });
         }
+    );
+});
 
-        // ==================== CONTENIDO GUARDADO ====================
-        function loadManageContent() {
-            const grid = document.getElementById('manageGrid');
-            database.ref('content').orderByChild('createdAt').on('value', function(snapshot) {
-                const data = snapshot.val();
-                let items = [];
-                if (data) {
-                    Object.keys(data).forEach(key => items.push({ id: key, ...data[key] }));
-                    items.reverse();
-                }
-                if (items.length === 0) {
-                    grid.innerHTML = `
-                        <div class="empty-state-premium" style="grid-column:1/-1;padding:40px 20px;text-align:center;">
-                            <div class="empty-icon" style="font-size:48px;">📭</div>
-                            <p style="color:#888;font-size:17px;">No hay contenido guardado</p>
-                            <p style="color:#666;font-size:15px;">Presiona el botón "Sincronizar con TMDB"</p>
-                        </div>
-                    `;
-                    return;
-                }
-                grid.innerHTML = items.slice(0, 50).map(item => `
-                    <div class="manage-item">
-                        <div class="manage-item-info">
-                            <img src="${item.poster}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/45x68/1A1A1A/ffffff?text=No'">
-                            <div>
-                                <h4>${item.title}</h4>
-                                <p>${item.year || 'N/A'} • ${item.type === 'pelicula' ? '🎬 Película' : '📺 Serie'} • ${item.episodes?.length || 0} episodios</p>
+// ==================== CARGAR VIDEOS ====================
+function loadVideos() {
+    const container = document.getElementById('videoList');
+
+    database.ref('videos').orderByChild('createdAt').on('value', function(snapshot) {
+        const data = snapshot.val();
+        let videos = [];
+
+        if (data) {
+            Object.keys(data).forEach(function(key) {
+                videos.push({ id: key, ...data[key] });
+            });
+            videos.reverse();
+        }
+
+        if (videos.length === 0) {
+            container.innerHTML = '<p style="color:#666; text-align:center; padding:20px;">No has subido ningún video aún</p>';
+            return;
+        }
+
+        container.innerHTML = videos.map(function(video) {
+            const date = video.createdAt ? new Date(video.createdAt).toLocaleDateString() : 'Fecha desconocida';
+            const isOwner = currentUser && video.userId === currentUser.uid;
+
+            return `
+                <div class="video-item">
+                    <div class="info">
+                        <h4>${video.title}</h4>
+                        <span>${video.type || 'Video'} • ${video.size ? formatFileSize(video.size) : ''} • ${date}</span>
+                        ${video.url ? `
+                            <div class="link-copy">
+                                <input type="text" value="${video.url}" readonly id="link_${video.id}">
+                                <button onclick="copyLink('${video.id}')">
+                                    <span class="material-icons" style="font-size:20px;">content_copy</span>
+                                </button>
+                                <a href="${video.url}" target="_blank" style="color:#3498db;text-decoration:none;">
+                                    <span class="material-icons" style="font-size:20px;">open_in_new</span>
+                                </a>
                             </div>
-                        </div>
-                        <div class="manage-item-actions">
-                            <button class="btn btn-danger btn-sm" onclick="deleteContent('${item.id}')">🗑️</button>
-                        </div>
+                        ` : ''}
                     </div>
-                `).join('');
+                    <div class="actions">
+                        ${isOwner ? `
+                            <button class="btn btn-secondary btn-sm" onclick="deleteVideo('${video.id}')">🗑️</button>
+                        ` : ''}
+                        <button class="btn btn-primary btn-sm" onclick="playVideo('${video.id}')">▶ Ver</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    });
+}
+
+// ==================== COPIAR ENLACE ====================
+function copyLink(id) {
+    const input = document.getElementById('link_' + id);
+    if (input) {
+        input.select();
+        document.execCommand('copy');
+        alert('✅ Enlace copiado al portapapeles');
+    }
+}
+
+// ==================== VER VIDEO ====================
+function playVideo(id) {
+    database.ref('videos/' + id).once('value', function(snapshot) {
+        const data = snapshot.val();
+        if (data && data.url) {
+            // Abrir el video en una nueva ventana o en el reproductor
+            window.open(data.url, '_blank');
+        } else {
+            alert('❌ No se encontró el video');
+        }
+    });
+}
+
+// ==================== ELIMINAR VIDEO ====================
+function deleteVideo(id) {
+    if (!confirm('¿Eliminar este video?')) return;
+
+    database.ref('videos/' + id).once('value', function(snapshot) {
+        const data = snapshot.val();
+        if (data && data.fileName) {
+            const storageRef = storage.ref('videos/' + currentUser.uid + '/' + data.fileName);
+            storageRef.delete().then(function() {
+                database.ref('videos/' + id).remove().then(function() {
+                    alert('✅ Video eliminado');
+                    loadVideos();
+                });
+            }).catch(function(error) {
+                alert('❌ Error al eliminar: ' + error.message);
+            });
+        } else {
+            database.ref('videos/' + id).remove().then(function() {
+                alert('✅ Video eliminado');
+                loadVideos();
             });
         }
+    });
+}
 
-        function deleteContent(id) {
-            if (confirm('¿Eliminar este contenido?')) {
-                database.ref(`content/${id}`).remove().then(() => {
-                    alert('✅ Eliminado');
-                    loadManageContent();
-                    loadStats();
-                });
-            }
-        }
-    </script>
+// ==================== CERRAR SESIÓN ====================
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { /* cerrar modales */ }
+});
+
+console.log('✅ Admin de videos cargado');
+</script>
 </body>
 </html>
