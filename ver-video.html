@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ver Video</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0D0D0D;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .video-container {
+            max-width: 900px;
+            width: 100%;
+            background: #1A1A1A;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .video-container video {
+            width: 100%;
+            max-height: 70vh;
+            background: #000;
+            display: block;
+        }
+        .info {
+            padding: 20px 24px;
+        }
+        .info h1 {
+            font-size: 26px;
+            margin-bottom: 6px;
+        }
+        .info p {
+            color: #888;
+            font-size: 17px;
+            margin-bottom: 12px;
+        }
+        .info .meta {
+            display: flex;
+            gap: 16px;
+            color: #666;
+            font-size: 15px;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+            margin-top: 12px;
+            transition: all 0.3s ease;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body>
+
+<div class="video-container">
+    <video id="player" controls autoplay></video>
+    <div class="info">
+        <h1 id="videoTitle">Cargando...</h1>
+        <p id="videoDescription">Cargando descripción...</p>
+        <div class="meta">
+            <span id="videoDate"></span>
+            <span id="videoSize"></span>
+        </div>
+        <a href="#" class="back-btn" onclick="window.history.back()">
+            <span style="font-size:20px;">←</span> Volver
+        </a>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyBAdvlj4qzHSaPUIRIW5F51mHlnzoy1_es",
+    authDomain: "tely2-245d5.firebaseapp.com",
+    databaseURL: "https://tely2-245d5-default-rtdb.firebaseio.com",
+    projectId: "tely2-245d5",
+    storageBucket: "tely2-245d5.appspot.com",
+    messagingSenderId: "37996516235",
+    appId: "1:37996516235:web:11f3d73fdc683de9d9558e",
+    measurementId: "G-L8W50JK7N3"
+};
+
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+// Obtener ID del video de la URL
+const urlParams = new URLSearchParams(window.location.search);
+const videoId = urlParams.get('id');
+
+if (videoId) {
+    database.ref('videos/' + videoId).once('value', function(snapshot) {
+        const data = snapshot.val();
+        if (data) {
+            document.getElementById('videoTitle').textContent = data.title || 'Sin título';
+            document.getElementById('videoDescription').textContent = data.description || 'Sin descripción';
+            document.getElementById('videoDate').textContent = data.createdAt ? new Date(data.createdAt).toLocaleDateString() : '';
+            document.getElementById('videoSize').textContent = data.size ? (data.size / 1048576).toFixed(1) + ' MB' : '';
+            
+            if (data.url) {
+                document.getElementById('player').src = data.url;
+            } else {
+                document.getElementById('videoTitle').textContent = '❌ Video no encontrado';
+                document.getElementById('videoDescription').textContent = 'El video no tiene un enlace válido';
+            }
+        } else {
+            document.getElementById('videoTitle').textContent = '❌ Video no encontrado';
+            document.getElementById('videoDescription').textContent = 'El video que buscas no existe o fue eliminado';
+        }
+    });
+} else {
+    document.getElementById('videoTitle').textContent = '❌ Sin ID';
+    document.getElementById('videoDescription').textContent = 'No se especificó un video';
+}
+</script>
+</body>
+</html>
