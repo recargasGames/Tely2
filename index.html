@@ -8,505 +8,410 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-    <header class="header-premium">
-        <div class="header-premium-content">
-            <button class="menu-btn" id="menuToggle">
-                <span class="material-icons">menu</span>
+
+<!-- HEADER -->
+<header class="header">
+    <div class="header-content">
+        <button class="menu-btn" id="menuToggle">
+            <span class="material-icons">menu</span>
+        </button>
+        <div class="logo">🎬 Mi Cine</div>
+        <div class="header-actions">
+            <button class="search-btn" id="searchToggle">
+                <span class="material-icons">search</span>
             </button>
-            <div class="logo-premium">🎬 Mi Cine</div>
-            <div class="header-actions">
-                <button class="search-btn" id="searchToggle">
-                    <span class="material-icons">search</span>
+            <button class="notifications-btn" id="notifBtn">
+                <span class="material-icons">notifications</span>
+                <span class="notification-dot"></span>
+            </button>
+        </div>
+    </div>
+    <div class="search-expand" id="searchExpand">
+        <div class="search-input-wrapper">
+            <span class="material-icons">search</span>
+            <input type="text" id="searchInput" placeholder="Buscar películas, series...">
+            <button class="clear-search" id="clearSearch">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- MENÚ LATERAL -->
+<div class="side-menu" id="sideMenu">
+    <div class="side-menu-header">
+        <div class="logo">🎬 Mi Cine</div>
+        <button class="close-menu" id="closeMenu">
+            <span class="material-icons">close</span>
+        </button>
+    </div>
+    <div class="side-user-info">
+        <img id="sideAvatar" src="https://ui-avatars.com/api/?name=Usuario&background=E50914&color=fff&size=100" alt="Avatar">
+        <div>
+            <h4 id="sideUserName">Invitado</h4>
+            <span class="side-user-badge">Premium</span>
+        </div>
+    </div>
+    <nav class="side-nav">
+        <a href="index.html" class="side-nav-item active">🏠 Inicio</a>
+        <a href="peliculas.html" class="side-nav-item">🎬 Películas</a>
+        <a href="series.html" class="side-nav-item">📺 Series</a>
+        <a href="mi-lista.html" class="side-nav-item">🔖 Mi Lista</a>
+        <a href="perfil.html" class="side-nav-item">👤 Perfil</a>
+    </nav>
+    <div class="side-menu-footer">
+        <button class="btn-logout-side" id="logoutBtnSide">Cerrar Sesión</button>
+    </div>
+</div>
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<!-- CONTENIDO -->
+<main class="main-content">
+
+    <section class="hero-banner" id="heroBanner">
+        <div class="hero-content">
+            <span class="hero-badge">🔥 Popular</span>
+            <h1 id="heroTitle">Cargando...</h1>
+            <div class="hero-meta" id="heroMeta">
+                <span>⭐ 0.0</span>
+                <span>2024</span>
+            </div>
+            <p id="heroDescription">Cargando contenido...</p>
+            <div class="hero-actions">
+                <button class="btn-hero-play" id="heroPlayBtn">
+                    <span class="material-icons">play_arrow</span> Reproducir
+                </button>
+                <button class="btn-hero-info" id="heroInfoBtn">
+                    <span class="material-icons">info</span> Más info
                 </button>
             </div>
         </div>
-        <div class="search-expand" id="searchExpand">
-            <div class="search-input-wrapper">
-                <span class="material-icons">search</span>
-                <input type="text" id="globalSearch" placeholder="Buscar películas, series...">
-            </div>
-        </div>
-    </header>
+        <div class="hero-gradient"></div>
+    </section>
 
-    <!-- MENÚ LATERAL SIN ADMIN -->
-    <div class="side-menu" id="sideMenu">
-        <div class="side-menu-header">
-            <div class="logo-premium">🎬 Mi Cine</div>
-            <button class="close-menu" id="closeMenu">
-                <span class="material-icons">close</span>
-            </button>
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <span class="material-icons">play_circle</span> Continuar viendo
+            </h2>
         </div>
-        <div class="side-user-info">
-            <img id="sideUserAvatar" src="" alt="Avatar">
-            <div>
-                <h4 id="sideUserName">Usuario</h4>
-                <span class="side-user-badge">Premium</span>
-            </div>
+        <div class="content-row" id="continueRow"></div>
+    </section>
+
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <span class="material-icons">movie</span> Películas Populares
+            </h2>
+            <a href="peliculas.html" class="section-link">Ver todas →</a>
         </div>
-        <nav class="side-nav">
-            <a href="index.html" class="side-nav-item active">🏠 Inicio</a>
-            <a href="peliculas.html" class="side-nav-item">🎬 Películas</a>
-            <a href="series.html" class="side-nav-item">📺 Series</a>
-            <a href="mi-lista.html" class="side-nav-item">🔖 Mi Lista</a>
-            <a href="perfil.html" class="side-nav-item">👤 Perfil</a>
-        </nav>
-        <div class="side-menu-footer">
-            <button class="btn-logout-side" id="logoutSide">Cerrar Sesión</button>
+        <div class="content-row" id="moviesRow"></div>
+    </section>
+
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <span class="material-icons">tv</span> Series Populares
+            </h2>
+            <a href="series.html" class="section-link">Ver todas →</a>
         </div>
+        <div class="content-row" id="seriesRow"></div>
+    </section>
+
+</main>
+
+<!-- BARRA INFERIOR -->
+<nav class="bottom-nav">
+    <a href="index.html" class="bottom-nav-item active">
+        <span class="material-icons">home</span>
+        <span>Inicio</span>
+    </a>
+    <a href="peliculas.html" class="bottom-nav-item">
+        <span class="material-icons">movie</span>
+        <span>Películas</span>
+    </a>
+    <a href="series.html" class="bottom-nav-item">
+        <span class="material-icons">tv</span>
+        <span>Series</span>
+    </a>
+    <a href="mi-lista.html" class="bottom-nav-item">
+        <span class="material-icons">bookmark</span>
+        <span>Mi Lista</span>
+    </a>
+    <a href="perfil.html" class="bottom-nav-item">
+        <span class="material-icons">person</span>
+        <span>Perfil</span>
+    </a>
+</nav>
+
+<!-- MODAL -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeModal()">
+            <span class="material-icons">close</span>
+        </button>
+        <div id="modalBody"></div>
     </div>
-    <div class="menu-overlay" id="menuOverlay"></div>
+</div>
 
-    <!-- CONTENIDO -->
-    <main class="main-premium">
-        <section class="hero-banner-premium" id="heroBanner">
-            <div class="hero-banner-content">
-                <span class="hero-badge">🔥 Popular</span>
-                <h1 id="heroTitle">Cargando...</h1>
-                <div class="hero-meta" id="heroMeta">
-                    <span>⭐ 0.0</span>
-                    <span>2024</span>
-                </div>
-                <p id="heroDescription">Cargando contenido...</p>
-                <div class="hero-actions">
-                    <button class="btn-hero-play" id="heroPlayBtn">
-                        <span class="material-icons">play_arrow</span> Reproducir
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+
+<script>
+let allContent = [];
+let isLoggedIn = false;
+let currentUser = null;
+
+auth.onAuthStateChanged(function(user) {
+    if (user) {
+        isLoggedIn = true;
+        currentUser = user;
+        document.getElementById('sideAvatar').src = user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'Usuario') + '&background=E50914&color=fff&size=100';
+        document.getElementById('sideUserName').textContent = user.displayName || 'Usuario';
+    } else {
+        isLoggedIn = false;
+        currentUser = null;
+        document.getElementById('sideUserName').textContent = 'Invitado';
+    }
+    loadContent();
+});
+
+function goToLogin() { window.location.href = 'login.html'; }
+
+function checkAuth() {
+    if (!isLoggedIn) {
+        if (confirm('🔒 Inicia sesión para ver contenido')) { goToLogin(); }
+        return false;
+    }
+    return true;
+}
+
+function playContent(id, type) {
+    if (!checkAuth()) return;
+    window.location.href = 'reproductor.html?id=' + id + '&type=' + type;
+}
+
+function loadContent() {
+    database.ref('content').orderByChild('createdAt').on('value', function(snapshot) {
+        const data = snapshot.val();
+        allContent = [];
+        if (data) {
+            Object.keys(data).forEach(function(key) {
+                allContent.push({ id: key, ...data[key] });
+            });
+            allContent.reverse();
+        }
+        renderAll();
+    });
+}
+
+function renderAll() {
+    const movies = allContent.filter(item => item.type === 'pelicula');
+    const series = allContent.filter(item => item.type === 'serie');
+
+    if (movies.length > 0) updateHero(movies[0]);
+    renderMovies(movies.slice(0, 10));
+    renderSeries(series.slice(0, 10));
+    renderContinue();
+}
+
+function renderMovies(movies) {
+    const container = document.getElementById('moviesRow');
+    if (!movies || movies.length === 0) {
+        container.innerHTML = '<div class="empty-row"><span class="material-icons">movie</span><p>No hay películas</p><button class="btn btn-primary" onclick="window.location.href=\'admin.html\'">📥 Sincronizar</button></div>';
+        return;
+    }
+    container.innerHTML = movies.map(m => `
+        <div class="movie-card" onclick="openModal('${m.id}')">
+            <div class="card-image">
+                <img src="${m.poster}" alt="${m.title}" loading="lazy">
+                <div class="card-badge">${m.vote_average ? '⭐ ' + m.vote_average.toFixed(1) : 'Nuevo'}</div>
+                <div class="card-overlay">
+                    <button class="play-btn" onclick="event.stopPropagation(); playContent('${m.id}','pelicula')">
+                        <span class="material-icons">play_arrow</span>
                     </button>
-                    <button class="btn-hero-info" id="heroInfoBtn">
-                        <span class="material-icons">info</span> Más info
-                    </button>
                 </div>
             </div>
-            <div class="hero-gradient"></div>
-        </section>
-
-        <section class="content-section" id="continueSection">
-            <div class="section-header-premium">
-                <h2 class="section-title-premium">
-                    <span class="material-icons">play_circle</span> Continuar viendo
-                </h2>
+            <div class="card-info">
+                <h4>${m.title}</h4>
+                <span>${m.year || 'N/A'}</span>
             </div>
-            <div class="content-row" id="continueRow"></div>
-        </section>
-
-        <section class="content-section">
-            <div class="section-header-premium">
-                <h2 class="section-title-premium">
-                    <span class="material-icons">movie</span> Películas Populares
-                </h2>
-                <a href="peliculas.html" class="section-link">Ver todas →</a>
-            </div>
-            <div class="content-row" id="moviesRow"></div>
-        </section>
-
-        <section class="content-section">
-            <div class="section-header-premium">
-                <h2 class="section-title-premium">
-                    <span class="material-icons">tv</span> Series Populares
-                </h2>
-                <a href="series.html" class="section-link">Ver todas →</a>
-            </div>
-            <div class="content-row" id="seriesRow"></div>
-        </section>
-    </main>
-
-    <!-- BARRA INFERIOR -->
-    <nav class="bottom-nav">
-        <a href="index.html" class="bottom-nav-item active">
-            <span class="material-icons">home</span>
-            <span>Inicio</span>
-        </a>
-        <a href="peliculas.html" class="bottom-nav-item">
-            <span class="material-icons">movie</span>
-            <span>Películas</span>
-        </a>
-        <a href="series.html" class="bottom-nav-item">
-            <span class="material-icons">tv</span>
-            <span>Series</span>
-        </a>
-        <a href="mi-lista.html" class="bottom-nav-item">
-            <span class="material-icons">bookmark</span>
-            <span>Mi Lista</span>
-        </a>
-        <a href="perfil.html" class="bottom-nav-item">
-            <span class="material-icons">person</span>
-            <span>Perfil</span>
-        </a>
-    </nav>
-
-    <!-- MODAL -->
-    <div id="contentModal" class="modal-premium">
-        <div class="modal-premium-content">
-            <button class="modal-close-premium" onclick="closeContentModal()">
-                <span class="material-icons">close</span>
-            </button>
-            <div id="modalContent"></div>
         </div>
-    </div>
+    `).join('');
+}
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="js/firebase-config.js"></script>
-    
-    <script>
-        // ==================== VARIABLES ====================
-        let featuredMovie = null;
-        let allContent = [];
-        let isLoggedIn = false;
+function renderSeries(series) {
+    const container = document.getElementById('seriesRow');
+    if (!series || series.length === 0) {
+        container.innerHTML = '<div class="empty-row"><span class="material-icons">tv</span><p>No hay series</p><button class="btn btn-primary" onclick="window.location.href=\'admin.html\'">📥 Sincronizar</button></div>';
+        return;
+    }
+    container.innerHTML = series.map(s => `
+        <div class="movie-card" onclick="openModal('${s.id}')">
+            <div class="card-image">
+                <img src="${s.poster}" alt="${s.title}" loading="lazy">
+                <div class="card-badge">${s.vote_average ? '⭐ ' + s.vote_average.toFixed(1) : 'Nuevo'}</div>
+                <div class="card-overlay">
+                    <button class="play-btn" onclick="event.stopPropagation(); playContent('${s.id}','serie')">
+                        <span class="material-icons">play_arrow</span>
+                    </button>
+                </div>
+            </div>
+            <div class="card-info">
+                <h4>${s.title}</h4>
+                <span>${s.year || 'N/A'}</span>
+            </div>
+        </div>
+    `).join('');
+}
 
-        // ==================== VERIFICAR AUTENTICACIÓN ====================
-        auth.onAuthStateChanged(function(user) {
-            isLoggedIn = !!user;
-            if (user) {
-                document.getElementById('sideUserAvatar').src = user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'Usuario') + '&background=E50914&color=fff&size=100';
-                document.getElementById('sideUserName').textContent = user.displayName || 'Usuario';
-            } else {
-                document.getElementById('sideUserAvatar').src = 'https://ui-avatars.com/api/?name=Usuario&background=333&color=fff&size=100';
-                document.getElementById('sideUserName').textContent = 'Invitado';
-            }
-        });
+function renderContinue() {
+    const container = document.getElementById('continueRow');
+    if (!isLoggedIn) {
+        container.innerHTML = `
+            <div class="empty-row" style="background:rgba(229,9,20,0.08);border-radius:14px;padding:24px;">
+                <span class="material-icons" style="color:#E50914;">lock</span>
+                <p style="color:#E50914;font-weight:600;">🔒 Inicia sesión para ver tu progreso</p>
+                <button class="btn btn-primary" onclick="goToLogin()">Iniciar sesión</button>
+            </div>
+        `;
+        return;
+    }
+    container.innerHTML = `
+        <div class="empty-row">
+            <span class="material-icons">play_circle</span>
+            <p>No tienes contenido en progreso</p>
+        </div>
+    `;
+}
 
-        // ==================== REDIRECCIÓN A LOGIN ====================
-        function goToLogin() {
-            localStorage.setItem('returnUrl', window.location.href);
-            window.location.href = 'login.html';
-        }
+function updateHero(movie) {
+    document.getElementById('heroTitle').textContent = movie.title;
+    document.getElementById('heroDescription').textContent = movie.description || 'Sin descripción';
+    document.getElementById('heroMeta').innerHTML = `
+        <span>⭐ ${movie.vote_average || 'N/A'}</span>
+        <span>${movie.year || 'N/A'}</span>
+    `;
+    if (movie.poster) {
+        document.getElementById('heroBanner').style.backgroundImage = 'url(' + movie.poster + ')';
+    }
+    document.getElementById('heroPlayBtn').onclick = function() { playContent(movie.id, 'pelicula'); };
+    document.getElementById('heroInfoBtn').onclick = function() { openModal(movie.id); };
+}
 
-        function checkAuth() {
-            if (!isLoggedIn) {
-                if (confirm('🔒 Para ver contenido necesitas iniciar sesión. ¿Deseas ir al login?')) {
-                    goToLogin();
-                }
-                return false;
-            }
-            return true;
-        }
+function openModal(id) {
+    if (!checkAuth()) return;
+    const item = allContent.find(c => c.id === id);
+    if (!item) return;
 
-        // ==================== REPRODUCIR ====================
-        function playContent(id, type) {
-            if (!checkAuth()) return;
-            window.location.href = `reproductor.html?id=${id}&type=${type}`;
-        }
+    const modal = document.getElementById('modal');
+    const body = document.getElementById('modalBody');
 
-        // ==================== CARGAR CONTENIDO ====================
-        document.addEventListener('DOMContentLoaded', function() {
-            loadContent();
-            setupEventListeners();
-        });
+    let episodesHTML = '';
+    if (item.episodes && item.episodes.length > 0) {
+        episodesHTML = `
+            <div class="modal-episodes">
+                <h3>Episodios</h3>
+                <div class="episodes-grid">
+                    ${item.episodes.slice(0, 15).map(ep => `
+                        <button class="episode-btn" onclick="playContent('${id}','${item.type}')">${ep.title}</button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
 
-        function loadContent() {
-            database.ref('content').orderByChild('createdAt').on('value', function(snapshot) {
-                const data = snapshot.val();
-                allContent = [];
-
-                if (data) {
-                    Object.keys(data).forEach(function(key) {
-                        allContent.push({ id: key, ...data[key] });
-                    });
-                    allContent.reverse();
-                }
-
-                renderContent();
-            });
-        }
-
-        function renderContent() {
-            const movies = allContent.filter(item => item.type === 'pelicula');
-            const series = allContent.filter(item => item.type === 'serie');
-
-            if (movies.length > 0) {
-                featuredMovie = movies[0];
-                updateHero(featuredMovie);
-            }
-
-            renderMovies(movies.slice(0, 10));
-            renderSeries(series.slice(0, 10));
-            renderContinueWatching();
-        }
-
-        function renderMovies(movies) {
-            const container = document.getElementById('moviesRow');
-            if (!movies || movies.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-row">
-                        <span class="material-icons">movie</span>
-                        <p>No hay películas disponibles</p>
-                        <button class="btn btn-primary" style="margin-top:12px;" onclick="goToAdmin()">📥 Sincronizar con TMDB</button>
+    body.innerHTML = `
+        <div class="modal-hero" style="background-image:url(${item.poster})">
+            <div class="modal-hero-gradient"></div>
+            <div class="modal-hero-content">
+                <img src="${item.poster}" alt="${item.title}" class="modal-poster">
+                <div>
+                    <h2>${item.title}</h2>
+                    <div class="modal-meta">
+                        <span>${item.year || 'N/A'}</span>
+                        <span class="rating">⭐ ${item.vote_average || 'N/A'}</span>
                     </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = movies.map(movie => `
-                <div class="content-card" onclick="openModal('${movie.id}')">
-                    <div class="card-image">
-                        <img src="${movie.poster}" alt="${movie.title}" loading="lazy">
-                        <div class="card-badge top">${movie.vote_average ? '⭐ ' + movie.vote_average.toFixed(1) : 'Nuevo'}</div>
-                        <div class="card-overlay">
-                            <button class="play-btn-small" onclick="event.stopPropagation(); playContent('${movie.id}', 'pelicula')">
-                                <span class="material-icons">play_arrow</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-info">
-                        <h4>${movie.title}</h4>
-                        <span class="card-year">${movie.year || 'N/A'}</span>
+                    <div class="modal-actions">
+                        <button class="btn btn-primary" onclick="playContent('${id}','${item.type}')">
+                            <span class="material-icons">play_arrow</span> Reproducir
+                        </button>
+                        <button class="btn btn-secondary" onclick="toggleFavorite('${id}')">
+                            <span class="material-icons">favorite_border</span>
+                        </button>
                     </div>
                 </div>
-            `).join('');
+            </div>
+        </div>
+        <div class="modal-body">
+            <p>${item.description || 'Sin descripción'}</p>
+            ${episodesHTML}
+        </div>
+    `;
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+    document.getElementById('modal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
+
+function toggleFavorite(id) {
+    if (!isLoggedIn) { goToLogin(); return; }
+    const ref = database.ref('favorites/' + currentUser.uid + '/' + id);
+    ref.once('value').then(function(snap) {
+        if (snap.exists()) { ref.remove(); alert('❌ Eliminado'); }
+        else { ref.set(true); alert('✅ Agregado'); }
+    });
+}
+
+// EVENTOS
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('menuToggle').addEventListener('click', function() {
+        document.getElementById('sideMenu').classList.add('active');
+        document.getElementById('menuOverlay').classList.add('active');
+    });
+    document.getElementById('closeMenu').addEventListener('click', closeMenu);
+    document.getElementById('menuOverlay').addEventListener('click', closeMenu);
+    function closeMenu() {
+        document.getElementById('sideMenu').classList.remove('active');
+        document.getElementById('menuOverlay').classList.remove('active');
+    }
+
+    document.getElementById('searchToggle').addEventListener('click', function() {
+        document.getElementById('searchExpand').classList.toggle('active');
+    });
+    document.getElementById('clearSearch').addEventListener('click', function() {
+        document.getElementById('searchInput').value = '';
+        loadContent();
+    });
+    document.getElementById('searchInput').addEventListener('input', function() {
+        const q = this.value.trim().toLowerCase();
+        if (q === '') { loadContent(); return; }
+        const filtered = allContent.filter(c => c.title.toLowerCase().includes(q));
+        renderMovies(filtered.filter(c => c.type === 'pelicula').slice(0, 10));
+        renderSeries(filtered.filter(c => c.type === 'serie').slice(0, 10));
+    });
+
+    document.getElementById('notifBtn').addEventListener('click', function() {
+        alert('📢 No hay notificaciones');
+    });
+
+    document.getElementById('logoutBtnSide').addEventListener('click', function() {
+        if (confirm('¿Cerrar sesión?')) {
+            auth.signOut().then(function() { window.location.href = 'login.html'; });
         }
+    });
 
-        function renderSeries(series) {
-            const container = document.getElementById('seriesRow');
-            if (!series || series.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-row">
-                        <span class="material-icons">tv</span>
-                        <p>No hay series disponibles</p>
-                        <button class="btn btn-primary" style="margin-top:12px;" onclick="goToAdmin()">📥 Sincronizar con TMDB</button>
-                    </div>
-                `;
-                return;
-            }
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+    document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+});
 
-            container.innerHTML = series.map(serie => `
-                <div class="content-card" onclick="openModal('${serie.id}')">
-                    <div class="card-image">
-                        <img src="${serie.poster}" alt="${serie.title}" loading="lazy">
-                        <div class="card-badge top">${serie.vote_average ? '⭐ ' + serie.vote_average.toFixed(1) : 'Nuevo'}</div>
-                        <div class="card-overlay">
-                            <button class="play-btn-small" onclick="event.stopPropagation(); playContent('${serie.id}', 'serie')">
-                                <span class="material-icons">play_arrow</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-info">
-                        <h4>${serie.title}</h4>
-                        <span class="card-year">${serie.year || 'N/A'}</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function goToAdmin() {
-            window.location.href = 'admin.html';
-        }
-
-        function renderContinueWatching() {
-            const container = document.getElementById('continueRow');
-            if (!isLoggedIn) {
-                container.innerHTML = `
-                    <div class="empty-row" style="background:rgba(229,9,20,0.05);border-radius:12px;padding:24px;">
-                        <span class="material-icons" style="color:#E50914;">lock</span>
-                        <p style="color:#E50914;font-weight:600;">🔒 Inicia sesión para ver tu progreso</p>
-                        <button class="btn btn-primary" style="margin-top:12px;" onclick="goToLogin()">Iniciar sesión</button>
-                    </div>
-                `;
-                return;
-            }
-
-            const user = auth.currentUser;
-            if (!user) return;
-
-            database.ref(`progress/${user.uid}`).once('value', function(snapshot) {
-                const progressData = snapshot.val() || {};
-                const progressIds = Object.keys(progressData);
-
-                if (progressIds.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-row">
-                            <span class="material-icons">play_circle</span>
-                            <p>No tienes contenido en progreso</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                const items = [];
-                progressIds.slice(0, 6).forEach(function(id) {
-                    const content = allContent.find(c => c.id === id);
-                    if (content) {
-                        items.push({ ...content, progress: progressData[id] });
-                    }
-                });
-
-                if (items.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-row">
-                            <span class="material-icons">play_circle</span>
-                            <p>No hay contenido en progreso</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                container.innerHTML = items.map(item => {
-                    const percent = item.progress.total > 0 ? (item.progress.episode / item.progress.total) * 100 : 0;
-                    return `
-                        <div class="content-card" onclick="playContent('${item.id}', '${item.type}')">
-                            <div class="card-image">
-                                <img src="${item.poster}" alt="${item.title}" loading="lazy">
-                                <div class="card-progress-bar" style="width: ${percent}%"></div>
-                                <div class="card-overlay">
-                                    <button class="play-btn-small">
-                                        <span class="material-icons">play_arrow</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="card-info">
-                                <h4>${item.title}</h4>
-                                <span class="card-progress-text">${item.progress.episode || 0}/${item.progress.total || 0} capítulos</span>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            });
-        }
-
-        // ==================== HERO ====================
-        function updateHero(movie) {
-            document.getElementById('heroTitle').textContent = movie.title;
-            document.getElementById('heroDescription').textContent = movie.description || 'Sin descripción disponible';
-            document.getElementById('heroMeta').innerHTML = `
-                <span>⭐ ${movie.vote_average || 'N/A'}</span>
-                <span>${movie.year || 'N/A'}</span>
-            `;
-
-            if (movie.poster) {
-                document.getElementById('heroBanner').style.backgroundImage = `url(${movie.poster})`;
-            }
-
-            document.getElementById('heroPlayBtn').onclick = function() {
-                playContent(movie.id, 'pelicula');
-            };
-
-            document.getElementById('heroInfoBtn').onclick = function() {
-                openModal(movie.id);
-            };
-        }
-
-        // ==================== MODAL ====================
-        function openModal(id) {
-            if (!checkAuth()) return;
-
-            const modal = document.getElementById('contentModal');
-            const modalContent = document.getElementById('modalContent');
-            const content = allContent.find(c => c.id === id);
-
-            if (!content) {
-                alert('Contenido no encontrado');
-                return;
-            }
-
-            modalContent.innerHTML = `
-                <div class="modal-hero" style="background-image: url(${content.poster})">
-                    <div class="modal-hero-gradient"></div>
-                    <div class="modal-hero-content">
-                        <img src="${content.poster}" alt="${content.title}" class="modal-poster-img">
-                        <div class="modal-hero-info">
-                            <h2>${content.title}</h2>
-                            <div class="modal-meta">
-                                <span class="modal-year">${content.year || 'N/A'}</span>
-                                <span class="modal-rating">⭐ ${content.vote_average || 'N/A'}</span>
-                                <span class="modal-type">${content.type === 'pelicula' ? '🎬 Película' : '📺 Serie'}</span>
-                            </div>
-                            <div class="modal-actions">
-                                <button class="modal-play-btn" onclick="playContent('${id}', '${content.type}')">
-                                    <span class="material-icons">play_arrow</span> Reproducir
-                                </button>
-                                <button class="modal-fav-btn" onclick="toggleFavorite('${id}')">
-                                    <span class="material-icons">favorite_border</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-body">
-                    <div class="modal-description">
-                        <h3>Sinopsis</h3>
-                        <p>${content.description || 'Sin descripción disponible'}</p>
-                    </div>
-                    ${content.episodes && content.episodes.length > 0 ? `
-                        <div class="modal-seasons">
-                            <h3>Episodios</h3>
-                            <div class="modal-episodes">
-                                ${content.episodes.slice(0, 15).map(ep => `
-                                    <button class="modal-episode-btn" onclick="playContent('${id}', '${content.type}')">
-                                        ${ep.title}
-                                    </button>
-                                `).join('')}
-                            </div>
-                        </div>
-                    ` : ''}
-                </div>
-            `;
-
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeContentModal() {
-            document.getElementById('contentModal').classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-
-        // ==================== FAVORITOS ====================
-        function toggleFavorite(id) {
-            const user = auth.currentUser;
-            if (!user) return;
-
-            const ref = database.ref(`favorites/${user.uid}/${id}`);
-            ref.once('value', function(snapshot) {
-                if (snapshot.exists()) {
-                    ref.remove();
-                    alert('❌ Eliminado de favoritos');
-                } else {
-                    ref.set(true);
-                    alert('✅ Agregado a favoritos');
-                }
-            });
-        }
-
-        // ==================== EVENTOS ====================
-        function setupEventListeners() {
-            document.getElementById('menuToggle').addEventListener('click', function() {
-                document.getElementById('sideMenu').classList.add('active');
-                document.getElementById('menuOverlay').classList.add('active');
-            });
-
-            document.getElementById('closeMenu').addEventListener('click', closeMenu);
-            document.getElementById('menuOverlay').addEventListener('click', closeMenu);
-
-            function closeMenu() {
-                document.getElementById('sideMenu').classList.remove('active');
-                document.getElementById('menuOverlay').classList.remove('active');
-            }
-
-            document.getElementById('searchToggle').addEventListener('click', function() {
-                document.getElementById('searchExpand').classList.toggle('active');
-            });
-
-            document.getElementById('logoutSide').addEventListener('click', function() {
-                if (confirm('¿Seguro que quieres cerrar sesión?')) {
-                    auth.signOut().then(function() {
-                        window.location.href = 'login.html';
-                    });
-                }
-            });
-
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    closeContentModal();
-                    closeMenu();
-                }
-            });
-
-            document.getElementById('contentModal').addEventListener('click', function(e) {
-                if (e.target === e.currentTarget) closeContentModal();
-            });
-        }
-
-        console.log('✅ Inicio cargado correctamente');
-    </script>
+console.log('✅ Index cargado');
+</script>
 </body>
 </html>
